@@ -71,6 +71,12 @@ export function ticketWindowBucket(tripDate: Date, today: Date): 'this' | 'next'
   return 'later'
 }
 
+/** [mondayYmd, sundayYmd] of the week containing `today`, inclusive. */
+export function currentWeekRange(today: Date): [string, string] {
+  const monday = mondayOfWeek(today)
+  return [ymd(monday), ymd(addDays(monday, 6))]
+}
+
 /** Next occurrence of a given weekday on/after `from`. */
 export function nextWeekdayOccurrence(from: Date, weekday: Weekday): Date {
   const targetDow = WEEKDAY_ORDER.indexOf(weekday) + 1 // Mon=1..Fri=5

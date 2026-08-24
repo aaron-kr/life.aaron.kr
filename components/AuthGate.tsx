@@ -15,7 +15,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return (
       <div className="auth-screen">
         <div className="auth-card">
-          <div className="mark">AS</div>
+          <div className="mark">🧭</div>
           <h1>Set up Firebase first</h1>
           <p>
             Copy <code>.env.local.example</code> to <code>.env.local</code> and fill in your Firebase project&apos;s

@@ -33,7 +33,7 @@ export function Header({
   return (
     <header className="top">
       <div className="brand">
-        <div className="mark">AS</div>
+        <div className="mark">🧭</div>
         <div>
           <h1>Compass</h1>
           <div className="sub">Personal Dashboard</div>

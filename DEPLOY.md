@@ -48,9 +48,8 @@ Open `.env.local` and fill in:
   Weather Data" / free tier is enough — the app uses the 5-day/3-hour
   forecast endpoint, which is included). Without this, weather widgets show
   `—` instead of crashing.
-- `CLASS_SCHEDULE_URL` — leave as-is. It points at a file that doesn't exist
-  in `courses.aaron.kr` yet; the Semester view shows a friendly empty state
-  until it does.
+- Course schedule sources aren't env vars — see `_data/course-sources.yml` in
+  the table below.
 
 `.env.local` is gitignored — it never gets committed, and Vercel doesn't read
 it (see step 4).
@@ -97,6 +96,14 @@ Most changes don't touch code at all:
 | Recurring ticket routes | `_data/tickets.yml` |
 | ETF watchlist prices | `_data/goal-lists/etfs.yml` |
 | North Star goals | `_data/goal-lists/north-star.yml` |
+| Course schedules (Semester view) | `_data/course-sources.yml` |
+| Weather hero background images | `public/images/weather/` (see its README) |
+
+Adding or removing a course is just adding/removing an entry in
+`_data/course-sources.yml` — each entry is a `label` + a raw GitHub link to
+that course's lecture YAML (same flat-list shape `courses.aaron.kr` already
+uses per course, e.g. `_data/2026/cbnu_grad_ml_lectures.yml`). Any number of
+courses works; each gets its own column in the Semester view.
 
 Add a new file to `_data/checklists/` and it shows up as a new card in the
 To-Do view automatically — no code change. Same for `_data/goal-lists/` and
@@ -120,9 +127,8 @@ cache-bust needed beyond that hour.
 - **Live ETF prices** — `_data/goal-lists/etfs.yml` is manually edited for
   now. A real feed would need a stock-price API route similar to
   `app/api/weather/route.ts`.
-- **class-schedule.yml** — the Semester view is fully wired but has nothing
-  to read until that file exists in the `courses.aaron.kr` repo (see
-  `CLASS_SCHEDULE_URL` in `.env.local.example` for the expected shape: a
-  `days` list and a `weeks` list — see `lib/types.ts`'s `ClassSchedule` type).
+- **Weather hero images** — `public/images/weather/` ships empty; the hero
+  falls back to a plain gradient until you upload images (see that folder's
+  README for the exact filenames it looks for).
 - **Google Calendar ICS bridge** — intentionally skipped per `CLAUDE.md`;
   `personal-events.yml` covers this for now.

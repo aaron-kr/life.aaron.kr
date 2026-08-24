@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
   if (!city) return NextResponse.json({ error: 'city is required' }, { status: 400 })
   if (!apiKey) {
-    return NextResponse.json({ am: null, pm: null, icon: null, rain: false, configured: false })
+    return NextResponse.json({ am: null, pm: null, icon: null, iconCode: null, condition: null, rain: false, configured: false })
   }
 
   const dateYmd = date ?? new Date().toISOString().slice(0, 10)
@@ -59,10 +59,12 @@ export async function GET(req: NextRequest) {
       am: am ? Math.round(am.main.temp) : null,
       pm: pm ? Math.round(pm.main.temp) : null,
       icon: iconSrc ? iconEmoji(iconSrc.weather[0]?.icon ?? '01d') : null,
+      iconCode: iconSrc?.weather[0]?.icon ?? null,
+      condition: iconSrc?.weather[0]?.main ?? null,
       rain: iconSrc ? /rain|drizzle|thunderstorm/i.test(iconSrc.weather[0]?.main ?? '') : false,
       configured: true,
     })
   } catch {
-    return NextResponse.json({ am: null, pm: null, icon: null, rain: false, configured: true, error: true })
+    return NextResponse.json({ am: null, pm: null, icon: null, iconCode: null, condition: null, rain: false, configured: true, error: true })
   }
 }

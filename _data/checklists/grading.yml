@@ -1,6 +1,4 @@
 title: Grading
 items:
-  - text: "ENGR 201 — midterm (Chungju)"
-    meta: "22 / 34 graded"
-  - text: "ENGR 305 — problem set 6"
-    meta: "due back Tue"
+  - text: "Add grading notes"
+    meta: "/_data/checklists/grading.yml"

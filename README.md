@@ -52,11 +52,10 @@ Stack:
   logged (habit check-ins, ticket purchases, weight/waist/km entries,
   checklist done-state).
 - **YAML** (`_data/`) for anything set once a semester and rarely changed.
-- Class schedule is **fetched, not duplicated** — read directly from
-  `courses.aaron.kr`'s public `_data/class-schedule.yml` via the GitHub raw
-  content API. That file doesn't exist yet in that repo, so the Semester view
-  shows a friendly empty state until it does — nothing to change on this end
-  when it appears.
+- Course schedules are **fetched, not duplicated** — `_data/course-sources.yml`
+  lists a raw GitHub link per course (any number of them), each pointing at
+  that course's lecture YAML in `courses.aaron.kr`. The Semester view renders
+  one column per course from whatever's live there.
 
 ## Design tokens (carried over from pailab.io / SERVO)
 

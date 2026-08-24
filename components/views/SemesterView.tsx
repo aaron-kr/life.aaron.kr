@@ -1,74 +1,58 @@
-import { Fragment } from 'react'
-import type { ClassSchedule } from '@/lib/types'
+import type { Course } from '@/lib/types'
+import { currentWeekRange, todayLocal } from '@/lib/dates'
 
-export function SemesterView({ classSchedule }: { classSchedule: ClassSchedule | null }) {
+export function SemesterView({ courses }: { courses: Course[] }) {
+  const [weekStart, weekEnd] = currentWeekRange(todayLocal())
+
   return (
     <section className="panel active">
       <div className="card">
         <h3>
-          Semester <span className="pill">courses.aaron.kr / _data/class-schedule.yml</span>
+          Semester <span className="pill">_data/course-sources.yml</span>
         </h3>
-        {!classSchedule ? (
+        {courses.length === 0 ? (
           <div className="sem-empty">
-            class-schedule.yml isn&apos;t available yet at CLASS_SCHEDULE_URL.
+            No courses configured yet — add one to <code>_data/course-sources.yml</code> with a raw GitHub link to
+            that course&apos;s lecture YAML.
             <br />
-            Once it exists in the courses.aaron.kr repo (with <code>days</code> and <code>week</code> keys), this
-            view fills in automatically — nothing to change here.
+            Any number of courses works; each becomes its own column here.
           </div>
         ) : (
           <div className="sem-wrap">
-            <div className="sem-grid2">
-              <div className="weeklabel">Wk</div>
-              {classSchedule.days.map((d) => (
-                <div className="shead2" key={d.weekday}>
-                  {d.logo && (
-                    <span className="slogo" title={d.university}>
-                      {d.logo}
-                    </span>
-                  )}
-                  <div className="stxt">
-                    <span className="sday">{d.weekday.slice(0, 3).toUpperCase()}</span>
-                    <span className="suniv">{d.university}</span>
+            <div className="sem-courses">
+              {courses.map((course) => (
+                <div className="sem-course-col" key={course.sourceUrl} style={{ ['--course-color' as string]: course.color ? `var(${course.color})` : undefined }}>
+                  <div className="sem-course-head">
+                    <span className="sc-title">{course.label}</span>
+                    <span className="sc-count">{course.lectures.length} sessions</span>
                   </div>
-                </div>
-              ))}
-              <div className="shead2">
-                <div className="stxt">
-                  <span className="sday">Deadlines</span>
-                  <span className="suniv">/ 학회</span>
-                </div>
-              </div>
-
-              {classSchedule.weeks.map((w) => (
-                <Fragment key={w.week}>
-                  <div className="weeklabel">{w.week}</div>
-                  {classSchedule.days.map((d) => (
-                    <div className="scell2" key={`${w.week}-${d.weekday}`}>
-                      {w.break ? (
-                        <div className="sc-break">exam / break week</div>
-                      ) : (
-                        <div
-                          className="sc-half"
-                          style={{ background: d.color ? `${d.color}22` : 'var(--panel-2)', borderLeft: `3px solid ${d.color ?? 'var(--border)'}` }}
-                        >
-                          {w.title}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  <div className="dl-cell">
-                    {classSchedule.deadlines?.[w.week] && (
-                      <span className="dl-tag" style={{ background: 'var(--pink-dim)', color: 'var(--pink)' }} title={classSchedule.deadlines[w.week].text}>
-                        deadline
-                      </span>
-                    )}
-                    {classSchedule.conferences?.[w.week] && (
-                      <span className="dl-tag" style={{ background: 'var(--gold-dim)', color: 'var(--gold)' }} title={classSchedule.conferences[w.week].text}>
-                        학회
-                      </span>
+                  <div className="sem-lecture-list">
+                    {course.lectures.length === 0 ? (
+                      <div className="sem-course-empty">No lectures parsed from this file yet.</div>
+                    ) : (
+                      course.lectures.map((lec) => {
+                        const isThisWeek = lec.date >= weekStart && lec.date <= weekEnd
+                        return (
+                          <div
+                            key={lec.date}
+                            className={`sem-lecture-row${isThisWeek ? ' today-week' : ''}${lec.isBreak ? ' break-row' : ''}${lec.isExam ? ' exam-row' : ''}`}
+                          >
+                            <div className="sem-lecture-wk">
+                              wk {lec.week}
+                              <span className="sl-date">
+                                {new Date(`${lec.date}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </span>
+                            </div>
+                            <div className="sem-lecture-body">
+                              <div className="sem-lecture-title">{lec.title || '—'}</div>
+                              {lec.logistics && <div className="sem-lecture-meta">{lec.logistics}</div>}
+                            </div>
+                          </div>
+                        )
+                      })
                     )}
                   </div>
-                </Fragment>
+                </div>
               ))}
             </div>
           </div>

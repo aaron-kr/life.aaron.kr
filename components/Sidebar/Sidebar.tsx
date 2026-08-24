@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { DashboardData } from '@/lib/types'
-import { MiniWeek } from './MiniWeek'
+import { WeatherHero } from './WeatherHero'
 import { BodyStats } from './BodyStats'
 import { HabitHeatmaps } from './HabitHeatmaps'
 import { SemesterStats } from './SemesterStats'
@@ -19,12 +19,12 @@ export function Sidebar({ data }: { data: DashboardData }) {
 
       <div className="sb-section hide-on-collapse">
         <h2>This Week</h2>
-        <MiniWeek template={data.template} />
+        <WeatherHero template={data.template} />
       </div>
 
       <BodyStats stats={data.stats} />
       <HabitHeatmaps habits={data.habits} />
-      <SemesterStats stats={data.stats} />
+
       <GoalAccordions goalLists={data.goalLists} />
     </aside>
   )

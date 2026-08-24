@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import type { StatDeclaration } from '@/lib/types'
 import { useStatLog } from '@/lib/firestore-hooks'
 
 function SemesterStatBlock({ stat }: { stat: StatDeclaration }) {
   const { entries } = useStatLog(stat.log)
+  const [expanded, setExpanded] = useState(false)
 
   if (stat.type === 'latest') {
     const latest = entries[0] // desc order, [0] = most recent
@@ -27,7 +29,7 @@ function SemesterStatBlock({ stat }: { stat: StatDeclaration }) {
     const total = inRange.reduce((sum, e) => sum + e.value, 0)
     const recent = inRange.slice(0, 6)
     return (
-      <div className="stat-block stat-hoverable">
+      <div className={`stat-block${recent.length ? ' stat-hoverable' : ''}`} onClick={() => recent.length && setExpanded((e) => !e)}>
         <div className="stat-top">
           <span className="stat-label">{stat.label}</span>
           <span className="stat-value">
@@ -36,7 +38,7 @@ function SemesterStatBlock({ stat }: { stat: StatDeclaration }) {
           </span>
         </div>
         {recent.length > 0 && (
-          <div className="stat-popover">
+          <div className={`stat-popover${expanded ? ' show' : ''}`}>
             <div className="ptitle">Last {recent.length} entries</div>
             {recent.map((e) => (
               <div className="prow" key={e.id}>

@@ -8,7 +8,7 @@ routes:
     route: "KTX → Chungju, Mon 7:10am"
     short: "Chungju Mon"
     opens_before_days: 30
-    urgent_within_days: 3
+    urgent_within_days: 7
 
   - id: jeonju-tue
     weekday: tuesday

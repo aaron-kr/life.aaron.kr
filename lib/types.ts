@@ -125,24 +125,36 @@ export interface TicketsFile {
   routes: TicketRoute[]
 }
 
-export interface ClassScheduleWeek {
+export type FullWeekday = Weekday | 'saturday' | 'sunday'
+
+/** One course's raw source: a flat lecture-list YAML like courses.aaron.kr
+ * uses (`_data/<year>/<slug>_lectures.yml`) — see lib/courses.ts for the
+ * expected per-entry shape (date/week/title/logistics). */
+export interface CourseSource {
+  label: string
+  url: string
+  color?: string // CSS var name, e.g. "--blue"
+}
+
+export interface CourseSourcesFile {
+  sources: CourseSource[]
+}
+
+export interface CourseLecture {
+  date: string // resolved YYYY-MM-DD
   week: number
-  title: string
-  break?: boolean
+  title: string // sanitized plain text (source titles may contain HTML)
+  logistics?: string
+  weekday: FullWeekday
+  isBreak: boolean // e.g. "No Class — holiday"
+  isExam: boolean // e.g. "Midterm Test"
 }
 
-export interface ClassScheduleDay {
-  weekday: Weekday
-  university: string
+export interface Course {
+  label: string
   color?: string
-  logo?: string
-}
-
-export interface ClassSchedule {
-  days: ClassScheduleDay[]
-  weeks: ClassScheduleWeek[]
-  deadlines?: Record<number, { text: string }>
-  conferences?: Record<number, { text: string }>
+  sourceUrl: string
+  lectures: CourseLecture[]
 }
 
 export interface DashboardData {
@@ -155,5 +167,5 @@ export interface DashboardData {
   checklists: ChecklistFile[]
   goalLists: GoalListFile[]
   tickets: TicketRoute[]
-  classSchedule: ClassSchedule | null
+  courses: Course[]
 }

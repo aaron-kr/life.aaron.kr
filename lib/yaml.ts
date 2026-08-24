@@ -1,9 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
+import { fetchAllCourses } from './courses'
 import type {
   ChecklistFile,
-  ClassSchedule,
+  CourseSourcesFile,
   DashboardData,
   DashboardTemplate,
   GoalListFile,
@@ -36,21 +37,6 @@ function readYamlDir<T>(relDir: string): { id: string; data: T }[] {
     }))
 }
 
-async function fetchClassSchedule(): Promise<ClassSchedule | null> {
-  const url = process.env.CLASS_SCHEDULE_URL
-  if (!url) return null
-  try {
-    const res = await fetch(url, { next: { revalidate: 3600 } })
-    if (!res.ok) return null
-    const text = await res.text()
-    const parsed = yaml.load(text) as ClassSchedule
-    if (!parsed || !parsed.days || !parsed.weeks) return null
-    return parsed
-  } catch {
-    return null
-  }
-}
-
 export async function loadDashboardData(): Promise<DashboardData> {
   const template = readYaml<DashboardTemplate>('dashboard-template.yml', {
     weekdays: {
@@ -77,7 +63,8 @@ export async function loadDashboardData(): Promise<DashboardData> {
     ({ id, data }) => ({ id, ...data })
   )
 
-  const classSchedule = await fetchClassSchedule()
+  const courseSources = readYaml<CourseSourcesFile>('course-sources.yml', { sources: [] }).sources
+  const courses = await fetchAllCourses(courseSources)
 
-  return { template, holidays, events, quotes, stats, habits, checklists, goalLists, tickets, classSchedule }
+  return { template, holidays, events, quotes, stats, habits, checklists, goalLists, tickets, courses }
 }

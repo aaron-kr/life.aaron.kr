@@ -4,21 +4,23 @@
 # illustrative placeholders (see CLAUDE.md "Open decisions" #1).
 
 weekdays:
-  monday: { city: Chungju, university: null }
-  tuesday: { city: Jeonju, university: null }
-  wednesday: { city: Seoul, university: Yonsei }
-  thursday: { city: Seoul, university: KAIST }
-  friday: { city: Seoul, university: SKKU }
+  monday: { city: Chungju, university: KNUT }
+  tuesday: { city: Jeonju, university: JBNU }
+  wednesday: { city: Iksan, university: JBNU / WKU }
+  thursday: { city: Cheongju, university: CBNU }
+  friday: { city: Kongju, university: KJNU }
 
 # type maps to a CSS class (b-<type>) — see app/globals.css for the palette:
 # class, family, church, deepwork, gym, nophone
 recurring_blocks:
-  - { day: monday, start: "07:00", end: "10:00", type: class, title: "Chungju lecture", sub: "ENGR 201" }
-  - { day: monday, start: "14:00", end: "16:00", type: deepwork, title: "Deep work", sub: "no phone" }
+  - { day: monday, start: "09:00", end: "12:00", type: class, title: "KNUT - 데이터과학", sub: "Room" }
+  - { day: monday, start: "13:00", end: "16:00", type: class, title: "KNUT - 데이터과학", sub: "Room" }
   - { day: monday, start: "17:00", end: "19:00", type: family, title: "Family time" }
 
-  - { day: tuesday, start: "07:00", end: "10:00", type: class, title: "Jeonju lecture", sub: "ENGR 305" }
-  - { day: tuesday, start: "15:00", end: "17:00", type: gym, title: "Gym", sub: "push day" }
+  - { day: tuesday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "push day" }
+  - { day: tuesday, start: "09:00", end: "12:00", type: deepwork, title: "Deep work", sub: "paper draft" }
+  - { day: tuesday, start: "13:00", end: "16:00", type: class, title: "JBNU - DC", sub: "Room" }
+  - { day: tuesday, start: "16:00", end: "19:00", type: class, title: "JBNU - AC", sub: "Room" }
 
   - { day: wednesday, start: "08:00", end: "12:00", type: class, title: "Seoul — Yonsei", sub: "Physical AI seminar" }
   - { day: wednesday, start: "14:00", end: "16:00", type: nophone, title: "No-phone block", sub: "writing" }

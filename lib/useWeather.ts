@@ -6,6 +6,8 @@ export interface WeatherResult {
   am: number | null
   pm: number | null
   icon: string | null
+  iconCode: string | null
+  condition: string | null
   rain: boolean
   configured: boolean
 }
@@ -28,7 +30,11 @@ export function useWeather(queries: WeatherQuery[]) {
         const data = (await res.json()) as WeatherResult
         if (!cancelled) setResults((prev) => ({ ...prev, [q.key]: data }))
       } catch {
-        if (!cancelled) setResults((prev) => ({ ...prev, [q.key]: { am: null, pm: null, icon: null, rain: false, configured: true } }))
+        if (!cancelled)
+          setResults((prev) => ({
+            ...prev,
+            [q.key]: { am: null, pm: null, icon: null, iconCode: null, condition: null, rain: false, configured: true },
+          }))
       }
     })
     return () => {

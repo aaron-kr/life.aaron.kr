@@ -6,7 +6,7 @@ import { SiteNav } from './SiteNav'
 import { Header } from './Header'
 import { QuoteBanner } from './QuoteBanner'
 import { Sidebar } from './Sidebar/Sidebar'
-import { StickyWeatherStrip } from './StickyWeatherStrip'
+import { SemesterStatsStrip } from './SemesterStatsStrip'
 import { WeekView } from './views/WeekView'
 import { MonthView } from './views/MonthView'
 import { SemesterView } from './views/SemesterView'
@@ -25,10 +25,10 @@ export function Dashboard({ data }: { data: DashboardData }) {
       <QuoteBanner quotes={data.quotes} />
       <Sidebar data={data} />
       <main className="content">
-        <StickyWeatherStrip template={data.template} />
+        <SemesterStatsStrip stats={data.stats} />
         {view === 'week' && <WeekView template={data.template} />}
         {view === 'month' && <MonthView holidays={data.holidays} events={data.events} />}
-        {view === 'semester' && <SemesterView classSchedule={data.classSchedule} />}
+        {view === 'semester' && <SemesterView courses={data.courses} />}
         {view === 'todo' && <TodoView checklists={data.checklists} />}
       </main>
       <Footer />

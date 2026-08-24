@@ -8,7 +8,7 @@ export function SignInScreen() {
   return (
     <div className="auth-screen">
       <div className="auth-card">
-        <div className="mark">AS</div>
+        <div className="mark">🧭</div>
         <h1>Compass</h1>
         <p>
           {status === 'unauthorized'

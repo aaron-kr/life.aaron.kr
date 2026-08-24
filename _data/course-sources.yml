@@ -1,0 +1,19 @@
+# One entry per course, any number of them — add/remove freely each semester,
+# nothing else in the app needs to change. `url` is a raw GitHub link to that
+# course's flat lecture-list YAML (courses.aaron.kr's
+# _data/<year>/<slug>_lectures.yml shape: a top-level list of
+# { date: "M/D", week, title, logistics } entries — the year comes from the
+# /YYYY/ folder in the URL, so the same course file works unmodified next
+# semester once it's copied into a new year folder).
+#
+# `color` is optional — a CSS custom property name from app/globals.css
+# (--blue, --violet, --green, --gold, --pink, --teal) used for that course's
+# column header accent. Omit it to just use the default border color.
+sources:
+  - label: "CBNU — Grad ML"
+    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_ml_lectures.yml"
+    color: "--blue"
+
+  # - label: "Another course"
+  #   url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/another_lectures.yml"
+  #   color: "--violet"
