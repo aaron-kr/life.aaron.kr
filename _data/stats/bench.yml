@@ -3,3 +3,4 @@ type: latest
 unit: kg
 log: bench
 placement: semester
+order: 30

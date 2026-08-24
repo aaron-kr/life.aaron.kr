@@ -1,8 +1,10 @@
 import { Fragment } from 'react'
-import type { DashboardTemplate } from '@/lib/types'
-import { WEEKDAY_ORDER, fmtHourLabel, minutesSinceMidnight, todayLocal, weekdayKey } from '@/lib/dates'
+import Image from 'next/image'
+import type { DashboardTemplate, University, Weekday } from '@/lib/types'
+import { fmtHourLabel, minutesSinceMidnight, todayLocal, weekdayKey } from '@/lib/dates'
+import { getThisFullWeekDays } from '@/lib/weekDays'
 
-const ROW_H = 34
+const ROW_H = 46
 
 const LEGEND = [
   { color: 'var(--blue)', label: 'Class' },
@@ -10,18 +12,32 @@ const LEGEND = [
   { color: 'var(--green)', label: 'Family' },
   { color: 'var(--gold)', label: 'Church' },
   { color: 'var(--pink)', label: 'Gym' },
+  { color: 'var(--teal)', label: 'Commute' },
   { color: 'var(--text-faint)', label: 'No-phone' },
 ]
 
-export function WeekView({ template }: { template: DashboardTemplate }) {
+export function WeekView({
+  template,
+  weekdayUniversities,
+  universities,
+}: {
+  template: DashboardTemplate
+  weekdayUniversities: Partial<Record<Weekday, University[]>>
+  universities: University[]
+}) {
   const blocks = template.recurring_blocks
   const todayKey = weekdayKey(todayLocal())
+  const days = getThisFullWeekDays(template)
 
   const startHours = blocks.length ? blocks.map((b) => minutesSinceMidnight(b.start) / 60) : [7]
   const endHours = blocks.length ? blocks.map((b) => minutesSinceMidnight(b.end) / 60) : [20]
   const hourStart = Math.max(0, Math.floor(Math.min(...startHours)))
   const hourEnd = Math.min(24, Math.ceil(Math.max(...endHours)))
   const hours = Array.from({ length: hourEnd - hourStart }, (_, i) => hourStart + i)
+
+  function logoFor(abbr: string | undefined) {
+    return abbr ? universities.find((u) => u.abbr === abbr) : undefined
+  }
 
   return (
     <section className="panel active">
@@ -31,12 +47,17 @@ export function WeekView({ template }: { template: DashboardTemplate }) {
         </h3>
         <div className="week-grid">
           <div className="gcell ghead" />
-          {WEEKDAY_ORDER.map((wd) => {
-            const mapping = template.weekdays[wd]
+          {days.map((d) => {
+            const schools = weekdayUniversities[d.weekday as Weekday] ?? []
             return (
-              <div key={wd} className={`gcell ghead${wd === todayKey ? ' today' : ''}`}>
-                {wd.slice(0, 3).toUpperCase()}
-                <span className="city-tag">{mapping?.city ?? '—'}</span>
+              <div key={d.weekday} className={`gcell ghead${d.weekday === todayKey ? ' today' : ''}`}>
+                {d.label}
+                <span className="city-tag">
+                  {d.cityDisplay || '—'}
+                  {schools.map((uni) => (
+                    <Image key={uni.abbr} src={uni.logo} alt={uni.name} title={uni.name} width={13} height={13} unoptimized />
+                  ))}
+                </span>
               </div>
             )
           })}
@@ -44,20 +65,34 @@ export function WeekView({ template }: { template: DashboardTemplate }) {
           {hours.map((h) => (
             <Fragment key={h}>
               <div className="time-label">{fmtHourLabel(`${h}:00`)}</div>
-              {WEEKDAY_ORDER.map((wd) => {
-                const cellBlocks = blocks.filter((b) => b.day === wd && Math.floor(minutesSinceMidnight(b.start) / 60) === h)
+              {days.map((d) => {
+                const cellBlocks = blocks.filter(
+                  (b) => b.day === d.weekday && Math.floor(minutesSinceMidnight(b.start) / 60) === h
+                )
                 return (
-                  <div className="gcell" key={`${wd}-${h}`}>
+                  <div className="gcell" key={`${d.weekday}-${h}`}>
                     {cellBlocks.map((b, i) => {
                       const durationMin = minutesSinceMidnight(b.end) - minutesSinceMidnight(b.start)
                       const spanHours = durationMin / 60
+                      const uni = logoFor(b.university)
                       return (
                         <div
                           key={i}
                           className={`block b-${b.type}`}
-                          style={{ height: `${ROW_H * spanHours - 4}px` }}
+                          style={{
+                            height: `${ROW_H * spanHours - 4}px`,
+                            ...(b.color
+                              ? {
+                                  background: `color-mix(in srgb, var(${b.color}) 22%, var(--panel-2))`,
+                                  borderLeftColor: `var(${b.color})`,
+                                }
+                              : {}),
+                          }}
                         >
-                          <div className="bt">{b.title}</div>
+                          <div className="bt">
+                            {uni && <Image src={uni.logo} alt={uni.name} width={12} height={12} unoptimized />}
+                            {b.title}
+                          </div>
                           {b.sub && <div className="bs">{b.sub}</div>}
                         </div>
                       )

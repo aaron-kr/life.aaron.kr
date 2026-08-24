@@ -1,5 +1,7 @@
 title: KNUT
 group: Schools
+order: 10
+university: ut
 items:
   - text: "개강 — Sep 7 (Mon)"
     meta: "first day of class"

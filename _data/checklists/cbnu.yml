@@ -1,5 +1,7 @@
 title: CBNU
 group: Schools
+order: 40
+university: cbnu
 items:
   - text: "개강 — Sep 3 (Thu)"
     meta: "first day of class"

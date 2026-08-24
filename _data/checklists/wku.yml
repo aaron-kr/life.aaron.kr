@@ -1,5 +1,7 @@
 title: WKU
 group: Schools
+order: 30
+university: wku
 items:
   - text: "개강 — Sep 2 (Wed)"
     meta: "first day of class"

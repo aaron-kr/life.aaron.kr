@@ -87,7 +87,7 @@ Most changes don't touch code at all:
 
 | Want to change... | Edit this file |
 |---|---|
-| Weekly schedule blocks, weekday→city map | `_data/dashboard-template.yml` |
+| Weekly schedule blocks, weekday→city map | `_data/weekly.yml` |
 | Holidays / make-up days | `_data/holidays.yml` |
 | Family events, deadlines, conferences | `_data/personal-events.yml` |
 | Daily quote rotation | `_data/quotes.yml` |
@@ -114,8 +114,15 @@ aligns to for every course's row in the Semester view.
 Add a new file to `_data/checklists/` and it shows up as a new card in the
 To-Do view automatically — no code change. Give it a `group:` field (see the
 5 school-admin checklists for an example) to cluster it under its own row
-heading instead of "General". Same file-drop pattern for `_data/goal-lists/`
+heading instead of "General", and a `university:` (abbr) field to show that
+school's logo on the card. Same file-drop pattern for `_data/goal-lists/`
 (sidebar accordions) and `_data/stats/` (top strip cards).
+
+Both `_data/stats/*.yml` and `_data/checklists/*.yml` support an `order:`
+number for controlling display order yourself instead of alphabetical-by-
+filename — lower sorts first, ties/unset fall back to file order, numbers are
+spaced by 10 so you can slot new ones in between without renumbering
+everything (see any existing stat or the school checklists for examples).
 
 None of these need a Firebase touch — only the *state* you check off (habit
 checkins, stat entries, checklist done-state, ticket purchases) lives in

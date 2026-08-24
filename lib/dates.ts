@@ -1,6 +1,17 @@
-import type { Weekday } from './types'
+import type { FullWeekday, Weekday } from './types'
 
 export const WEEKDAY_ORDER: Weekday[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+
+/** Sunday -> Saturday, for the full-week schedule grid. */
+export const FULL_WEEK_ORDER: FullWeekday[] = [
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+]
 
 export function todayLocal(): Date {
   const d = new Date()

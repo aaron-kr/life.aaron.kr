@@ -39,8 +39,14 @@ function readYamlDir<T>(relDir: string): { id: string; data: T }[] {
     }))
 }
 
+/** Sorts ascending by an optional `order` field — items without one sort
+ * after all items that have one, in their original (directory-read) order. */
+function sortByOrder<T extends { order?: number }>(items: T[]): T[] {
+  return [...items].sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER))
+}
+
 export async function loadDashboardData(): Promise<DashboardData> {
-  const template = readYaml<DashboardTemplate>('dashboard-template.yml', {
+  const template = readYaml<DashboardTemplate>('weekly.yml', {
     weekdays: {
       monday: { city: '' },
       tuesday: { city: '' },
@@ -57,14 +63,12 @@ export async function loadDashboardData(): Promise<DashboardData> {
   const habits = readYaml<HabitsFile>('habits.yml', { habits: [] }).habits
   const tickets = readYaml<TicketsFile>('tickets.yml', { routes: [] }).routes
 
-  const stats: StatDeclaration[] = readYamlDir<Omit<StatDeclaration, 'id'>>('stats').map(({ id, data }) => ({
-    id,
-    ...data,
-  }))
-  const checklists: ChecklistFile[] = readYamlDir<Omit<ChecklistFile, 'id'>>('checklists').map(({ id, data }) => ({
-    id,
-    ...data,
-  }))
+  const stats: StatDeclaration[] = sortByOrder(
+    readYamlDir<Omit<StatDeclaration, 'id'>>('stats').map(({ id, data }) => ({ id, ...data }))
+  )
+  const checklists: ChecklistFile[] = sortByOrder(
+    readYamlDir<Omit<ChecklistFile, 'id'>>('checklists').map(({ id, data }) => ({ id, ...data }))
+  )
   const goalLists: GoalListFile[] = readYamlDir<Omit<GoalListFile, 'id'>>('goal-lists').map(({ id, data }) => ({
     id,
     ...data,

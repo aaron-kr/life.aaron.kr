@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 export interface ChecklistCardItem {
   id: string
@@ -10,20 +11,32 @@ export interface ChecklistCardItem {
   done: boolean
 }
 
+export interface ChecklistCardLogo {
+  src: string
+  alt: string
+  href: string
+}
+
 interface ChecklistCardProps {
   title: string
   items: ChecklistCardItem[]
   onToggle: (id: string, done: boolean) => void
   onRemove: (id: string) => void
+  logo?: ChecklistCardLogo
 }
 
-export function ChecklistCard({ title, items, onToggle, onRemove }: ChecklistCardProps) {
+export function ChecklistCard({ title, items, onToggle, onRemove, logo }: ChecklistCardProps) {
   const [showDone, setShowDone] = useState(false)
   const active = items.filter((i) => !i.done)
   const done = items.filter((i) => i.done)
 
   return (
     <div className="checklist-card">
+      {logo && (
+        <a className="cl-logo" href={logo.href} target="_blank" rel="noopener noreferrer" title={logo.alt}>
+          <Image src={logo.src} alt={logo.alt} width={20} height={20} unoptimized />
+        </a>
+      )}
       <h4>{title}</h4>
       <div>
         {active.map((item) => (

@@ -10,16 +10,18 @@ export interface WeekdayMapping {
 }
 
 export interface RecurringBlock {
-  day: Weekday
+  day: FullWeekday
   start: string // "HH:MM" 24h
   end: string
   type: string // maps to a b-* CSS class, e.g. "class" -> "b-class"
   title: string
   sub?: string
+  color?: string // CSS var name, e.g. "--pink" — overrides the type's default palette color
+  university?: string // University.abbr — shows that school's logo inline in the block
 }
 
 export interface DashboardTemplate {
-  weekdays: Record<Weekday, WeekdayMapping>
+  weekdays: Partial<Record<FullWeekday, WeekdayMapping>>
   recurring_blocks: RecurringBlock[]
 }
 
@@ -64,6 +66,7 @@ export interface StatDeclaration {
   goal?: number // for type: fraction
   color?: string
   placement: 'body' | 'semester' // which row of the top stats strip this renders in
+  order?: number // ascending sort within its row; unset sorts to the end
 }
 
 export interface HabitDeclaration {
@@ -87,6 +90,8 @@ export interface ChecklistFile {
   id: string // derived from filename
   title: string
   group?: string // optional row heading — files sharing a group render together, e.g. "Schools"
+  order?: number // ascending sort within its group; unset sorts to the end
+  university?: string // University.abbr — shows that school's logo on the card
   items: ChecklistItemDecl[]
 }
 

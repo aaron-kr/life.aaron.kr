@@ -1,10 +1,10 @@
-import type { ChecklistFile } from '@/lib/types'
+import type { ChecklistFile, University } from '@/lib/types'
 import { ChecklistSection } from '../Checklist/ChecklistSection'
 
 const DEFAULT_GROUP = 'General'
 const GROUP_ORDER = [DEFAULT_GROUP, 'Schools']
 
-export function TodoView({ checklists }: { checklists: ChecklistFile[] }) {
+export function TodoView({ checklists, universities }: { checklists: ChecklistFile[]; universities: University[] }) {
   const groups = new Map<string, ChecklistFile[]>()
   checklists.forEach((c) => {
     const g = c.group || DEFAULT_GROUP
@@ -25,7 +25,7 @@ export function TodoView({ checklists }: { checklists: ChecklistFile[] }) {
           <h2 className="todo-group-title">{group}</h2>
           <div className="checklist-row">
             {groups.get(group)!.map((c) => (
-              <ChecklistSection checklist={c} key={c.id} />
+              <ChecklistSection checklist={c} universities={universities} key={c.id} />
             ))}
           </div>
         </div>

@@ -1,5 +1,7 @@
 title: JBNU
 group: Schools
+order: 20
+university: jbnu
 items:
   - text: "개강 — Sep 1 (Tue)"
     meta: "first day of class"

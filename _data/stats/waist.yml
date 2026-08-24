@@ -4,3 +4,4 @@ unit: cm
 log: waist
 color: "--pink"
 placement: body
+order: 20

@@ -1,5 +1,5 @@
-import { WEEKDAY_ORDER, addDays, mondayOfWeek, sameDate, todayLocal, ymd } from './dates'
-import type { DashboardTemplate, Weekday } from './types'
+import { FULL_WEEK_ORDER, WEEKDAY_ORDER, addDays, mondayOfWeek, sameDate, sundayOfWeek, todayLocal, ymd } from './dates'
+import type { DashboardTemplate, FullWeekday, Weekday } from './types'
 
 export interface WeekDayInfo {
   weekday: Weekday
@@ -16,6 +16,35 @@ export function getThisWeekDays(template: DashboardTemplate): WeekDayInfo[] {
   const monday = mondayOfWeek(today)
   return WEEKDAY_ORDER.map((weekday, i) => {
     const date = addDays(monday, i)
+    const mapping = template.weekdays[weekday] ?? { city: '' }
+    return {
+      weekday,
+      date,
+      dateYmd: ymd(date),
+      city: mapping.city,
+      cityDisplay: mapping.city_kr || mapping.city,
+      isToday: sameDate(date, today),
+      label: weekday.slice(0, 3).toUpperCase(),
+    }
+  })
+}
+
+export interface FullWeekDayInfo {
+  weekday: FullWeekday
+  date: Date
+  dateYmd: string
+  city: string
+  cityDisplay: string
+  isToday: boolean
+  label: string
+}
+
+/** Sunday -> Saturday, for the Week view grid. */
+export function getThisFullWeekDays(template: DashboardTemplate): FullWeekDayInfo[] {
+  const today = todayLocal()
+  const sunday = sundayOfWeek(today)
+  return FULL_WEEK_ORDER.map((weekday, i) => {
+    const date = addDays(sunday, i)
     const mapping = template.weekdays[weekday] ?? { city: '' }
     return {
       weekday,

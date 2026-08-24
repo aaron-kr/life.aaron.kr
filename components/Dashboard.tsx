@@ -49,7 +49,9 @@ export function Dashboard({ data }: { data: DashboardData }) {
       />
       <main className="content">
         <StatsStrip stats={data.stats} />
-        {view === 'week' && <WeekView template={data.template} />}
+        {view === 'week' && (
+          <WeekView template={data.template} weekdayUniversities={weekdayUniversities} universities={data.universities} />
+        )}
         {view === 'month' && (
           <MonthView holidays={data.holidays} events={data.events} weekdayUniversities={weekdayUniversities} />
         )}
@@ -61,7 +63,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
             universities={data.universities}
           />
         )}
-        {view === 'todo' && <TodoView checklists={data.checklists} />}
+        {view === 'todo' && <TodoView checklists={data.checklists} universities={data.universities} />}
       </main>
       <Footer />
       <TicketDrawer routes={data.tickets} open={drawerOpen} onClose={() => setDrawerOpen(false)} />

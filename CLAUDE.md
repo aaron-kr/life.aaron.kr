@@ -41,7 +41,7 @@ it does not live in that repo.
 
 ```
 _data/
-  dashboard-template.yml     # recurring weekly blocks + weekday→city map
+  weekly.yml                 # recurring weekly blocks + weekday→city map
   holidays.yml               # KR public holidays, school holidays, make-up days
   personal-events.yml        # family hikes, church events (manually added)
   quotes.yml                 # daily quote/verse rotation
@@ -56,7 +56,7 @@ _data/
   stats.yml                  # stat *declarations* (see "Stat types" below)
 ```
 
-### `dashboard-template.yml` (sketch)
+### `weekly.yml` (sketch)
 
 ```yaml
 weekdays:
@@ -161,7 +161,7 @@ sums all entries where `date >= reset_date`. `latest` takes the max-date entry.
 
 ### Weather
 - Sidebar mini-week: icon per day, click/hover opens a small popover with AM/PM
-  temps for that day's **assigned city** (from `dashboard-template.yml`).
+  temps for that day's **assigned city** (from `weekly.yml`).
 - Sticky strip at the top of the main content area (all views, not just Week):
   compact AM/PM per weekday, sticks under the header on scroll. This replaces the
   larger forecast cards from mockup v1.
@@ -223,7 +223,7 @@ sums all entries where `date >= reset_date`. `latest` takes the max-date entry.
 
 1. **Real weekday → city/university mapping.** Mockup uses illustrative
    placeholders (Chungju/Jeonju/Seoul×3) from the original request — confirm the
-   actual 5-day mapping for `dashboard-template.yml`.
+   actual 5-day mapping for `weekly.yml`.
 2. **Recurring checklist items**: should "Grading" / "Prep" items reset weekly
    (pulling fresh from the YAML template each Monday) or persist indefinitely
    until manually removed? Affects whether checklist items are keyed by

@@ -4,3 +4,4 @@ unit: books since Sep 1
 log: books_read
 reset_date: "2026-09-01"
 placement: semester
+order: 90

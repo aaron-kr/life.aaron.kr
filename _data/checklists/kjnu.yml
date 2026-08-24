@@ -1,5 +1,7 @@
 title: KJNU
 group: Schools
+order: 50
+university: kjnu
 items:
   - text: "개강 — Sep 4 (Fri)"
     meta: "first day of class"

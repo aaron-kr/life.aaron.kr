@@ -85,5 +85,5 @@ stats, goal accordions), the ticket drawer, and the wave background toggle are
 wired up end-to-end against real Firestore + a real weather API route — not
 mock data. What's left is filling in **your** data: a real Firebase project
 (DEPLOY.md), the real weekday→city/university mapping in
-`_data/dashboard-template.yml` (still the mockup's placeholder cities), and an
+`_data/weekly.yml` (still the mockup's placeholder cities), and an
 OpenWeatherMap key if you want live weather instead of `—`.

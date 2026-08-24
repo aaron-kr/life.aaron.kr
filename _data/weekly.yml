@@ -1,0 +1,46 @@
+# Recurring weekly schedule template + weekday→city map.
+# Edit freely — this drives the Week view grid and the weather hero.
+# `city` must be English/romanized (OpenWeatherMap's lookup needs it — see
+# DEPLOY.md). Add an optional `city_kr` for the on-screen label if you want
+# it shown in Korean instead, e.g. `{ city: Chungju, city_kr: 충주 }`.
+# University/weekday mapping now lives in course-sources.yml, not here — it's
+# the shared source of truth for the Semester/Month views and weather-hero
+# school logos too.
+
+weekdays:
+  monday: { city: Chungju, city_kr: 충주 }
+  tuesday: { city: Jeonju, city_kr: 전주 }
+  wednesday: { city: Iksan, city_kr: 임산 }
+  thursday: { city: Cheongju, city_kr: 청주 }
+  friday: { city: Kongju, city_kr: 공주 }
+
+# type maps to a CSS class (b-<type>) — see app/globals.css for the palette:
+# class, family, church, deepwork, gym, commute, nophone
+# `university:` (a courses.aaron.kr universities.yml abbr) puts that school's
+# logo inline in the block. `color:` (a CSS var name, e.g. "--pink") overrides
+# the type's default palette color — set your own per block if you want each
+# school's block to match its logo's color.
+recurring_blocks:
+  - { day: monday, start: "06:00", end: "09:00", type: commute, title: "KTX - 무궁화", sub: "Buy tix" }
+  - { day: monday, start: "09:00", end: "12:00", type: class, title: "KNUT - 데이터과학", sub: "Room", university: ut }
+  - { day: monday, start: "13:00", end: "16:00", type: class, title: "KNUT - 데이터과학", sub: "Room", university: ut }
+
+  - { day: tuesday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "push" }
+  - { day: tuesday, start: "09:00", end: "12:00", type: deepwork, title: "Deep work", sub: "paper draft" }
+  - { day: tuesday, start: "13:00", end: "16:00", type: class, title: "JBNU - DC", sub: "Room", university: jbnu }
+  - { day: tuesday, start: "16:00", end: "19:00", type: class, title: "JBNU - AC", sub: "Room", university: jbnu }
+
+  - { day: wednesday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "legs" }
+  - { day: wednesday, start: "09:00", end: "12:00", type: class, title: "JBNU - Info", sub: "Room", university: jbnu }
+  - { day: wednesday, start: "15:00", end: "18:00", type: class, title: "WKU - DB", sub: "Room", university: wku }
+
+  - { day: thursday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "pull" }
+  - { day: thursday, start: "12:00", end: "15:00", type: class, title: "CBNU - Grad ML", sub: "Room", university: cbnu }
+  - { day: thursday, start: "15:00", end: "18:00", type: class, title: "CBNU - Grad MongoDB", sub: "Room", university: cbnu }
+
+  - { day: friday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "other" }
+  - { day: friday, start: "14:00", end: "17:00", type: class, title: "KJNU - Bio Net", sub: "Room", university: kjnu }
+
+  # Optional recurring blocks that don't fit neatly into the weekday grid, e.g.
+  - { day: saturday, start: "17:00", end: "19:00", type: family, title: "Family time" }
+  - { day: saturday, start: "18:00", end: "19:30", type: church, title: "Church prep" }
