@@ -12,8 +12,7 @@ const LEGEND = [
   { color: 'var(--green)', label: 'Family' },
   { color: 'var(--gold)', label: 'Church' },
   { color: 'var(--pink)', label: 'Gym' },
-  { color: 'var(--teal)', label: 'Commute' },
-  { color: 'var(--text-faint)', label: 'No-phone' },
+  { color: 'var(--text-faint)', label: 'Commute / No-phone' },
 ]
 
 export function WeekView({

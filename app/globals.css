@@ -70,22 +70,22 @@ button.hamburger-btn { display: none; }
 .view-toggle button:hover:not(.active) { color: var(--text); }
 
 .icon-btn { position: relative; width: 34px; height: 34px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.0714rem; }
+/* Windows Chromium/Edge lack native flag-emoji glyphs — CountryFlagPolyfill
+   injects this font (scoped to flag codepoints via unicode-range) only when
+   needed; harmless no-op elsewhere. */
+.flag-emoji { font-family: "Twemoji Country Flags", var(--font-sans); }
 .icon-btn:hover { color: var(--text); border-color: var(--violet); }
 .icon-btn .badge { position: absolute; top: -5px; right: -5px; background: var(--pink); color: #2a0f18; font-family: var(--font-mono); font-size: 0.6429rem; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
 .account { width: 32px; height: 32px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.8571rem; color: var(--text-dim); cursor: pointer; overflow: hidden; }
 .account img { width: 100%; height: 100%; object-fit: cover; }
-.account-menu { position: absolute; top: 54px; right: 22px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 6px; z-index: 30; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.account-menu { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 6px; min-width: 120px; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
 .account-menu button { display: block; width: 100%; text-align: left; padding: 8px 12px; font-family: var(--font-mono); font-size: 0.7857rem; color: var(--text-dim); background: transparent; border: none; border-radius: 5px; cursor: pointer; }
 .account-menu button:hover { background: var(--panel); color: var(--text); }
 
-.hometown-menu { position: absolute; top: 42px; right: 0; z-index: 30; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; width: 190px; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
-.hometown-title { font-family: var(--font-mono); font-size: 0.6429rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); }
-.hometown-place { font-family: var(--font-display); font-size: 0.9286rem; font-weight: 600; margin: 2px 0 6px; }
-.hometown-time { font-family: var(--font-mono); font-size: 0.9286rem; color: var(--text); margin-bottom: 6px; }
-.hometown-weather { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.7857rem; color: var(--text-dim); }
-.hometown-weather b { font-weight: 400; color: var(--text-faint); font-size: 0.6429rem; margin-right: 3px; }
-.hometown-empty { font-family: var(--font-mono); font-size: 0.7143rem; color: var(--text-faint); line-height: 1.5; }
+.hometown-panel { width: 260px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.4); overflow: hidden; }
+.hometown-panel .weather-hero-content { height: 130px; border-radius: 0; border: none; }
+.hometown-empty { font-family: var(--font-mono); font-size: 0.7143rem; color: var(--text-faint); line-height: 1.5; padding: 14px; }
 
 /* ===== QUOTE BANNER ===== */
 .quote-banner { grid-column: 1/-1; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; border-bottom: 1px solid var(--border-soft); background: linear-gradient(90deg, rgba(212,175,106,.07), transparent 55%); flex-wrap: wrap; position: relative; z-index: 3; }
@@ -123,7 +123,7 @@ aside.sidebar.collapsed .hide-on-collapse { display: none; }
 .wh-icon { font-size: 1.2857rem; margin-right: 2px; }
 .wh-ampm b { font-weight: 400; font-size: 0.6429rem; color: rgba(255,255,255,.65); margin-right: 3px; }
 .wh-pop { font-style: normal; font-size: 0.6429rem; color: #9fd4ff; margin-left: 3px; }
-.wh-rain-note { font-family: var(--font-mono); font-size: 0.6786rem; color: #9fd4ff; margin-top: 4px; }
+.wh-rain-note { font-family: var(--font-mono); font-size: 0.6rem; color: #9fd4ff; margin-top: 4px; }
 .wh-schools { position: absolute; top: 8px; right: 8px; z-index: 2; display: flex; gap: 4px; }
 .wh-schools a { width: 26px; height: 26px; border-radius: 6px; background: rgba(10,11,23,.55); border: 1px solid rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .wh-schools img { width: 18px; height: 18px; object-fit: contain; }
@@ -190,6 +190,8 @@ aside.sidebar.collapsed .hide-on-collapse { display: none; }
 main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: relative; z-index: 1; }
 
 .sticky-strip { position: sticky; top: 0; z-index: 12; background: var(--bg); padding: 14px 0 10px; border-bottom: 1px solid var(--border-soft); margin-bottom: 16px; }
+.strip-collapse-btn { font-family: var(--font-mono); font-size: 0.6786rem; letter-spacing: .04em; color: var(--text-faint); background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; cursor: pointer; margin-bottom: 8px; }
+.strip-collapse-btn:hover { color: var(--text-dim); border-color: var(--text-dim); }
 .stat-strip-inner { display: flex; gap: 8px; overflow-x: auto; }
 .stat-strip-item { flex: 1; min-width: 150px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; }
 .ss-label { font-size: 0.7857rem; color: var(--text-dim); margin-bottom: 4px; }
@@ -272,8 +274,7 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .b-church { background: var(--gold-dim); border-left: 3px solid var(--gold); color: #f2e3c2; }
 .b-deepwork { background: var(--violet-dim); border-left: 3px solid var(--violet); color: #e2ddfa; }
 .b-gym { background: var(--pink-dim); border-left: 3px solid var(--pink); color: #f9d6de; }
-.b-commute { background: var(--teal-dim); border-left: 3px solid var(--teal); color: #cdf3ee; }
-.b-nophone { background: #1c1f38; border-left: 3px dashed var(--text-faint); color: var(--text-dim); }
+.b-nophone, .b-commute { background: #1c1f38; border-left: 3px dashed var(--text-faint); color: var(--text-dim); }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 0.8214rem; color: var(--text-dim); }
 .legend .lg-item { display: flex; align-items: center; gap: 6px; }
 .legend .lg-dot { width: 9px; height: 9px; border-radius: 2.5px; }

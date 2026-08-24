@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import type { HometownConfig, TicketRoute, View } from '@/lib/types'
 import { useTicketBadgeCount } from './Checklist/TicketDrawer'
 import { WaveToggleButton } from './WaveToggleButton'
 import { HometownWidget } from './HometownWidget'
+import { DropdownPortal } from './DropdownPortal'
 
 const VIEWS: { id: View; label: string }[] = [
   { id: 'week', label: 'Week' },
@@ -32,6 +33,7 @@ export function Header({
 }) {
   const { user, signOutUser } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const accountRef = useRef<HTMLDivElement>(null)
   const badgeCount = useTicketBadgeCount(tickets)
   const initials = (user?.displayName ?? user?.email ?? '?').slice(0, 2).toUpperCase()
 
@@ -60,15 +62,15 @@ export function Header({
         <button className="icon-btn" onClick={onDrawerOpen} title="Ticket checklist">
           🎫{badgeCount > 0 && <span className="badge">{badgeCount}</span>}
         </button>
-        <div style={{ position: 'relative' }}>
-          <div className="account" onClick={() => setMenuOpen((m) => !m)}>
+        <div>
+          <div className="account" ref={accountRef} onClick={() => setMenuOpen((m) => !m)}>
             {user?.photoURL ? <Image src={user.photoURL} alt="" width={32} height={32} /> : initials}
           </div>
-          {menuOpen && (
+          <DropdownPortal anchorRef={accountRef} open={menuOpen} align="right">
             <div className="account-menu">
               <button onClick={signOutUser}>Sign out</button>
             </div>
-          )}
+          </DropdownPortal>
         </div>
       </div>
     </header>

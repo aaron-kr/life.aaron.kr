@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { AuthProvider } from '@/lib/auth-context'
+import { CountryFlagPolyfill } from '@/components/CountryFlagPolyfill'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: WAVES_INIT_SCRIPT }} />
       </head>
       <body>
+        <CountryFlagPolyfill />
         <AuthProvider>
           <div data-waves className="waves-root">
             {children}

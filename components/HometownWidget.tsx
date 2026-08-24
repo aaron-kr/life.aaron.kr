@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { HometownConfig } from '@/lib/types'
 import { useWeather } from '@/lib/useWeather'
 import { ymd } from '@/lib/dates'
+import { weatherBackgroundUrl } from '@/lib/weatherImages'
+import { DropdownPortal } from './DropdownPortal'
 
 function useClock(timezone: string) {
   const [now, setNow] = useState<Date | null>(null)
@@ -27,6 +29,7 @@ function useClock(timezone: string) {
 
 export function HometownWidget({ hometown }: { hometown: HometownConfig }) {
   const [open, setOpen] = useState(false)
+  const btnRef = useRef<HTMLButtonElement>(null)
   const configured = Boolean(hometown.city)
   const time = useClock(hometown.timezone)
   const today = ymd(new Date())
@@ -36,37 +39,47 @@ export function HometownWidget({ hometown }: { hometown: HometownConfig }) {
   const w = weather.home
 
   return (
-    <div style={{ position: 'relative' }}>
-      <button className="icon-btn" onClick={() => setOpen((o) => !o)} title="Hometown">
+    <div>
+      <button className="icon-btn flag-emoji" ref={btnRef} onClick={() => setOpen((o) => !o)} title="Hometown">
         🇺🇸
       </button>
-      {open && (
-        <div className="hometown-menu">
+      <DropdownPortal anchorRef={btnRef} open={open} align="right">
+        <div className="hometown-panel">
           {!configured ? (
             <div className="hometown-empty">Set your hometown in _data/hometown.yml</div>
           ) : (
-            <>
-              <div className="hometown-title">{hometown.label}</div>
-              <div className="hometown-place">
-                {hometown.city}
-                {hometown.state ? `, ${hometown.state}` : ''}
+            <div className="weather-hero-content" style={{ animation: 'none' }}>
+              <div className="weather-hero-bg" style={{ backgroundImage: `url(${weatherBackgroundUrl(w?.iconCode ?? null)})` }} />
+              <div className="weather-hero-overlay" />
+              <div className="weather-hero-info">
+                <div className="wh-loc">
+                  <div className="wh-city">
+                    {hometown.city}
+                    {hometown.state ? `, ${hometown.state}` : ''}
+                  </div>
+                  <div className="wh-date">
+                    {hometown.label} · {time}
+                  </div>
+                </div>
+                <div className="wh-temps">
+                  <span className="wh-icon">{w?.icon ?? '·'}</span>
+                  <span className="wh-ampm">
+                    <b>AM</b>
+                    {w?.am != null ? `${w.am}°` : '—'}
+                    {w?.popAm != null && <i className="wh-pop">{w.popAm}%</i>}
+                  </span>
+                  <span className="wh-ampm">
+                    <b>PM</b>
+                    {w?.pm != null ? `${w.pm}°` : '—'}
+                    {w?.popPm != null && <i className="wh-pop">{w.popPm}%</i>}
+                  </span>
+                </div>
+                {w?.rainNote && <div className="wh-rain-note">☂ {w.rainNote}</div>}
               </div>
-              <div className="hometown-time">{time}</div>
-              <div className="hometown-weather">
-                <span className="wi">{w?.icon ?? '·'}</span>
-                <span>
-                  <b>AM</b>
-                  {w?.am != null ? `${w.am}°` : '—'}
-                </span>
-                <span>
-                  <b>PM</b>
-                  {w?.pm != null ? `${w.pm}°` : '—'}
-                </span>
-              </div>
-            </>
+            </div>
           )}
         </div>
-      )}
+      </DropdownPortal>
     </div>
   )
 }
