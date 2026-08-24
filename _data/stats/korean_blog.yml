@@ -1,0 +1,6 @@
+label: Korean blog posts
+type: total
+unit: posts since Sep 1
+log: korean_blog
+reset_date: "2026-09-01"
+placement: semester

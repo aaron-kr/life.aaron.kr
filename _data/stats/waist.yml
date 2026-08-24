@@ -1,0 +1,6 @@
+label: Waist
+type: latest
+unit: cm
+log: waist
+color: "--pink"
+placement: body

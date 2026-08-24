@@ -36,6 +36,7 @@ function resolveDate(dateStr: string | undefined, sourceUrl: string): string | n
 }
 
 export async function fetchCourse(source: CourseSource): Promise<Course | null> {
+  if (!source.url) return null
   try {
     const res = await fetch(source.url, { next: { revalidate: 3600 } })
     if (!res.ok) return null
@@ -45,7 +46,7 @@ export async function fetchCourse(source: CourseSource): Promise<Course | null> 
 
     const lectures: CourseLecture[] = raw
       .map((entry): CourseLecture | null => {
-        const date = resolveDate(entry.date, source.url)
+        const date = resolveDate(entry.date, source.url!)
         if (!date) return null
         const title = sanitizeTitle(entry.title)
         const weekday = WEEKDAY_NAMES[new Date(`${date}T00:00:00`).getDay()]
@@ -62,7 +63,14 @@ export async function fetchCourse(source: CourseSource): Promise<Course | null> 
       .filter((l): l is CourseLecture => l !== null)
       .sort((a, b) => a.date.localeCompare(b.date))
 
-    return { label: source.label, color: source.color, sourceUrl: source.url, lectures }
+    return {
+      label: source.label,
+      color: source.color,
+      university: source.university,
+      weekday: source.weekday,
+      sourceUrl: source.url,
+      lectures,
+    }
   } catch {
     return null
   }

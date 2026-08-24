@@ -1,0 +1,10 @@
+# Any file dropped in _data/stats/ becomes a card in the top stats strip —
+# no code change needed. `log` is the Firestore doc id under
+# stat_logs/{log}/entries. `placement: body` -> Body row, `placement:
+# semester` -> Semester Stats row.
+label: Weight
+type: latest
+unit: kg
+log: weight
+color: "--gold"
+placement: body

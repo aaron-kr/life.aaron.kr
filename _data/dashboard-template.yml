@@ -1,14 +1,18 @@
-# Recurring weekly schedule template + weekday→city/university map.
-# Edit freely — this drives the Week view grid and the sticky weather strip.
-# TODO(aaron): confirm the real 5-day mapping — these are still the mockup's
-# illustrative placeholders (see CLAUDE.md "Open decisions" #1).
+# Recurring weekly schedule template + weekday→city map.
+# Edit freely — this drives the Week view grid and the weather hero.
+# `city` must be English/romanized (OpenWeatherMap's lookup needs it — see
+# DEPLOY.md). Add an optional `city_kr` for the on-screen label if you want
+# it shown in Korean instead, e.g. `{ city: Chungju, city_kr: 충주 }`.
+# University/weekday mapping now lives in course-sources.yml, not here — it's
+# the shared source of truth for the Semester/Month views and weather-hero
+# school logos too.
 
 weekdays:
-  monday: { city: Chungju, university: KNUT }
-  tuesday: { city: Jeonju, university: JBNU }
-  wednesday: { city: Iksan, university: JBNU / WKU }
-  thursday: { city: Cheongju, university: CBNU }
-  friday: { city: Kongju, university: KJNU }
+  monday: { city: Chungju }
+  tuesday: { city: Jeonju }
+  wednesday: { city: Iksan }
+  thursday: { city: Cheongju }
+  friday: { city: Kongju }
 
 # type maps to a CSS class (b-<type>) — see app/globals.css for the palette:
 # class, family, church, deepwork, gym, nophone
@@ -22,12 +26,12 @@ recurring_blocks:
   - { day: tuesday, start: "13:00", end: "16:00", type: class, title: "JBNU - DC", sub: "Room" }
   - { day: tuesday, start: "16:00", end: "19:00", type: class, title: "JBNU - AC", sub: "Room" }
 
-  - { day: wednesday, start: "08:00", end: "12:00", type: class, title: "Seoul — Yonsei", sub: "Physical AI seminar" }
-  - { day: wednesday, start: "14:00", end: "16:00", type: nophone, title: "No-phone block", sub: "writing" }
+  - { day: wednesday, start: "09:00", end: "12:00", type: class, title: "JBNU - TBD", sub: "Room" }
+  - { day: wednesday, start: "13:00", end: "16:00", type: class, title: "WKU - TBD", sub: "Room" }
   - { day: wednesday, start: "18:00", end: "20:00", type: gym, title: "Gym", sub: "legs" }
 
-  - { day: thursday, start: "08:00", end: "12:00", type: class, title: "Seoul — KAIST", sub: "grad advising" }
+  - { day: thursday, start: "09:00", end: "12:00", type: class, title: "CBNU - Grad ML", sub: "Room" }
   - { day: thursday, start: "15:00", end: "18:00", type: deepwork, title: "Deep work", sub: "paper draft" }
 
-  - { day: friday, start: "08:00", end: "11:00", type: class, title: "Seoul — SKKU", sub: "undergrad lab" }
+  - { day: friday, start: "09:00", end: "12:00", type: class, title: "KJNU - TBD", sub: "Room" }
   - { day: friday, start: "18:00", end: "19:30", type: church, title: "Church prep" }

@@ -1,31 +1,39 @@
 'use client'
 
 import { useState } from 'react'
-import type { DashboardData } from '@/lib/types'
+import type { DashboardData, University, Weekday } from '@/lib/types'
 import { WeatherHero } from './WeatherHero'
-import { BodyStats } from './BodyStats'
 import { HabitHeatmaps } from './HabitHeatmaps'
-import { SemesterStats } from './SemesterStats'
 import { GoalAccordions } from './GoalAccordions'
 
-export function Sidebar({ data }: { data: DashboardData }) {
+export function Sidebar({
+  data,
+  weekdayUniversities,
+  mobileOpen,
+  onMobileClose,
+}: {
+  data: DashboardData
+  weekdayUniversities: Partial<Record<Weekday, University[]>>
+  mobileOpen: boolean
+  onMobileClose: () => void
+}) {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <aside className={`sidebar${collapsed ? ' collapsed' : ''}`}>
+    <div className="sidebar-wrap">
+      <div className={`sidebar-backdrop${mobileOpen ? ' show' : ''}`} onClick={onMobileClose} />
+      <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' mobile-open' : ''}`}>
+        <div className="sb-section hide-on-collapse">
+          <h2>This Week</h2>
+          <WeatherHero template={data.template} weekdayUniversities={weekdayUniversities} />
+        </div>
+
+        <HabitHeatmaps habits={data.habits} />
+        <GoalAccordions goalLists={data.goalLists} />
+      </aside>
       <button className="collapse-btn" onClick={() => setCollapsed((c) => !c)}>
-        ‹
+        {collapsed ? '›' : '‹'}
       </button>
-
-      <div className="sb-section hide-on-collapse">
-        <h2>This Week</h2>
-        <WeatherHero template={data.template} />
-      </div>
-
-      <BodyStats stats={data.stats} />
-      <HabitHeatmaps habits={data.habits} />
-
-      <GoalAccordions goalLists={data.goalLists} />
-    </aside>
+    </div>
   )
 }

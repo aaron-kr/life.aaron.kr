@@ -1,19 +1,55 @@
-# One entry per course, any number of them — add/remove freely each semester,
-# nothing else in the app needs to change. `url` is a raw GitHub link to that
-# course's flat lecture-list YAML (courses.aaron.kr's
-# _data/<year>/<slug>_lectures.yml shape: a top-level list of
-# { date: "M/D", week, title, logistics } entries — the year comes from the
-# /YYYY/ folder in the URL, so the same course file works unmodified next
-# semester once it's copied into a new year folder).
+# One entry per course, any number of them — add/remove freely each semester.
+# `url` is a raw GitHub link to that course's flat lecture-list YAML
+# (courses.aaron.kr's _data/<year>/<slug>_lectures.yml shape: a top-level
+# list of { date: "M/D", week, title, logistics } entries — the year comes
+# from the /YYYY/ folder in the URL). Omit `url` until you have it; the
+# course just won't show lecture content yet, but `weekday`+`university`
+# still make it show up in the Month view / weather hero logos.
 #
-# `color` is optional — a CSS custom property name from app/globals.css
-# (--blue, --violet, --green, --gold, --pink, --teal) used for that course's
-# column header accent. Omit it to just use the default border color.
-sources:
-  - label: "CBNU — Grad ML"
-    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_ml_lectures.yml"
-    color: "--blue"
+# `university` is a University.abbr key from courses.aaron.kr's
+# universities.yml (fetched live — ut, jbnu, wku, cbnu, kjnu, etc.).
+# `weekday` places the course's column in the Semester view and drives the
+# Month-view header logos + the weather hero's school badge for that day.
+# `color` is a CSS custom property name from app/globals.css.
+#
+# semester_start is the Monday that begins "week 1" in the Semester view grid
+# (all courses' rows align to this, regardless of each course's own internal
+# week numbering).
+semester_start: "2026-09-07"
 
-  # - label: "Another course"
-  #   url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/another_lectures.yml"
-  #   color: "--violet"
+sources:
+  - label: "KNUT — TBD"
+    university: ut
+    weekday: monday
+    color: "--teal"
+    # url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/<slug>_lectures.yml"
+
+  - label: "JBNU — TBD (Tue)"
+    university: jbnu
+    weekday: tuesday
+    color: "--violet"
+    # url: "..."
+
+  - label: "JBNU — TBD (Wed)"
+    university: jbnu
+    weekday: wednesday
+    color: "--violet"
+    # url: "..."
+
+  - label: "WKU — TBD"
+    university: wku
+    weekday: wednesday
+    color: "--pink"
+    # url: "..."
+
+  - label: "CBNU — Grad ML"
+    university: cbnu
+    weekday: thursday
+    color: "--blue"
+    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_ml_lectures.yml"
+
+  - label: "KJNU — TBD"
+    university: kjnu
+    weekday: friday
+    color: "--gold"
+    # url: "..."

@@ -21,3 +21,8 @@ habits:
     label: No-phone block
     color: "--blue"
     log: no_phone
+
+  - id: korean_study
+    label: Korean study
+    color: "--teal"
+    log: korean_study

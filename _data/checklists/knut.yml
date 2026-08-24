@@ -1,0 +1,12 @@
+title: KNUT
+group: Schools
+items:
+  - text: "개강 — Sep 7 (Mon)"
+    meta: "first day of class"
+    urgent: true
+  - text: "Upload syllabus"
+    meta: "admin — repeat each semester"
+  - text: "Continuing education / training hours"
+    meta: "check requirement + deadline"
+  - text: "Grade turn-in"
+    meta: "confirm deadline once posted"

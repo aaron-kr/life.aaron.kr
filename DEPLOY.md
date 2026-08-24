@@ -91,23 +91,31 @@ Most changes don't touch code at all:
 | Holidays / make-up days | `_data/holidays.yml` |
 | Family events, deadlines, conferences | `_data/personal-events.yml` |
 | Daily quote rotation | `_data/quotes.yml` |
-| Sidebar stats (what's tracked, units, goals) | `_data/stats.yml` |
+| Top stats strip (what's tracked, units, goals) | `_data/stats/*.yml` — one file per stat |
 | Habit heatmaps (what's tracked) | `_data/habits.yml` |
 | Recurring ticket routes | `_data/tickets.yml` |
 | ETF watchlist prices | `_data/goal-lists/etfs.yml` |
-| North Star goals | `_data/goal-lists/north-star.yml` |
-| Course schedules (Semester view) | `_data/course-sources.yml` |
+| North Star / PAI Lab goals | `_data/goal-lists/*.yml` |
+| Courses, weekdays, university, colors (Semester + Month view + weather logo) | `_data/course-sources.yml` |
+| Hometown weather/time widget | `_data/hometown.yml` |
 | Weather hero background images | `public/images/weather/` (see its README) |
+| Top-band background image | `public/images/hero/` (see its README) |
 
-Adding or removing a course is just adding/removing an entry in
-`_data/course-sources.yml` — each entry is a `label` + a raw GitHub link to
-that course's lecture YAML (same flat-list shape `courses.aaron.kr` already
-uses per course, e.g. `_data/2026/cbnu_grad_ml_lectures.yml`). Any number of
-courses works; each gets its own column in the Semester view.
+`_data/course-sources.yml` is the hub for anything school-related: each entry
+declares a course's `label`, `weekday`, `university` (an `abbr` key from
+courses.aaron.kr's shared `universities.yml`, fetched live — logos and portal
+links come from there automatically), `color`, and optionally a `url` to that
+course's lecture YAML. A course shows up in the Month view header and the
+weather hero's school badge as soon as `weekday`+`university` are set — the
+`url` only affects whether the Semester view's column has actual lecture rows
+in it yet. `semester_start` (top-level, one date) is the Monday that "week 1"
+aligns to for every course's row in the Semester view.
 
 Add a new file to `_data/checklists/` and it shows up as a new card in the
-To-Do view automatically — no code change. Same for `_data/goal-lists/` and
-the sidebar accordions.
+To-Do view automatically — no code change. Give it a `group:` field (see the
+5 school-admin checklists for an example) to cluster it under its own row
+heading instead of "General". Same file-drop pattern for `_data/goal-lists/`
+(sidebar accordions) and `_data/stats/` (top strip cards).
 
 None of these need a Firebase touch — only the *state* you check off (habit
 checkins, stat entries, checklist done-state, ticket purchases) lives in

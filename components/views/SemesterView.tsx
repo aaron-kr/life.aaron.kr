@@ -1,8 +1,79 @@
-import type { Course } from '@/lib/types'
-import { currentWeekRange, todayLocal } from '@/lib/dates'
+import { Fragment } from 'react'
+import Image from 'next/image'
+import type { Course, CourseSource, University, Weekday } from '@/lib/types'
+import { addDays, todayLocal, ymd } from '@/lib/dates'
 
-export function SemesterView({ courses }: { courses: Course[] }) {
-  const [weekStart, weekEnd] = currentWeekRange(todayLocal())
+const WEEKDAY_COLS: Weekday[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+
+function mondayOf(dateYmd: string): Date {
+  return new Date(`${dateYmd}T00:00:00`)
+}
+
+function weekIndexOf(dateYmd: string, semesterStart: Date): number {
+  const d = new Date(`${dateYmd}T00:00:00`)
+  return Math.floor((d.getTime() - semesterStart.getTime()) / (7 * 86400000))
+}
+
+export function SemesterView({
+  courseSources,
+  courses,
+  semesterStart,
+  universities,
+}: {
+  courseSources: CourseSource[]
+  courses: Course[]
+  semesterStart: string | null
+  universities: University[]
+}) {
+  const sourcesWithWeekday = courseSources.filter((s) => s.weekday)
+  const today = todayLocal()
+  const todayYmd = ymd(today)
+
+  if (sourcesWithWeekday.length === 0) {
+    return (
+      <section className="panel active">
+        <div className="card">
+          <h3>
+            Semester <span className="pill">_data/course-sources.yml</span>
+          </h3>
+          <div className="sem-empty">
+            No courses with a <code>weekday</code> set yet — add entries to <code>_data/course-sources.yml</code>.
+            Each becomes a column here under its weekday; add a <code>url</code> once you have the lecture file to
+            fill in that column&apos;s rows.
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  const lecturesFor = (source: CourseSource): Course | null => courses.find((c) => c.sourceUrl === source.url) ?? null
+
+  // Fall back to the earliest lecture's Monday if semester_start isn't set.
+  const earliestDate = courses.flatMap((c) => c.lectures.map((l) => l.date)).sort()[0]
+  const startDate = semesterStart ? mondayOf(semesterStart) : earliestDate ? mondayOf(earliestDate) : today
+
+  const byWeekday: Partial<Record<Weekday, CourseSource[]>> = {}
+  sourcesWithWeekday.forEach((s) => {
+    const list = byWeekday[s.weekday!] ?? (byWeekday[s.weekday!] = [])
+    list.push(s)
+  })
+
+  let minWeek = 0
+  let maxWeek = 0
+  courses.forEach((c) => {
+    c.lectures.forEach((l) => {
+      const idx = weekIndexOf(l.date, startDate)
+      if (idx < minWeek) minWeek = idx
+      if (idx > maxWeek) maxWeek = idx
+    })
+  })
+
+  const rows = Array.from({ length: maxWeek - minWeek + 1 }, (_, i) => minWeek + i)
+  const todayWeekIdx = weekIndexOf(todayYmd, startDate)
+
+  function logoFor(source: CourseSource) {
+    return universities.find((u) => u.abbr === source.university)
+  }
 
   return (
     <section className="panel active">
@@ -10,53 +81,64 @@ export function SemesterView({ courses }: { courses: Course[] }) {
         <h3>
           Semester <span className="pill">_data/course-sources.yml</span>
         </h3>
-        {courses.length === 0 ? (
-          <div className="sem-empty">
-            No courses configured yet — add one to <code>_data/course-sources.yml</code> with a raw GitHub link to
-            that course&apos;s lecture YAML.
-            <br />
-            Any number of courses works; each becomes its own column here.
-          </div>
-        ) : (
-          <div className="sem-wrap">
-            <div className="sem-courses">
-              {courses.map((course) => (
-                <div className="sem-course-col" key={course.sourceUrl} style={{ ['--course-color' as string]: course.color ? `var(${course.color})` : undefined }}>
-                  <div className="sem-course-head">
-                    <span className="sc-title">{course.label}</span>
-                    <span className="sc-count">{course.lectures.length} sessions</span>
-                  </div>
-                  <div className="sem-lecture-list">
-                    {course.lectures.length === 0 ? (
-                      <div className="sem-course-empty">No lectures parsed from this file yet.</div>
-                    ) : (
-                      course.lectures.map((lec) => {
-                        const isThisWeek = lec.date >= weekStart && lec.date <= weekEnd
-                        return (
-                          <div
-                            key={lec.date}
-                            className={`sem-lecture-row${isThisWeek ? ' today-week' : ''}${lec.isBreak ? ' break-row' : ''}${lec.isExam ? ' exam-row' : ''}`}
-                          >
-                            <div className="sem-lecture-wk">
-                              wk {lec.week}
-                              <span className="sl-date">
-                                {new Date(`${lec.date}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                              </span>
-                            </div>
-                            <div className="sem-lecture-body">
-                              <div className="sem-lecture-title">{lec.title || '—'}</div>
-                              {lec.logistics && <div className="sem-lecture-meta">{lec.logistics}</div>}
-                            </div>
-                          </div>
-                        )
-                      })
-                    )}
-                  </div>
+        <div className="sem-wrap">
+          <div className="sem-grid3">
+            <div className="sem-wk-head">Wk</div>
+            {WEEKDAY_COLS.map((wd) => {
+              const daySources = byWeekday[wd] ?? []
+              return (
+                <div className="sem-day-head" key={wd}>
+                  <span className="sdh-label">{wd.slice(0, 3).toUpperCase()}</span>
+                  {daySources.map((s) => {
+                    const uni = logoFor(s)
+                    return (
+                      <div className="sdh-course" key={s.url ?? s.label} style={{ ['--course-color' as string]: s.color ? `var(${s.color})` : undefined }}>
+                        {uni && <Image src={uni.logo} alt={uni.name} width={16} height={16} unoptimized />}
+                        <span>{s.label}</span>
+                      </div>
+                    )
+                  })}
+                  {daySources.length === 0 && <span className="sdh-empty">—</span>}
                 </div>
-              ))}
-            </div>
+              )
+            })}
+
+            {rows.map((weekIdx) => {
+              const rowMonday = addDays(startDate, weekIdx * 7)
+              return (
+                <Fragment key={weekIdx}>
+                  <div className="sem-wk-cell">
+                    <span>wk {weekIdx + 1}</span>
+                    <span className="swc-date">{rowMonday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                  </div>
+                  {WEEKDAY_COLS.map((wd) => {
+                    const daySources = byWeekday[wd] ?? []
+                    return (
+                      <div className="sem-day-cell" key={`${weekIdx}-${wd}`}>
+                        {daySources.map((s) => {
+                          const course = lecturesFor(s)
+                          const lecture = course?.lectures.find((l) => weekIndexOf(l.date, startDate) === weekIdx)
+                          if (!lecture) return null
+                          const isPast = lecture.date < todayYmd
+                          const isThisWeek = weekIdx === todayWeekIdx
+                          return (
+                            <div
+                              key={s.url ?? s.label}
+                              className={`sem-cell-course${isPast ? ' past' : ''}${isThisWeek ? ' current' : ''}${lecture.isBreak ? ' break-row' : ''}${lecture.isExam ? ' exam-row' : ''}`}
+                              style={{ borderLeftColor: s.color ? `var(${s.color})` : 'var(--border)' }}
+                            >
+                              {lecture.title || '—'}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })}
+                </Fragment>
+              )
+            })}
           </div>
-        )}
+        </div>
       </div>
     </section>
   )

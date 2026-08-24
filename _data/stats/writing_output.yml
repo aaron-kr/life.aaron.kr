@@ -1,0 +1,8 @@
+# Blog posts + papers together, as a simple running count — `papers.yml`
+# tracks the more specific "submitted toward the 2-paper semester goal" figure.
+label: Posts & papers written
+type: total
+unit: since Sep 1
+log: writing_output
+reset_date: "2026-09-01"
+placement: semester

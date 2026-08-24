@@ -5,8 +5,8 @@ export interface WeekDayInfo {
   weekday: Weekday
   date: Date
   dateYmd: string
-  city: string
-  university: string | null
+  city: string // English/romanized — used for the weather API lookup
+  cityDisplay: string // city_kr if set, else city — used for on-screen labels
   isToday: boolean
   label: string // MON, TUE, ...
 }
@@ -16,13 +16,13 @@ export function getThisWeekDays(template: DashboardTemplate): WeekDayInfo[] {
   const monday = mondayOfWeek(today)
   return WEEKDAY_ORDER.map((weekday, i) => {
     const date = addDays(monday, i)
-    const mapping = template.weekdays[weekday] ?? { city: '', university: null }
+    const mapping = template.weekdays[weekday] ?? { city: '' }
     return {
       weekday,
       date,
       dateYmd: ymd(date),
       city: mapping.city,
-      university: mapping.university,
+      cityDisplay: mapping.city_kr || mapping.city,
       isToday: sameDate(date, today),
       label: weekday.slice(0, 3).toUpperCase(),
     }

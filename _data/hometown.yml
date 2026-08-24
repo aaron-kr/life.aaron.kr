@@ -1,0 +1,8 @@
+# Powers the small hometown weather/time dropdown next to the wave toggle.
+# Leave `city` blank to hide the widget's real data (it shows a "set this up"
+# hint instead) until you fill this in.
+city: ""
+state: ""             # 2-letter US state code, e.g. "CO" — improves weather match accuracy
+country: "US"
+timezone: "America/Denver"   # IANA timezone name — pick yours from https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+label: "Home"

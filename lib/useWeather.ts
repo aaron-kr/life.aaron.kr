@@ -9,32 +9,49 @@ export interface WeatherResult {
   iconCode: string | null
   condition: string | null
   rain: boolean
+  popAm: number | null
+  popPm: number | null
+  rainNote: string | null
   configured: boolean
+}
+
+const EMPTY_RESULT: WeatherResult = {
+  am: null,
+  pm: null,
+  icon: null,
+  iconCode: null,
+  condition: null,
+  rain: false,
+  popAm: null,
+  popPm: null,
+  rainNote: null,
+  configured: true,
 }
 
 export interface WeatherQuery {
   key: string
   city: string
   date: string
+  country?: string
+  state?: string
 }
 
 export function useWeather(queries: WeatherQuery[]) {
   const [results, setResults] = useState<Record<string, WeatherResult>>({})
-  const depKey = queries.map((q) => `${q.key}:${q.city}:${q.date}`).join('|')
+  const depKey = queries.map((q) => `${q.key}:${q.city}:${q.date}:${q.country ?? ''}:${q.state ?? ''}`).join('|')
 
   useEffect(() => {
     let cancelled = false
     queries.forEach(async (q) => {
       try {
-        const res = await fetch(`/api/weather?city=${encodeURIComponent(q.city)}&date=${q.date}`)
+        const params = new URLSearchParams({ city: q.city, date: q.date })
+        if (q.country) params.set('country', q.country)
+        if (q.state) params.set('state', q.state)
+        const res = await fetch(`/api/weather?${params.toString()}`)
         const data = (await res.json()) as WeatherResult
         if (!cancelled) setResults((prev) => ({ ...prev, [q.key]: data }))
       } catch {
-        if (!cancelled)
-          setResults((prev) => ({
-            ...prev,
-            [q.key]: { am: null, pm: null, icon: null, iconCode: null, condition: null, rain: false, configured: true },
-          }))
+        if (!cancelled) setResults((prev) => ({ ...prev, [q.key]: EMPTY_RESULT }))
       }
     })
     return () => {

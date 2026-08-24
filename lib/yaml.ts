@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
 import { fetchAllCourses } from './courses'
+import { fetchUniversities } from './universities'
 import type {
   ChecklistFile,
   CourseSourcesFile,
@@ -10,9 +11,10 @@ import type {
   GoalListFile,
   HabitsFile,
   HolidaysFile,
+  HometownConfig,
   PersonalEventsFile,
   QuotesFile,
-  StatsFile,
+  StatDeclaration,
   TicketsFile,
 } from './types'
 
@@ -40,11 +42,11 @@ function readYamlDir<T>(relDir: string): { id: string; data: T }[] {
 export async function loadDashboardData(): Promise<DashboardData> {
   const template = readYaml<DashboardTemplate>('dashboard-template.yml', {
     weekdays: {
-      monday: { city: '', university: null },
-      tuesday: { city: '', university: null },
-      wednesday: { city: '', university: null },
-      thursday: { city: '', university: null },
-      friday: { city: '', university: null },
+      monday: { city: '' },
+      tuesday: { city: '' },
+      wednesday: { city: '' },
+      thursday: { city: '' },
+      friday: { city: '' },
     },
     recurring_blocks: [],
   })
@@ -52,19 +54,49 @@ export async function loadDashboardData(): Promise<DashboardData> {
   const holidays = readYaml<HolidaysFile>('holidays.yml', { holidays: [] }).holidays
   const events = readYaml<PersonalEventsFile>('personal-events.yml', { events: [] }).events
   const quotes = readYaml<QuotesFile>('quotes.yml', { quotes: [] }).quotes
-  const stats = readYaml<StatsFile>('stats.yml', { stats: [] }).stats
   const habits = readYaml<HabitsFile>('habits.yml', { habits: [] }).habits
   const tickets = readYaml<TicketsFile>('tickets.yml', { routes: [] }).routes
 
-  const checklists: ChecklistFile[] = readYamlDir<Omit<ChecklistFile, 'id'>>('checklists').map(
-    ({ id, data }) => ({ id, ...data })
-  )
-  const goalLists: GoalListFile[] = readYamlDir<Omit<GoalListFile, 'id'>>('goal-lists').map(
-    ({ id, data }) => ({ id, ...data })
-  )
+  const stats: StatDeclaration[] = readYamlDir<Omit<StatDeclaration, 'id'>>('stats').map(({ id, data }) => ({
+    id,
+    ...data,
+  }))
+  const checklists: ChecklistFile[] = readYamlDir<Omit<ChecklistFile, 'id'>>('checklists').map(({ id, data }) => ({
+    id,
+    ...data,
+  }))
+  const goalLists: GoalListFile[] = readYamlDir<Omit<GoalListFile, 'id'>>('goal-lists').map(({ id, data }) => ({
+    id,
+    ...data,
+  }))
 
-  const courseSources = readYaml<CourseSourcesFile>('course-sources.yml', { sources: [] }).sources
-  const courses = await fetchAllCourses(courseSources)
+  const courseSourcesFile = readYaml<CourseSourcesFile>('course-sources.yml', { sources: [] })
+  const courseSources = courseSourcesFile.sources
+  const semesterStart = courseSourcesFile.semester_start ?? null
 
-  return { template, holidays, events, quotes, stats, habits, checklists, goalLists, tickets, courses }
+  const hometown = readYaml<HometownConfig>('hometown.yml', {
+    city: '',
+    country: 'US',
+    timezone: 'America/Denver',
+    label: 'Home',
+  })
+
+  const [courses, universities] = await Promise.all([fetchAllCourses(courseSources), fetchUniversities()])
+
+  return {
+    template,
+    holidays,
+    events,
+    quotes,
+    stats,
+    habits,
+    checklists,
+    goalLists,
+    tickets,
+    courseSources,
+    courses,
+    universities,
+    semesterStart,
+    hometown,
+  }
 }

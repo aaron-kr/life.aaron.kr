@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
-import type { TicketRoute, View } from '@/lib/types'
+import type { HometownConfig, TicketRoute, View } from '@/lib/types'
 import { useTicketBadgeCount } from './Checklist/TicketDrawer'
 import { WaveToggleButton } from './WaveToggleButton'
+import { HometownWidget } from './HometownWidget'
 
 const VIEWS: { id: View; label: string }[] = [
   { id: 'week', label: 'Week' },
@@ -18,12 +19,16 @@ export function Header({
   view,
   onViewChange,
   onDrawerOpen,
+  onHamburgerClick,
   tickets,
+  hometown,
 }: {
   view: View
   onViewChange: (v: View) => void
   onDrawerOpen: () => void
+  onHamburgerClick: () => void
   tickets: TicketRoute[]
+  hometown: HometownConfig
 }) {
   const { user, signOutUser } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -33,6 +38,9 @@ export function Header({
   return (
     <header className="top">
       <div className="brand">
+        <button className="icon-btn hamburger-btn" onClick={onHamburgerClick} title="Menu" aria-label="Toggle sidebar">
+          ☰
+        </button>
         <div className="mark">🧭</div>
         <div>
           <h1>Compass</h1>
@@ -48,6 +56,7 @@ export function Header({
           ))}
         </div>
         <WaveToggleButton />
+        <HometownWidget hometown={hometown} />
         <button className="icon-btn" onClick={onDrawerOpen} title="Ticket checklist">
           🎫{badgeCount > 0 && <span className="badge">{badgeCount}</span>}
         </button>

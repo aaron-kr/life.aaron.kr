@@ -1,7 +1,9 @@
-import type { HolidayEntry, PersonalEvent } from '@/lib/types'
+import Image from 'next/image'
+import type { HolidayEntry, PersonalEvent, University, Weekday } from '@/lib/types'
 import { addDays, rollingMonthGridStart, sameDate, todayLocal, ymd } from '@/lib/dates'
 
 const DOW_HEADS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const DOW_WEEKDAY_KEY: (Weekday | null)[] = [null, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', null]
 
 const FLAG_LABEL: Record<PersonalEvent['type'], string> = {
   hike: 'hike',
@@ -20,7 +22,15 @@ const FLAG_CLASS: Record<PersonalEvent['type'], string> = {
   ticket: 'flag-ticket',
 }
 
-export function MonthView({ holidays, events }: { holidays: HolidayEntry[]; events: PersonalEvent[] }) {
+export function MonthView({
+  holidays,
+  events,
+  weekdayUniversities,
+}: {
+  holidays: HolidayEntry[]
+  events: PersonalEvent[]
+  weekdayUniversities: Partial<Record<Weekday, University[]>>
+}) {
   const today = todayLocal()
   const gridStart = rollingMonthGridStart(today)
   const currentMonth = today.getMonth()
@@ -48,11 +58,22 @@ export function MonthView({ holidays, events }: { holidays: HolidayEntry[]; even
           <span className="pill">holidays.yml + personal-events.yml</span>
         </h3>
         <div className="month-grid">
-          {DOW_HEADS.map((d, i) => (
-            <div key={d} className={`mhead${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}`}>
-              {d}
-            </div>
-          ))}
+          {DOW_HEADS.map((d, i) => {
+            const wdKey = DOW_WEEKDAY_KEY[i]
+            const schools = wdKey ? (weekdayUniversities[wdKey] ?? []) : []
+            return (
+              <div key={d} className={`mhead${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}`}>
+                {d}
+                {schools.length > 0 && (
+                  <div className="mhead-logos">
+                    {schools.map((uni) => (
+                      <Image key={uni.abbr} src={uni.logo} alt={uni.name} title={uni.name} width={16} height={16} unoptimized />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
           {cells.map((date) => {
             const key = ymd(date)
             const dow = date.getDay()
