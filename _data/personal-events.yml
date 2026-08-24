@@ -1,0 +1,7 @@
+# Family hikes, church events, deadlines, conferences — anything manually
+# added to the Month view that doesn't come from class-schedule.yml.
+# type: hike | church | event | deadline | conference | ticket
+events:
+  - { date: "2026-08-29", label: "Family hike — Bukhansan", type: hike }
+  - { date: "2026-09-05", label: "IROS abstract due", type: deadline }
+  - { date: "2026-09-12", label: "KSPAI 학회 — Daejeon", type: conference }

@@ -1,0 +1,42 @@
+// Paste into: Firebase Console → Firestore Database → Rules tab.
+// Replace YOUR_EMAIL with your actual Google account email — must exactly
+// match NEXT_PUBLIC_ALLOWED_EMAIL in .env.local / Vercel env vars.
+//
+// This is a single-user app: every collection is fully private to one signed-in
+// account. There is no public read/write path anywhere.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner() {
+      return request.auth != null && request.auth.token.email == "YOUR_EMAIL";
+    }
+
+    // Stat logs: stat_logs/{statId}/entries/{entryId} — { date, value, note? }
+    match /stat_logs/{statId}/entries/{entryId} {
+      allow read, write: if isOwner();
+    }
+
+    // Habit checkins: habit_checkins/{habitId}/entries/{date} — { done }
+    match /habit_checkins/{habitId}/entries/{date} {
+      allow read, write: if isOwner();
+    }
+
+    // Checklist item state: checklist_state/{checklistId}/items/{itemSlug}
+    // — { done, removed }
+    match /checklist_state/{checklistId}/items/{itemSlug} {
+      allow read, write: if isOwner();
+    }
+
+    // Goal-list checkbox state: goal_items/{listId}/items/{itemSlug} — { done }
+    match /goal_items/{listId}/items/{itemSlug} {
+      allow read, write: if isOwner();
+    }
+
+    // Ticket purchase state: tickets/{routeId_weekOf} — { purchased, time, seat }
+    match /tickets/{ticketId} {
+      allow read, write: if isOwner();
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# Daily quote/verse rotation for the banner under the header.
+# One is chosen deterministically by day-of-year so it's stable within a day.
+quotes:
+  - text: "It is not the critic who counts... but who, while daring greatly, spends himself in a worthy cause."
+    ref: "— T. Roosevelt"
+  - text: "Whatever you do, work at it with all your heart, as working for the Lord."
+    ref: "— Colossians 3:23"
+  - text: "The way to get started is to quit talking and begin doing."
+    ref: "— W. Disney"
+  - text: "Be strong and courageous. Do not be afraid; do not be discouraged."
+    ref: "— Joshua 1:9"

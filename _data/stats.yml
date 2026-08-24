@@ -1,0 +1,49 @@
+# Stat declarations. `log` is the Firestore doc id under stat_logs/{log}/entries.
+# sidebar: "body" -> sidebar Body section (latest-value + sparkline row)
+#          "semester" -> sidebar Semester Stats section (latest/total/fraction)
+stats:
+  - id: weight
+    label: Weight
+    type: latest
+    unit: kg
+    log: weight
+    color: "--gold"
+    sidebar: body
+
+  - id: waist
+    label: Waist
+    type: latest
+    unit: cm
+    log: waist
+    color: "--pink"
+    sidebar: body
+
+  - id: bench
+    label: Bench PR
+    type: latest
+    unit: kg
+    log: bench
+    sidebar: semester
+
+  - id: km_rucked
+    label: KM rucked
+    type: total
+    unit: km total
+    log: ruck
+    reset_date: "2026-09-01"
+    sidebar: semester
+
+  - id: papers
+    label: Papers submitted
+    type: fraction
+    goal: 2
+    log: papers
+    sidebar: semester
+
+  - id: deep_work_hrs
+    label: Deep work hrs
+    type: total
+    unit: hrs since Sep 1
+    log: deepwork
+    reset_date: "2026-09-01"
+    sidebar: semester

@@ -1,0 +1,17 @@
+# Recurring transportation-ticket needs. The drawer groups these into a
+# rolling 4-week window (This week / Next week / 3-4 weeks out) computed from
+# today's date — nothing here is date-specific, `weekday` + `opens_before_days`
+# is enough to derive it each week.
+routes:
+  - id: chungju-mon
+    weekday: monday
+    route: "KTX → Chungju, Mon 7:10am"
+    short: "Chungju Mon"
+    opens_before_days: 30
+    urgent_within_days: 3
+
+  - id: jeonju-tue
+    weekday: tuesday
+    route: "Bus → Jeonju, Tue 6:40am"
+    short: "Jeonju Tue"
+    opens_before_days: 14

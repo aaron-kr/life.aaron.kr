@@ -1,0 +1,23 @@
+# Habit declarations for the sidebar's 7-row GitHub-style heatmaps.
+# `log` is the Firestore doc id under habit_checkins/{log}/entries/{date}.
+# `color` must be one of the CSS custom properties defined in globals.css.
+habits:
+  - id: rucking
+    label: Rucking / cardio
+    color: "--pink"
+    log: rucking
+
+  - id: deep_work
+    label: Deep work
+    color: "--violet"
+    log: deep_work
+
+  - id: bible
+    label: Bible reading
+    color: "--green"
+    log: bible
+
+  - id: no_phone
+    label: No-phone block
+    color: "--blue"
+    log: no_phone
