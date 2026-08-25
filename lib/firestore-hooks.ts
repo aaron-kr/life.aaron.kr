@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   collection,
   doc,
@@ -168,14 +168,24 @@ export function useTickets() {
 export function useUiSettings() {
   const { status } = useAuth()
   const [lastView, setLastViewState] = useState<View | null>(null)
-  const [statsCollapsed, setStatsCollapsedState] = useState<boolean | null>(null)
+  const [statsCollapsed, setStatsCollapsedState] = useState(false)
+  // Firestore's own value should only ever *seed* the local toggle once (so
+  // a stale device jumps to whatever the last device set) — after that, the
+  // click itself is the source of truth. Without this guard, a slow/failed
+  // round trip (or the listener re-firing your own write back at you) can
+  // silently stomp the very click that just happened, which is exactly what
+  // made this button feel broken.
+  const statsInitialized = useRef(false)
 
   useEffect(() => {
     if (status !== 'signed-in') return
     return onSnapshot(doc(db, 'settings', 'ui'), (snap) => {
       const data = snap.data()
       if (data?.lastView) setLastViewState(data.lastView as View)
-      if (typeof data?.statsCollapsed === 'boolean') setStatsCollapsedState(data.statsCollapsed)
+      if (typeof data?.statsCollapsed === 'boolean' && !statsInitialized.current) {
+        setStatsCollapsedState(data.statsCollapsed)
+        statsInitialized.current = true
+      }
     })
   }, [status])
 
@@ -183,8 +193,10 @@ export function useUiSettings() {
     await setDoc(doc(db, 'settings', 'ui'), { lastView: view }, { merge: true })
   }
 
-  async function setStatsCollapsed(collapsed: boolean) {
-    await setDoc(doc(db, 'settings', 'ui'), { statsCollapsed: collapsed }, { merge: true })
+  function setStatsCollapsed(collapsed: boolean) {
+    statsInitialized.current = true
+    setStatsCollapsedState(collapsed) // instant, regardless of network state
+    setDoc(doc(db, 'settings', 'ui'), { statsCollapsed: collapsed }, { merge: true }).catch(() => {})
   }
 
   return { lastView, setLastView, statsCollapsed, setStatsCollapsed }

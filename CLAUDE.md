@@ -42,6 +42,15 @@ real ways worth knowing before assuming this file is current:
   Each ticker renders in its own native currency (Yahoo reports `meta.currency`
   per symbol — KRW for KODEX/TIGER funds, USD for US ETFs, etc.; see
   `lib/formatCurrency.ts`). Adding a new entry to `etfs.yml` auto-adds a card.
+  The top strip's *content* now switches by view instead of always showing
+  both: Week/Month/Semester/To-Do render body/semester stats, Business/Jobs
+  render the ETF row instead (`showEtfs` prop on `StatsStrip` — see
+  `components/Dashboard.tsx`), sharing one collapsed/hidden state either way.
+  The ETF row also has 1D/1W/1M/1Y/5Y/10Y period buttons — Yahoo's chart
+  endpoint takes a (range, interval) pair rather than a single period, so
+  `PERIODS` in `components/StatsStrip.tsx` maps each button to a sensible
+  pair (allowlisted server-side too, in `app/api/stock/route.ts`, since the
+  client picks the value).
 - **Weekday→city weather mapping split into its own file**, `_data/weather.yml`
   (was folded into `weekly.yml`) — the one thing Aaron kept losing track of,
   so it gets its own obviously-named file. `weekly.yml` now only holds
@@ -66,15 +75,44 @@ real ways worth knowing before assuming this file is current:
   across devices** via one `settings/ui` Firestore doc (`lib/firestore-hooks.ts`
   → `useUiSettings()`, replacing the old single-field `useLastView()`) — add
   more small cross-device UI prefs to that same doc/hook rather than opening
-  a second listener.
-- **Week view has print / save-image buttons** — `window.print()` with a
-  dedicated `@media print` block (native browser dialog handles landscape vs.
-  portrait), and a client-side JPG export via `html2canvas` targeting the
-  `#week-print-area` node.
+  a second listener. `statsCollapsed` is optimistic-local-first: the click
+  updates React state immediately and fires the Firestore write in the
+  background (a `statsInitialized` ref lets the remote value seed local
+  state once on load, then never overwrite a later click) — a version that
+  waited on the Firestore round-trip for every click was the actual cause of
+  a "the hide button doesn't do anything" report; don't revert to that.
+- **Week view has print / save-image buttons.** Print sets a `--print-scale`
+  CSS custom property (computed from the on-screen content height against an
+  A4-landscape page, in `handlePrint()`) that the `@media print` block
+  applies via `zoom` — not `transform: scale`, which doesn't affect layout
+  size and so doesn't stop Chrome's print pagination from splitting onto a
+  2nd page anyway. The print target is `position: fixed` in print, not
+  `absolute` — the rest of the page is only `visibility: hidden` (still
+  occupying its layout space), so anchoring to the nearest ancestor instead
+  of the page box left blank space above the schedule. Save Image
+  (`html2canvas`) has to work around two things: university logos are
+  hotlinked from Cloudinary and can taint the canvas, so `<img>` elements are
+  excluded via `ignoreElements` rather than relying on their CORS headers;
+  and per-block `color-mix()` overrides (the `b.color` field) crash
+  html2canvas's CSS parser outright — worse, `getComputedStyle()` resolves a
+  `color-mix()` result to a `color(srgb r g b)` function, which html2canvas
+  *also* can't parse, so the block backgrounds are temporarily swapped to a
+  manually-converted plain `rgb()` string for the duration of the capture and
+  restored after (see the `colorFnToRgb` helper in `WeekView.tsx`).
 - **Quote banner arrows** are paired together in one hit-zone at the banner's
   right edge (`.quote-arrows-zone`), hidden by default and revealed on hover
   (desktop) or tap (mobile, via an `arrowsRevealed` state toggle) — they no
   longer sit split on either side of the quote text.
+- **`.flag-emoji` (the Chromium flag-glyph polyfill class) must land on its
+  own element, not share one with another selector that also sets
+  `font-family`.** `BusinessView`'s flags silently didn't render even with
+  the class applied, because the h4 they sat on was also matched by
+  `.checklist-card h4 { font-family: var(--font-mono) }` — same specificity
+  tier (one class + one type selector) beats `.flag-emoji` alone, so the
+  mono font won the cascade and the polyfilled face was never in play for
+  that element. Fixed by wrapping just the flag glyph in its own inner span.
+  If a future flag emoji doesn't render, check for exactly this before
+  assuming the polyfill itself failed.
 - **Everyday operation is documented in `DEPLOY.md` and `README.md`**, not
   here — this file is for architecture/history, those two are for "how do I
   change X." If you're about to explain how to edit something, check there

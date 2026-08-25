@@ -99,8 +99,8 @@ Most changes don't touch code at all:
 | Family events, deadlines, conferences, multi-day trips | `_data/personal-events.yml` |
 | Daily quote rotation | `_data/quotes.yml` |
 | Bible reading plan | `_data/bible-plan.yml` |
-| Top stats strip: body/semester stats (what's tracked, units, goals, order) | `_data/stats/*.yml` — one file per stat |
-| Top stats strip: ETF watchlist (live-priced, auto-currency) | `_data/etfs.yml` |
+| Top strip on Week/Month/Semester/To-Do: body/semester stats (what's tracked, units, goals, order) | `_data/stats/*.yml` — one file per stat |
+| Top strip on Business/Jobs: ETF watchlist (live-priced, auto-currency, 1D–10Y period buttons) | `_data/etfs.yml` |
 | Habit heatmaps (what's tracked) | `_data/habits.yml` |
 | Recurring ticket routes | `_data/tickets.yml` |
 | North Star / PAI Lab goals | `_data/goal-lists/*.yml` |
@@ -116,11 +116,13 @@ Most changes don't touch code at all:
 
 **Editing convention**: in date-listy files (`holidays.yml`, `personal-events.yml`), newest-first is just a convention for your own sake — nothing in the code reads or depends on file order, add entries wherever's convenient. `bible-plan.yml` is the one exception: it's keyed by calendar day (`MM-DD`), not entry date, so keep it in month-day order instead.
 
-**Weekly schedule blocks** (`_data/weekly.yml`) support a few optional per-block fields: `color` (a CSS var name like `"--pink"`, overriding the `type`'s default palette color), `university` (a courses.aaron.kr `universities.yml` abbr, which puts that school's logo inline in the block and links it to the portal), and `day` accepts `saturday`/`sunday` too, not just weekdays — the grid runs Sun→Sat. Row height and block height are both driven by one constant (`SLOT_H` in `components/views/WeekView.tsx`) — if you ever want taller/shorter rows, that's the only number to change; there's no separate CSS value to keep in sync. The Week view card has **Print** and **Save Image** buttons — Print opens your browser's normal print dialog (pick landscape/portrait there, print to PDF or paper); Save Image exports a JPG of just the schedule grid, sized for a phone screen.
+**Weekly schedule blocks** (`_data/weekly.yml`) support a few optional per-block fields: `color` (a CSS var name like `"--pink"`, overriding the `type`'s default palette color), `university` (a courses.aaron.kr `universities.yml` abbr, which puts that school's logo inline in the block and links it to the portal), and `day` accepts `saturday`/`sunday` too, not just weekdays — the grid runs Sun→Sat. Row height and block height are both driven by one constant (`SLOT_H` in `components/views/WeekView.tsx`) — if you ever want taller/shorter rows, that's the only number to change; there's no separate CSS value to keep in sync. The Week view card has **Print** and **Save Image** buttons — Print opens your browser's normal print dialog against an A4-landscape page with only the schedule on it, auto-shrunk (via a JS-computed `zoom`, applied only in print) to fit one page regardless of how many time slots that week has — pick portrait there instead if you'd rather; Save Image exports a JPG of just the schedule grid (university logos omitted, since they're hotlinked and can't always be captured), sized for a phone screen.
 
 **Weekday→city weather map** lives in its own file, `_data/weather.yml` — separate from `weekly.yml` on purpose, since this is the setting people lose track of. `city` needs to be English/romanized for OpenWeatherMap's lookup; `city_kr` is an optional Korean display label. Add `saturday`/`sunday` entries there if you want weekend forecasts too — until you do, the weekend box just shows `—`, which is expected.
 
 **Business/Jobs checklists piggyback on the same `_data/checklists/` file-drop pattern as the To-Do view** — a checklist's `group:` field decides which view it renders in: `group: Business` goes to the Business view (good for milestone-style project tracking — put a target date in each item's `meta` field, e.g. `meta: "by Sep 30"`), `group: Jobs` goes to the Jobs view, and anything else (or no group) stays in To-Do.
+
+**The top strip's content switches by view, not by a separate toggle**: Week/Month/Semester/To-Do show body/semester stats; Business/Jobs show the ETF row instead (same "hide" button, same persisted collapsed state either way — see `_data/etfs.yml`'s comments for a few suggested market-pulse tickers, like SPY/QQQ/VIX or a KRW=X exchange-rate card). The ETF row has **1D/1W/1M/1Y/5Y/10Y** buttons above it — Yahoo needs both a `range` and an `interval` per request, so each button maps to a sensible pair (e.g. 1M → daily closes over the past month, 1Y → weekly closes over the past year); the small text next to the buttons always says exactly which one is currently showing.
 
 `_data/course-sources.yml` is the hub for anything school-related: each entry
 declares a course's `label`, `weekday`, `university` (an `abbr` key from

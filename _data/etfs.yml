@@ -1,10 +1,34 @@
-# ETF row in the top stats strip, priced live from Yahoo Finance's free chart
-# endpoint (no API key, no signup — see app/api/stock/route.ts). `symbol` is
-# a plain ticker, e.g. "VTI"; for Korean tickers use the .KS suffix, e.g.
-# "091160.KS" for a KODEX fund — Yahoo reports each symbol's native currency
-# automatically (KRW shows with a ₩ sign, no manual currency field needed).
-# Add/remove freely; a new entry here shows up as a new card automatically.
+# ETF row, shown only on the Business and Jobs views (top strip switches
+# content by view — Week/Month/Semester/To-Do show body/semester stats
+# instead). Priced live from Yahoo Finance's free chart endpoint (no API
+# key, no signup — see app/api/stock/route.ts). `symbol` is a plain ticker,
+# e.g. "VTI"; for Korean tickers use the .KS suffix, e.g. "091160.KS" for a
+# KODEX fund — Yahoo reports each symbol's native currency automatically
+# (KRW shows with a ₩ sign, no manual currency field needed). Add/remove
+# freely; a new entry here shows up as a new card automatically. Each card
+# has 1D/1W/1M/1Y/5Y/10Y buttons above it (shared across all cards) — the
+# small text next to them says exactly what interval is currently showing,
+# e.g. "1 month · daily close".
 etfs:
   - { symbol: "VTI", label: "VTI", color: "--blue" }
   - { symbol: "VXUS", label: "VXUS", color: "--green" }
   - { symbol: "SCHD", label: "SCHD", color: "--gold" }
+
+# A few broad market-pulse tickers, if you want a "which way is the wind
+# blowing" sanity check alongside your actual holdings (VTI/VXUS/SCHD are
+# already broad, diversified funds — these aren't "better," just faster
+# gut-check reads on market mood). Uncomment any you want tracked:
+#
+# US:
+#   - { symbol: "SPY", label: "S&P 500", color: "--violet" }   # broad US large-cap — "as goes the S&P, so goes the market"
+#   - { symbol: "QQQ", label: "Nasdaq-100", color: "--teal" }  # tech-heavy — a faster, twitchier read than SPY
+#   - { symbol: "^VIX", label: "VIX", color: "--red" }         # the "fear gauge" — above ~20 usually means the market's on edge
+#   - { symbol: "^TNX", label: "10Y yield", color: "--yellow" } # 10-yr Treasury yield — rising fast tends to hit growth stocks
+#
+# KR:
+#   - { symbol: "069500.KS", label: "KODEX 200", color: "--pink" } # tracks the KOSPI 200 — closest single-ticker KR market proxy
+#   - { symbol: "^KS11", label: "KOSPI", color: "--silver" }       # the index itself, if you'd rather not hold the ETF just to watch it
+#
+# Currency (relevant for you specifically — KRW income, USD investments,
+# US tax filing all in one life):
+  - { symbol: "KRW=X", label: "USD/KRW", color: "--gold" }  # check this before wiring money either direction — timing matters

@@ -106,3 +106,11 @@ Known soft spots, not bugs exactly:
 - `public/images/weather/` and `public/images/hero/` are asset folders you
   populate yourself (see each folder's README) — the app degrades gracefully
   to a plain gradient without them.
+- **`_data/tickets.yml` has a real bug worth fixing by hand**: two entries
+  share `id: wed-from-iksan` (one under Wednesday, one mislabeled under
+  Thursday with stale Wednesday route text) — since a ticket's saved state is
+  keyed by that id, the two routes currently overwrite each other's
+  purchased/time/seat state in Firestore. The Friday entries also look like
+  copy-pasted placeholders (route text and `short` label both still say
+  "Thur"). This wasn't touched automatically since only you know the actual
+  Thursday/Friday route times.

@@ -55,23 +55,75 @@ export function WeekView({
   }
 
   function handlePrint() {
+    const el = captureRef.current
+    if (el) {
+      // Row heights are fixed px (SLOT_H), not width-dependent, so the
+      // on-screen height is a reliable stand-in for the printed height even
+      // though the printed width differs (it fills the full page, see the
+      // @media print rule below). Shrink via `zoom` — unlike `transform:
+      // scale`, it changes layout size too, so Chrome's print pagination
+      // actually respects it instead of still splitting onto a 2nd page.
+      const A4_LANDSCAPE_H_MM = 210
+      const PRINT_MARGIN_MM = 10
+      const MM_TO_PX = 96 / 25.4
+      const availablePx = (A4_LANDSCAPE_H_MM - PRINT_MARGIN_MM * 2) * MM_TO_PX
+      const scale = Math.min(1, availablePx / el.getBoundingClientRect().height)
+      el.style.setProperty('--print-scale', String(scale))
+    }
     window.print()
   }
 
   async function handleSaveImage() {
     if (!captureRef.current) return
     setExporting(true)
+    // html2canvas's CSS parser predates `color-mix()` (used inline for
+    // per-block color overrides, see the `b.color` block below) and throws
+    // on it outright, aborting the whole capture. Reading the resolved value
+    // back via getComputedStyle isn't enough on its own — Chromium reports a
+    // color-mix() result as `color(srgb r g b)`, a *different* modern color
+    // function html2canvas doesn't understand either — so convert that down
+    // to a plain rgb() string before handing it to html2canvas, then restore
+    // the original color-mix() afterward so the live page is untouched.
+    const colorFnToRgb = (value: string) => {
+      const m = value.match(/^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\)$/)
+      if (!m) return value
+      const to255 = (x: string) => Math.round(parseFloat(x) * 255)
+      return `rgb(${to255(m[1])}, ${to255(m[2])}, ${to255(m[3])})`
+    }
+    const patched: { el: HTMLElement; background: string; borderLeftColor: string }[] = []
+    captureRef.current.querySelectorAll<HTMLElement>('.block').forEach((block) => {
+      if (!block.style.background) return
+      const computed = getComputedStyle(block)
+      patched.push({ el: block, background: block.style.background, borderLeftColor: block.style.borderLeftColor })
+      block.style.background = colorFnToRgb(computed.backgroundColor)
+      block.style.borderLeftColor = colorFnToRgb(computed.borderLeftColor)
+    })
     try {
       const { default: html2canvas } = await import('html2canvas')
       const canvas = await html2canvas(captureRef.current, {
         backgroundColor: '#0a0b17',
         scale: 2,
+        useCORS: true,
+        // University logos are hotlinked from Cloudinary; if any of them
+        // ever fail the CORS check html2canvas needs to read pixel data,
+        // that taints the whole canvas and toDataURL() throws — skip them
+        // rather than let a decorative 12px icon silently kill the export.
+        ignoreElements: (element) => element.tagName === 'IMG',
       })
       const link = document.createElement('a')
       link.download = `week-schedule-${todayLocal().toISOString().slice(0, 10)}.jpg`
       link.href = canvas.toDataURL('image/jpeg', 0.92)
+      document.body.appendChild(link)
       link.click()
+      link.remove()
+    } catch (err) {
+      console.error('Save Image failed', err)
+      alert('Could not save the image — see the browser console for details.')
     } finally {
+      patched.forEach(({ el, background, borderLeftColor }) => {
+        el.style.background = background
+        el.style.borderLeftColor = borderLeftColor
+      })
       setExporting(false)
     }
   }

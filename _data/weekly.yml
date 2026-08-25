@@ -38,17 +38,23 @@ recurring_blocks:
 
   - { day: thursday, start: "06:00", end: "07:00", type: commute, title: "Isaac"}
   - { day: thursday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "pull" }
+  - { day: thursday, start: "09:30", end: "11:30", type: commute, title: "Bus ➔ 청주", sub: "09:20 - 11:20~" }
   - { day: thursday, start: "12:00", end: "15:00", type: class, title: "CBNU - Grad ML", sub: "Room", university: cbnu, color: "--red" }
   - { day: thursday, start: "15:00", end: "18:00", type: class, title: "CBNU - Grad MongoDB", sub: "Room", university: cbnu, color: "--red" }
+  - { day: thursday, start: "18:00", end: "18:30", type: commute, title: "Walk"}
+  - { day: thursday, start: "18:30", end: "20:30", type: commute, title: "Bus ➔ 전주", sub: "18:40 - 20:40" }
   - { day: thursday, start: "21:30", end: "22:30", type: commute, title: "Isaac"}
 
   - { day: friday, start: "06:00", end: "07:00", type: commute, title: "Isaac"}
   - { day: friday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "other" }
+  - { day: friday, start: "11:00", end: "12:00", type: commute, title: "Bus ➔ 유성", sub: "11:00 (일반) / 11:30 (우등)" }
+  - { day: friday, start: "12:30", end: "13:30", type: commute, title: "Bus ➔ 공주", sub: "Often, no later than 13:13" }
   - { day: friday, start: "14:00", end: "17:00", type: class, title: "KJNU - Bio Net", sub: "Room", university: kjnu, color: "--teal" }
+  - { day: friday, start: "17:00", end: "18:00", type: commute, title: "Bus ➔ 유성", sub: "17:11 - 18:00~ (optimal)" }
+  - { day: friday, start: "18:30", end: "19:30", type: commute, title: "Bus ➔ 전주", sub: "18:20 - 19:20 (optimal)" }
 
   # Weekend
-  - { day: saturday, start: "17:00", end: "19:00", type: family, title: "Family time" }
-  - { day: saturday, start: "18:00", end: "19:30", type: church, title: "Church prep" }
+  - { day: saturday, start: "10:00", end: "12:00", type: church, title: "Men's Group" }
 
   - { day: sunday, start: "09:00", end: "10:30", type: church, title: "3부 예배 연습" }
   - { day: sunday, start: "10:30", end: "12:00", type: church, title: "3부 예배" }

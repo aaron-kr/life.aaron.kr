@@ -32,7 +32,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
   }, [lastView])
 
   function toggleStatsCollapsed() {
-    setStatsCollapsed(!(statsCollapsed ?? false)).catch(() => {})
+    setStatsCollapsed(!statsCollapsed)
   }
 
   function setView(v: View) {
@@ -75,7 +75,8 @@ export function Dashboard({ data }: { data: DashboardData }) {
         <StatsStrip
           stats={data.stats}
           etfs={data.etfs}
-          collapsed={statsCollapsed ?? false}
+          showEtfs={view === 'business' || view === 'jobs'}
+          collapsed={statsCollapsed}
           onToggleCollapsed={toggleStatsCollapsed}
         />
         {view === 'week' && (

@@ -7,7 +7,12 @@ import { ChecklistSection } from '../Checklist/ChecklistSection'
 function DeadlineCard({ country, deadlines }: { country: string; deadlines: BusinessDeadline[] }) {
   return (
     <div className="checklist-card">
-      <h4 className="flag-emoji">{country === 'KR' ? '🇰🇷 Korea' : '🇺🇸 United States'}</h4>
+      <h4>
+        <span>
+          <span className="flag-emoji">{country === 'KR' ? '🇰🇷' : '🇺🇸'}</span>{' '}
+          {country === 'KR' ? 'Korea' : 'United States'}
+        </span>
+      </h4>
       <div>
         {deadlines.map((d, i) => (
           <div className="cl-item" key={i}>

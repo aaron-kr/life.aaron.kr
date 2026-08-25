@@ -12,15 +12,17 @@ export interface StockResult {
 
 const EMPTY: StockResult = { symbol: '', price: null, changePct: null, series: [], currency: null }
 
-export function useStocks(symbols: string[]) {
+export function useStocks(symbols: string[], range = '1mo', interval = '1d') {
   const [results, setResults] = useState<Record<string, StockResult>>({})
-  const depKey = symbols.join('|')
+  const depKey = `${symbols.join('|')}|${range}|${interval}`
 
   useEffect(() => {
     let cancelled = false
     symbols.forEach(async (symbol) => {
       try {
-        const res = await fetch(`/api/stock?symbol=${encodeURIComponent(symbol)}`)
+        const res = await fetch(
+          `/api/stock?symbol=${encodeURIComponent(symbol)}&range=${range}&interval=${interval}`
+        )
         const data = (await res.json()) as StockResult
         if (!cancelled) setResults((prev) => ({ ...prev, [symbol]: data }))
       } catch {

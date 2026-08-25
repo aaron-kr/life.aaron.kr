@@ -4,8 +4,11 @@
 # Newest first is just a convention for your own editing convenience — nothing
 # in the code depends on this file's order.
 holidays:
-  - { date: "2026-11-24", label: "Make-up class day", makeup: true }
-  - { date: "2026-11-14", label: "Suneung prep day" }
+  - { date: "2026-12-18", label: "KJNU 보강", makeup: true }
+  - { date: "2026-12-17", label: "CBNU 보강", makeup: true }
+  - { date: "2026-12-16", label: "WKU 보강", makeup: true }
+  - { date: "2026-12-14", label: "KNUT 보강", makeup: true }
+  - { date: "2026-11-19", label: "Suneung FYI" }
   - { date: "2026-10-09", label: "Hangeul Day" }
   - { date: "2026-10-05", label: "대체휴일 - National Foundation Day" }
   - { date: "2026-10-03", label: "National Foundation Day" }

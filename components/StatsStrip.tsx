@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import type { EtfDeclaration, StatDeclaration } from '@/lib/types'
 import { useStatLog } from '@/lib/firestore-hooks'
 import { useStocks } from '@/lib/useStock'
@@ -89,8 +90,22 @@ function SemesterStripItem({ stat }: { stat: StatDeclaration }) {
   )
 }
 
-function EtfStripItem({ etf }: { etf: EtfDeclaration }) {
-  const results = useStocks([etf.symbol])
+type PeriodId = '1D' | '1W' | '1M' | '1Y' | '5Y' | '10Y'
+
+// Yahoo's chart endpoint wants a (range, interval) pair, not a single
+// "period" — these map the buttons to that pair. Widening the interval as
+// the range grows keeps the point count (and payload size) sane.
+const PERIODS: { id: PeriodId; range: string; interval: string; desc: string }[] = [
+  { id: '1D', range: '1d', interval: '5m', desc: 'today · 5-min bars' },
+  { id: '1W', range: '5d', interval: '30m', desc: '5 trading days · 30-min bars' },
+  { id: '1M', range: '1mo', interval: '1d', desc: '1 month · daily close' },
+  { id: '1Y', range: '1y', interval: '1wk', desc: '1 year · weekly close' },
+  { id: '5Y', range: '5y', interval: '1mo', desc: '5 years · monthly close' },
+  { id: '10Y', range: '10y', interval: '3mo', desc: '10 years · quarterly close' },
+]
+
+function EtfStripItem({ etf, range, interval }: { etf: EtfDeclaration; range: string; interval: string }) {
+  const results = useStocks([etf.symbol], range, interval)
   const r = results[etf.symbol]
   const color = etf.color ? `var(${etf.color})` : 'var(--text-dim)'
   const up = r?.changePct != null && r.changePct >= 0
@@ -128,17 +143,57 @@ function EtfStripItem({ etf }: { etf: EtfDeclaration }) {
 export function StatsStrip({
   stats,
   etfs,
+  showEtfs,
   collapsed,
   onToggleCollapsed,
 }: {
   stats: StatDeclaration[]
   etfs: EtfDeclaration[]
+  showEtfs: boolean
   collapsed: boolean
   onToggleCollapsed: () => void
 }) {
+  const [period, setPeriod] = useState<PeriodId>('1M')
+
+  if (showEtfs) {
+    if (etfs.length === 0) return null
+    const p = PERIODS.find((x) => x.id === period)!
+
+    return (
+      <div className="sticky-strip">
+        <button className="strip-collapse-btn" onClick={onToggleCollapsed}>
+          {collapsed ? '▾ ETFs' : '▴ hide'}
+        </button>
+        {!collapsed && (
+          <>
+            <div className="etf-period-row">
+              <div className="etf-period-btns">
+                {PERIODS.map((pd) => (
+                  <button
+                    key={pd.id}
+                    className={`etf-period-btn${pd.id === period ? ' active' : ''}`}
+                    onClick={() => setPeriod(pd.id)}
+                  >
+                    {pd.id}
+                  </button>
+                ))}
+              </div>
+              <span className="etf-period-desc">{p.desc}</span>
+            </div>
+            <div className="stat-strip-inner">
+              {etfs.map((etf) => (
+                <EtfStripItem etf={etf} range={p.range} interval={p.interval} key={etf.symbol} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    )
+  }
+
   const body = stats.filter((s) => s.placement === 'body')
   const semester = stats.filter((s) => s.placement === 'semester')
-  if (body.length === 0 && semester.length === 0 && etfs.length === 0) return null
+  if (body.length === 0 && semester.length === 0) return null
 
   return (
     <div className="sticky-strip">
@@ -158,13 +213,6 @@ export function StatsStrip({
             <div className="stat-strip-inner" style={{ marginTop: body.length ? 8 : 0 }}>
               {semester.map((s) => (
                 <SemesterStripItem stat={s} key={s.id} />
-              ))}
-            </div>
-          )}
-          {etfs.length > 0 && (
-            <div className="stat-strip-inner" style={{ marginTop: body.length || semester.length ? 8 : 0 }}>
-              {etfs.map((etf) => (
-                <EtfStripItem etf={etf} key={etf.symbol} />
               ))}
             </div>
           )}

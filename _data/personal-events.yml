@@ -14,4 +14,4 @@
 events:
   - { date: "2026-09-12", label: "KSPAI 학회 — Daejeon", type: conference }
   - { date: "2026-09-05", label: "IROS abstract due", type: deadline }
-  - { date: "2026-08-29", label: "Family hike — Bukhansan", type: family }
+  - { date: "2026-08-26", end_date: "2026-08-28", label: "영덕 STAY 축구 대회", type: family }

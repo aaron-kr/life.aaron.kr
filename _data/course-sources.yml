@@ -23,45 +23,53 @@ sources:
     weekday: monday
     color: "--pink"
     url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/ut_data_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/ut-data/"
 
   - label: "JBNU — AC (Tue)"
     university: jbnu
     weekday: tuesday
     color: "--violet"
     url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/jbnu_circuits_ii_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/jbnu-circuits-ii/"
 
   - label: "JBNU — DC (Tue)"
     university: jbnu
     weekday: tuesday
     color: "--violet"
     url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/jbnu_circuits_i_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/jbnu-circuits-i/"
 
   - label: "JBNU — Info (Wed)"
     university: jbnu
     weekday: wednesday
     color: "--violet"
     url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/jbnu_info_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/jbnu-info/"
 
   - label: "WKU —  (Wed)"
     university: wku
     weekday: wednesday
     color: "--teal"
     url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/wku_db_lectures.yml"
-
-  - label: "CBNU — Grad ML (Thur)"
-    university: cbnu
-    weekday: thursday
-    color: "--gold"
-    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_ml_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/wku-db/"
 
   - label: "CBNU — Grad Mongo (Thur)"
     university: cbnu
     weekday: thursday
     color: "--gold"
     url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_mongo_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/cbnu-grad-mongo/"
+
+  - label: "CBNU — Grad ML (Thur)"
+    university: cbnu
+    weekday: thursday
+    color: "--gold"
+    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_ml_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/cbnu-grad-ml/"
 
   - label: "KJNU — Bio Net (Fri)"
     university: kjnu
     weekday: friday
     color: "--blue"
     url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/kongju_bio_net_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/kongju-bio-net/"

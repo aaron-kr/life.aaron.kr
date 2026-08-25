@@ -7,12 +7,12 @@
 # change "Deliver to" from Email to "RSS feed", then copy the feed link it
 # gives you into alert_rss_url below. Leave it blank and the Jobs view will
 # just show setup instructions instead of a feed.
-alert_rss_url: ""
+alert_rss_url: "https://www.google.com/alerts/feeds/01791098627280631713/18075294122812759102"
 
 # Google Drive folder/link where you keep your résumé, 경력증명서 packet,
-# and Corus (외국인등록/취업) filing documents — shown as a quick-access
+# and Korus (외국인등록/취업) filing documents — shown as a quick-access
 # link in the Jobs view.
-drive_url: ""
+drive_url: "https://drive.google.com/drive/u/1/folders/1WElFNilGFe90Whz9Qi57-x3FEzGRK9wA"
 
 # Free-text blurb shown at the top of the Jobs view — what you're actually
 # looking for, so future-you (or anyone helping you search) has it in one

@@ -141,7 +141,8 @@ aside.sidebar.collapsed .hide-on-collapse { display: none; }
 .wh-schools img { width: 18px; height: 18px; object-fit: contain; }
 
 .day-strip { display: flex; gap: 4px; }
-.day-strip-cell { flex: 1; aspect-ratio: 1/1.1; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--border-soft); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.6429rem; color: var(--text-faint); gap: 1px; cursor: pointer; }
+.day-strip-cell { flex: 1; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--border-soft); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.6429rem; color: var(--text-faint); gap: 1px; cursor: pointer; }
+/* .day-strip-cell { aspect-ratio: 1/1.1; } */
 .day-strip-cell .dsc-icon { font-size: 0.8571rem; }
 .day-strip-cell .dsc-date { font-size: 0.7857rem; font-weight: 600; color: var(--text-dim); }
 .day-strip-cell.today { border-color: var(--violet); }
@@ -220,6 +221,13 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .ss-val { font-family: var(--font-mono); font-size: 0.9286rem; font-weight: 600; color: var(--text); }
 .ss-val.dash { color: var(--text-faint); font-weight: 400; }
 
+.etf-period-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.etf-period-btns { display: flex; gap: 4px; }
+.etf-period-btn { font-family: var(--font-mono); font-size: 0.6786rem; background: var(--panel-2); border: 1px solid var(--border); color: var(--text-dim); padding: 3px 10px; border-radius: 999px; cursor: pointer; }
+.etf-period-btn:hover { color: var(--text); border-color: var(--violet); }
+.etf-period-btn.active { background: var(--violet); border-color: var(--violet); color: #0a0b17; font-weight: 600; }
+.etf-period-desc { font-family: var(--font-mono); font-size: 0.6786rem; color: var(--text-faint); }
+
 .panel { display: none; }
 .panel.active { display: block; }
 
@@ -232,10 +240,29 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .week-export-btn:disabled { opacity: .6; cursor: default; }
 
 @media print {
-  @page { size: landscape; margin: 10mm; }
+  @page { size: A4 landscape; margin: 10mm; }
   body * { visibility: hidden; }
   #week-print-area, #week-print-area * { visibility: visible; }
-  #week-print-area { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; color: #111 !important; border: none; box-shadow: none; }
+  /* `position: fixed` anchors to the page box itself, ignoring the
+     sidebar/header/hero-band flex layout it sits inside — those are only
+     `visibility: hidden` (still occupying their normal layout space), so
+     `position: absolute` here would inherit blank space from them and land
+     the schedule wherever that flow happened to push it, not page top-left.
+     `zoom` (not `transform: scale`) is set from WeekView's handlePrint via
+     --print-scale so a full day of 30-min blocks still fits one page —
+     transform doesn't affect layout size, so Chrome's pagination would
+     still see the pre-scale height and split onto a 2nd page anyway. */
+  #week-print-area {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    zoom: var(--print-scale, 1);
+    background: #fff !important;
+    color: #111 !important;
+    border: none;
+    box-shadow: none;
+  }
   .week-export-btns { display: none !important; }
   .week-grid .gcell, .week-grid .ghead { border-color: #ccc !important; background: #fff !important; }
   .week-grid .ghead.today { background: #eee !important; }

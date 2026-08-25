@@ -7,28 +7,28 @@ routes:
   - id: mon-to-osong
     weekday: monday
     route: "KTX → 오송, Mon 06:25am"
-    short: "Mon am KTX"
+    short: "Mon am 오송 KTX"
     opens_before_days: 30
     urgent_within_days: 7
 
   - id: mon-to-chungju
     weekday: monday
     route: "무궁화 → 충주, Mon 07:30am"
-    short: "Mon am 무궁화"
+    short: "Mon am 충주 무궁화"
     opens_before_days: 30
     urgent_within_days: 7
 
   - id: mon-from-chungju
     weekday: monday
     route: "무궁화 → 오송, Mon 17:44pm"
-    short: "Mon pm 무궁화"
+    short: "Mon pm 오송 무궁화"
     opens_before_days: 30
     urgent_within_days: 7
 
   - id: mon-from-osong
     weekday: monday
     route: "KTX → 전주, Mon 19:56pm"
-    short: "Mon pm KTX"
+    short: "Mon pm 전주 KTX"
     opens_before_days: 30
     urgent_within_days: 7
 
@@ -36,17 +36,57 @@ routes:
   - id: wed-to-iksan
     weekday: wednesday
     route: "전주 → 익산, Wed 12:31, 13:39(ITX) / 13:17, 13:50, 14:03(KTX)"
-    short: "Jeonju Tue"
+    short: "Wed am 익산 ITX/KTX"
     opens_before_days: 30
     urgent_within_days: 7
 
   - id: wed-from-iksan
     weekday: wednesday
     route: "익산 → 전주, Wed 18:40(무궁화) / 18:05, 19:00(KTX)"
-    short: "Jeonju Tue"
+    short: "Wed pm 전주 ITX/KTX"
     opens_before_days: 30
     urgent_within_days: 7
 
   # 목요일 THURSDAY
+  - id: thur-to-cbnu
+    weekday: Thursday
+    route: "덕진 → 청주, Thu 9:20am"
+    short: "Thur am 청주 bus"
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  - id: thur-from-cbnu
+    weekday: Thursday
+    route: "청주 → 전주, Thu 18:40"
+    short: "Thur pm 전주 bus"
+    opens_before_days: 30
+    urgent_within_days: 7
 
   # 금요일 FRIDAY
+  - id: fri-to-yoosung
+    weekday: friday
+    route: "덕진 → 유성, Fri 9:55, 11:30(우등) / 10:30, 11:00(일반)"
+    short: "Fri am 유성 bus"
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  - id: fri-to-kongju
+    weekday: friday
+    route: "유성 → 공주, Fri 12:17, 12:37, 13:13, 13:17(예매불가)"
+    short: "Fri am 공주 bus"
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  - id: fri-from-kongju
+    weekday: friday
+    route: "공주 → 유성, Fri 17:03, 17:11, 17:47, 17:59(예매불가)"
+    short: "Fri pm 유성 bus"
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  - id: fri-from-yoosung
+    weekday: friday
+    route: "공주 → 전주, Fri 18:20, 19:50(우등)"
+    short: "Fri pm 전주 bus"
+    opens_before_days: 30
+    urgent_within_days: 7
