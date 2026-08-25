@@ -15,6 +15,7 @@ const VIEWS: { id: View; label: string }[] = [
   { id: 'month', label: 'Month' },
   { id: 'semester', label: 'Semester' },
   { id: 'todo', label: 'To-Do' },
+  { id: 'business', label: 'Business' },
 ]
 
 export function Header({

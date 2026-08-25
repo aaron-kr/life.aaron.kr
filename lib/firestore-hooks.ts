@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { useAuth } from './auth-context'
+import type { View } from './types'
 
 export interface StatEntry {
   id: string
@@ -158,4 +159,25 @@ export function useTickets() {
   }
 
   return { tickets, save, undo }
+}
+
+/** settings/ui — { lastView } — so the active view carries over across
+ * devices/sessions instead of always starting on Week. */
+export function useLastView() {
+  const { status } = useAuth()
+  const [lastView, setLastViewState] = useState<View | null>(null)
+
+  useEffect(() => {
+    if (status !== 'signed-in') return
+    return onSnapshot(doc(db, 'settings', 'ui'), (snap) => {
+      const v = snap.data()?.lastView as View | undefined
+      if (v) setLastViewState(v)
+    })
+  }, [status])
+
+  async function setLastView(view: View) {
+    await setDoc(doc(db, 'settings', 'ui'), { lastView: view }, { merge: true })
+  }
+
+  return { lastView, setLastView }
 }

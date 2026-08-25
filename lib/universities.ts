@@ -12,6 +12,7 @@ interface RawUniversity {
   short_ko?: string
   abbr?: string
   url?: string
+  portal?: string // if courses.aaron.kr adds a more specific student-portal link, prefer it over `url`
   logo?: string
 }
 
@@ -23,8 +24,9 @@ export async function fetchUniversities(): Promise<University[]> {
     if (!Array.isArray(raw)) return []
     const universities: University[] = []
     for (const u of raw) {
-      if (u.abbr && u.name && u.url && u.logo) {
-        universities.push({ abbr: u.abbr, name: u.name, nameKo: u.name_ko, shortKo: u.short_ko, url: u.url, logo: u.logo })
+      const link = u.portal ?? u.url
+      if (u.abbr && u.name && link && u.logo) {
+        universities.push({ abbr: u.abbr, name: u.name, nameKo: u.name_ko, shortKo: u.short_ko, url: link, logo: u.logo })
       }
     }
     return universities

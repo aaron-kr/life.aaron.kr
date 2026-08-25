@@ -24,6 +24,12 @@ editing" and "Updating the live site" matter.
    `YOUR_EMAIL` with your actual Google account email (the one you'll sign in
    with). **Publish.**
 
+   ⚠️ `firestore.rules` in this repo is a *template* — pushing a code change
+   to it does **not** update your live rules. Whenever a new Firestore
+   collection is added here (check `git log -- firestore.rules`), re-paste
+   the updated file into the console's Rules tab and Publish again, or writes
+   to that collection will fail with "Missing or insufficient permissions."
+
 This is the same pattern used by `courses.aaron.kr/attend` — a single-user
 app where every collection is gated to one email address, both client-side
 (the sign-in screen rejects other accounts) and server-side (Firestore rules
@@ -87,29 +93,54 @@ Most changes don't touch code at all:
 
 | Want to change... | Edit this file |
 |---|---|
-| Weekly schedule blocks, weekday→city map | `_data/weekly.yml` |
+| Weekly schedule blocks, weekday→city map, block colors | `_data/weekly.yml` |
 | Holidays / make-up days | `_data/holidays.yml` |
-| Family events, deadlines, conferences | `_data/personal-events.yml` |
+| Family events, deadlines, conferences, multi-day trips | `_data/personal-events.yml` |
 | Daily quote rotation | `_data/quotes.yml` |
-| Top stats strip (what's tracked, units, goals) | `_data/stats/*.yml` — one file per stat |
+| Bible reading plan | `_data/bible-plan.yml` |
+| Top stats strip (what's tracked, units, goals, order) | `_data/stats/*.yml` — one file per stat |
 | Habit heatmaps (what's tracked) | `_data/habits.yml` |
 | Recurring ticket routes | `_data/tickets.yml` |
-| ETF watchlist prices | `_data/goal-lists/etfs.yml` |
+| ETF watchlist (live-priced) | `_data/etfs.yml` |
 | North Star / PAI Lab goals | `_data/goal-lists/*.yml` |
-| Courses, weekdays, university, colors (Semester + Month view + weather logo) | `_data/course-sources.yml` |
+| Courses, weekdays, university, colors, course webpage link | `_data/course-sources.yml` |
 | Hometown weather/time widget | `_data/hometown.yml` |
+| Business/tax filing reminders | `_data/business-deadlines.yml` |
+| Compass logo (replaces the 🧭 emoji) | `_data/branding.yml` |
 | Weather hero background images | `public/images/weather/` (see its README) |
 | Top-band background image | `public/images/hero/` (see its README) |
+
+**Editing convention**: in date-listy files (`holidays.yml`, `personal-events.yml`), newest-first is just a convention for your own sake — nothing in the code reads or depends on file order, add entries wherever's convenient. `bible-plan.yml` is the one exception: it's keyed by calendar day (`MM-DD`), not entry date, so keep it in month-day order instead.
+
+**Weekly schedule blocks** (`_data/weekly.yml`) support a few optional per-block fields: `color` (a CSS var name like `"--pink"`, overriding the `type`'s default palette color), `university` (a courses.aaron.kr `universities.yml` abbr, which puts that school's logo inline in the block and links it to the portal), and `day` accepts `saturday`/`sunday` too, not just weekdays — the grid runs Sun→Sat. Row height and block height are both driven by one constant (`SLOT_H` in `components/views/WeekView.tsx`) — if you ever want taller/shorter rows, that's the only number to change; there's no separate CSS value to keep in sync.
 
 `_data/course-sources.yml` is the hub for anything school-related: each entry
 declares a course's `label`, `weekday`, `university` (an `abbr` key from
 courses.aaron.kr's shared `universities.yml`, fetched live — logos and portal
-links come from there automatically), `color`, and optionally a `url` to that
-course's lecture YAML. A course shows up in the Month view header and the
-weather hero's school badge as soon as `weekday`+`university` are set — the
-`url` only affects whether the Semester view's column has actual lecture rows
-in it yet. `semester_start` (top-level, one date) is the Monday that "week 1"
-aligns to for every course's row in the Semester view.
+links come from there automatically), `color`, optionally a `url` to that
+course's lecture YAML, and optionally a `page_url` — the course's own webpage
+on courses.aaron.kr, which the Semester view links every title/header to when
+set. A course shows up in the Month view header and the weather hero's school
+badge as soon as `weekday`+`university` are set — the `url` only affects
+whether the Semester view's column has actual lecture rows in it yet.
+`semester_start` (top-level, one date) is the Monday that "week 1" aligns to
+for every course's row in the Semester view.
+
+### Universities.yml: what's automatic vs. what you update yourself
+
+`_data/course-sources.yml` is **not** the university directory — it just
+references one by `abbr`. The actual names/logos/portal links are fetched
+live every hour from courses.aaron.kr's `_data/universities.yml`
+(`lib/universities.ts`). That means:
+
+- **Automatic, no action needed**: adding a new school to courses.aaron.kr's
+  `universities.yml`, or changing a logo/portal URL there, shows up here on
+  its own (within the hour, or immediately on next deploy).
+- **Manual, every semester**: `_data/course-sources.yml` in *this* repo still
+  needs hand-editing — it's the list of which courses you're actually
+  teaching this semester, on which weekday, with which color, and (once you
+  have it) which raw lecture-file URL. Nothing pulls that automatically,
+  since only you know which courses you're teaching.
 
 Add a new file to `_data/checklists/` and it shows up as a new card in the
 To-Do view automatically — no code change. Give it a `group:` field (see the
@@ -125,9 +156,23 @@ spaced by 10 so you can slot new ones in between without renumbering
 everything (see any existing stat or the school checklists for examples).
 
 None of these need a Firebase touch — only the *state* you check off (habit
-checkins, stat entries, checklist done-state, ticket purchases) lives in
-Firestore. The declarations above are just YAML, committed to git like any
-other file.
+checkins, stat entries, checklist done-state, ticket purchases, ETF prices
+are fetched live rather than stored at all) lives in Firestore. The
+declarations above are just YAML, committed to git like any other file.
+
+### How the quote banner and Bible reading plan work
+
+The quote is picked deterministically by day-of-year (`quotes[dayOfYear() %
+quotes.length]`), so it changes once a day automatically and is the same for
+every visit that day, cycling back to the start once it runs past the end of
+`quotes.yml`. The ‹ › arrows just let you browse other quotes in the list for
+your own viewing — they don't change what "today's" quote is, or affect the
+Bible reading, which is looked up separately by today's `MM-DD` in
+`bible-plan.yml` (no year, so the same file works indefinitely; Feb 29 falls
+back to Feb 28 automatically). `bible-plan.yml` ships with just 3 placeholder
+days — Claude didn't have a full reading plan memorized reliably enough to
+fill in all 365+ days without risking a wrong reference, so add your own
+(M'Cheyne, chronological, whatever you're using).
 
 ## Updating the live site
 
@@ -139,11 +184,30 @@ cache-bust needed beyond that hour.
 
 ## Future enhancements (not built yet)
 
-- **Live ETF prices** — `_data/goal-lists/etfs.yml` is manually edited for
-  now. A real feed would need a stock-price API route similar to
-  `app/api/weather/route.ts`.
 - **Weather hero images** — `public/images/weather/` ships empty; the hero
   falls back to a plain gradient until you upload images (see that folder's
   README for the exact filenames it looks for).
 - **Google Calendar ICS bridge** — intentionally skipped per `CLAUDE.md`;
   `personal-events.yml` covers this for now.
+- **Business view dates** — `_data/business-deadlines.yml` was seeded from
+  general/commonly-known deadlines, not verified against your specific
+  사업자등록 type or personal situation. Confirm with your 세무사/accountant
+  before relying on it, especially the KR VAT schedule and anything
+  PFIC-related.
+- **Business view scope** — currently just a static reminder list. If you
+  want it to do more (track filed/not-filed state, link to actual forms),
+  that's a bigger lift than this pass — say so and it can grow into a real
+  checklist like the To-Do view's.
+
+## Third-party data sources this app depends on
+
+None of these need a key, but all are informal/unofficial endpoints that
+could change or go away — noting them here so a future "why did X stop
+working" debugging session starts in the right place:
+
+| Feature | Source | Notes |
+|---|---|---|
+| Weather | OpenWeatherMap forecast API | Needs `OPENWEATHER_API_KEY` (free tier) — the one official, documented dependency here |
+| ETF prices | Yahoo Finance's unofficial chart endpoint (`query1.finance.yahoo.com`) | No key. Stooq's CSV export was the original choice but now sits behind a JS bot-verification challenge a server fetch can't pass — see `app/api/stock/route.ts` |
+| University directory | courses.aaron.kr's `universities.yml` via raw GitHub | Yours, so unlikely to break, but a path/rename there needs a matching update in `lib/universities.ts` |
+| University logos | Cloudinary URLs referenced in `universities.yml` | Rendered `unoptimized` (no Next Image proxy), so any hotlink protection changes there would show as broken logo icons |

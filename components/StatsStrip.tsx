@@ -4,23 +4,7 @@ import { useState } from 'react'
 import type { StatDeclaration } from '@/lib/types'
 import { useStatLog } from '@/lib/firestore-hooks'
 import { currentWeekRange, todayLocal } from '@/lib/dates'
-
-function sparkPoints(values: number[]): string {
-  if (values.length === 0) return ''
-  const w = 160
-  const h = 20
-  const min = Math.min(...values)
-  const max = Math.max(...values)
-  const range = max - min || 1
-  const step = values.length > 1 ? w / (values.length - 1) : 0
-  return values
-    .map((v, i) => {
-      const x = i * step
-      const y = h - ((v - min) / range) * (h - 4) - 2
-      return `${x.toFixed(1)},${y.toFixed(1)}`
-    })
-    .join(' ')
-}
+import { sparkPoints } from '@/lib/sparkline'
 
 function BodyStripItem({ stat }: { stat: StatDeclaration }) {
   const { entries } = useStatLog(stat.log)

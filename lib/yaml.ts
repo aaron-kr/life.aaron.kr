@@ -4,11 +4,14 @@ import yaml from 'js-yaml'
 import { fetchAllCourses } from './courses'
 import { fetchUniversities } from './universities'
 import type {
+  BiblePlanFile,
   BrandingConfig,
+  BusinessDeadline,
   ChecklistFile,
   CourseSourcesFile,
   DashboardData,
   DashboardTemplate,
+  EtfDeclaration,
   GoalListFile,
   HabitsFile,
   HolidaysFile,
@@ -61,8 +64,13 @@ export async function loadDashboardData(): Promise<DashboardData> {
   const holidays = readYaml<HolidaysFile>('holidays.yml', { holidays: [] }).holidays
   const events = readYaml<PersonalEventsFile>('personal-events.yml', { events: [] }).events
   const quotes = readYaml<QuotesFile>('quotes.yml', { quotes: [] }).quotes
+  const biblePlan = readYaml<BiblePlanFile>('bible-plan.yml', { plan: [] }).plan
   const habits = readYaml<HabitsFile>('habits.yml', { habits: [] }).habits
   const tickets = readYaml<TicketsFile>('tickets.yml', { routes: [] }).routes
+  const etfs = readYaml<{ etfs: EtfDeclaration[] }>('etfs.yml', { etfs: [] }).etfs
+  const businessDeadlines = readYaml<{ deadlines: BusinessDeadline[] }>('business-deadlines.yml', {
+    deadlines: [],
+  }).deadlines
 
   const stats: StatDeclaration[] = sortByOrder(
     readYamlDir<Omit<StatDeclaration, 'id'>>('stats').map(({ id, data }) => ({ id, ...data }))
@@ -96,11 +104,14 @@ export async function loadDashboardData(): Promise<DashboardData> {
     holidays,
     events,
     quotes,
+    biblePlan,
     stats,
     habits,
     checklists,
     goalLists,
     tickets,
+    etfs,
+    businessDeadlines,
     courseSources,
     courses,
     universities,

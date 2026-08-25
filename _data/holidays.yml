@@ -1,11 +1,14 @@
 # KR public holidays, school holidays, and make-up days for the Month view.
 # makeup: true renders the date number in yellow instead of red.
+#
+# Newest first is just a convention for your own editing convenience — nothing
+# in the code depends on this file's order.
 holidays:
-  - { date: "2026-09-24", label: "Chuseok holiday" }
-  - { date: "2026-09-25", label: "Chuseok" }
-  - { date: "2026-09-26", label: "Chuseok holiday" }
-  - { date: "2026-10-03", label: "National Foundation Day" }
-  - { date: "2026-10-05", label: "대체휴일 - National Foundation Day" }
-  - { date: "2026-10-09", label: "Hangeul Day" }
-  - { date: "2026-11-14", label: "Suneung prep day" }
   - { date: "2026-11-24", label: "Make-up class day", makeup: true }
+  - { date: "2026-11-14", label: "Suneung prep day" }
+  - { date: "2026-10-09", label: "Hangeul Day" }
+  - { date: "2026-10-05", label: "대체휴일 - National Foundation Day" }
+  - { date: "2026-10-03", label: "National Foundation Day" }
+  - { date: "2026-09-26", label: "Chuseok holiday" }
+  - { date: "2026-09-25", label: "Chuseok" }
+  - { date: "2026-09-24", label: "Chuseok holiday" }

@@ -1,0 +1,29 @@
+# Recurring KR/US filing reminders — these are yearly-recurring, so `when` is
+# a description ("May 31") rather than a specific date to track/check off.
+# ⚠️ Seeded from general/commonly-known deadlines plus what you mentioned —
+# NOT verified against your specific 사업자등록 type or personal tax
+# situation. Confirm with your 세무사/accountant, especially the KR business
+# filing dates (simplified vs. general taxation have different schedules) and
+# anything PFIC-related (Form 8621 is notoriously situational). Treat this as
+# a reminder list, not tax advice.
+deadlines:
+  - country: KR
+    label: "종합소득세 (Comprehensive Income Tax)"
+    when: "May 31"
+    note: "Annual — personal income tax return"
+  - country: KR
+    label: "부가가치세 (VAT)"
+    when: "Jan 25 / Jul 25"
+    note: "확인 필요 — simplified vs. general taxation have different schedules; confirm which applies to your 사업자등록"
+  - country: US
+    label: "FBAR (FinCEN 114)"
+    when: "Apr 15 (auto-extended to Oct 15)"
+    note: "Required if foreign accounts exceeded $10,000 at any point in the year"
+  - country: US
+    label: "Form 1040 + FEIE (Form 2555)"
+    when: "Jun 15 (automatic 2-month extension for filers abroad; further extension to Oct 15 available)"
+    note: "Foreign Earned Income Exclusion — confirm you still qualify (physical presence / bona fide residence test)"
+  - country: US
+    label: "PFIC (Form 8621)"
+    when: "Filed with Form 1040"
+    note: "Applies if you hold non-US mutual funds/ETFs — complex; get a CPA to confirm whether this applies to you"

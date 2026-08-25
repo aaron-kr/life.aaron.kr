@@ -1,0 +1,15 @@
+# Reading plan keyed by month-day only (no year) so the same file works every
+# year indefinitely, whether you're running a 1-year or a 3-year plan — the
+# app just looks up today's MM-DD. Feb 29 falls back to Feb 28's entry in
+# non-leap years, so leap years aren't a special case you have to handle.
+#
+# I don't have a full plan memorized reliably enough to fill in all 365+ days
+# without risking a wrong reference, so these first few days are just a
+# placeholder to show the format — replace/extend with whatever plan you're
+# actually using (M'Cheyne, chronological, whatever). Newest-first isn't
+# useful here since it's keyed by calendar day, not entry date — keep it in
+# MM-DD order instead.
+plan:
+  - { date: "08-25", reading: "Genesis 1-3" }
+  - { date: "08-26", reading: "Genesis 4-6" }
+  - { date: "08-27", reading: "Genesis 7-9" }

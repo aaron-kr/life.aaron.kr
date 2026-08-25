@@ -35,7 +35,7 @@ recurring_blocks:
 
   - { day: wednesday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "legs" }
   - { day: wednesday, start: "09:00", end: "12:00", type: class, title: "JBNU - Info", sub: "Room", university: jbnu, color: "--violet" }
-  - { day: wednesday, start: "15:00", end: "18:00", type: class, title: "WKU - DB", sub: "Room", university： wku, color: "--blue" }
+  - { day: wednesday, start: "15:00", end: "18:00", type: class, title: "WKU - DB", sub: "Room", university: wku, color: "--blue" }
 
   - { day: thursday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "pull" }
   - { day: thursday, start: "12:00", end: "15:00", type: class, title: "CBNU - Grad ML", sub: "Room", university: cbnu, color: "--red" }

@@ -93,8 +93,18 @@ export function SemesterView({
                     const uni = logoFor(s)
                     return (
                       <div className="sdh-course" key={s.url ?? s.label} style={{ ['--course-color' as string]: s.color ? `var(${s.color})` : undefined }}>
-                        {uni && <Image src={uni.logo} alt={uni.name} width={16} height={16} unoptimized />}
-                        <span>{s.label}</span>
+                        {uni && (
+                          <a href={uni.url} target="_blank" rel="noopener noreferrer" title={`${uni.name} portal`}>
+                            <Image src={uni.logo} alt={uni.name} width={16} height={16} unoptimized />
+                          </a>
+                        )}
+                        {s.page_url ? (
+                          <a href={s.page_url} target="_blank" rel="noopener noreferrer" className="sdh-course-link">
+                            {s.label}
+                          </a>
+                        ) : (
+                          <span>{s.label}</span>
+                        )}
                       </div>
                     )
                   })}
@@ -127,7 +137,13 @@ export function SemesterView({
                               className={`sem-cell-course${isPast ? ' past' : ''}${isThisWeek ? ' current' : ''}${lecture.isBreak ? ' break-row' : ''}${lecture.isExam ? ' exam-row' : ''}`}
                               style={{ borderLeftColor: s.color ? `var(${s.color})` : 'var(--border)' }}
                             >
-                              {lecture.title || '—'}
+                              {s.page_url ? (
+                                <a href={s.page_url} target="_blank" rel="noopener noreferrer">
+                                  {lecture.title || '—'}
+                                </a>
+                              ) : (
+                                lecture.title || '—'
+                              )}
                             </div>
                           )
                         })}

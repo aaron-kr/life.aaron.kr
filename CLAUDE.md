@@ -17,6 +17,39 @@ Separate project from pailab.io / courses.aaron.kr / SERVO — shares design tok
 only. It **reads** `courses.aaron.kr`'s class-schedule YAML as an external source;
 it does not live in that repo.
 
+## Current state — read this first, then treat the rest of this file as historical design notes
+
+Everything below "Stack decisions" was written **before** the build started
+and documents the original plan. The plan mostly held, but drifted in a few
+real ways worth knowing before assuming this file is current:
+
+- **Not 5 universities, one weekday each** — it's grown to as many courses as
+  are in `_data/course-sources.yml` (several schools have 2+ courses on the
+  same weekday). `_data/course-sources.yml` is now the hub for
+  course↔weekday↔university↔color, not the weekdays map in `_data/weekly.yml`
+  (which now only carries city, for weather).
+- **The Semester view isn't per-course columns** — it's weekday columns ×
+  week rows (closer to the original mockup's transposed idea), with courses
+  grouped under their declared weekday and past lectures dimmed.
+- **universities.yml is fetched live**, not copied — `lib/universities.ts`
+  pulls courses.aaron.kr's shared `_data/universities.yml` every hour, so
+  logos/portal links update themselves; only *which courses you're teaching*
+  needs manual editing each semester.
+- **ETF prices are live** (Yahoo Finance's unofficial chart endpoint, no
+  key), not manually typed — moved out of the sidebar goal-list accordions
+  into their own file-driven row (`_data/etfs.yml`), styled like the body
+  stats (sparkline + current value).
+- **Two views were added** beyond the original four: a **Business** view
+  (KR/US tax filing reminders — `_data/business-deadlines.yml`) and the quote
+  banner grew a companion **Bible reading plan** (`_data/bible-plan.yml`,
+  keyed by `MM-DD` so it's year-agnostic).
+- **The active view now persists across devices** via a small
+  `settings/ui` Firestore doc.
+- **Everyday operation is documented in `DEPLOY.md` and `README.md`**, not
+  here — this file is for architecture/history, those two are for "how do I
+  change X." If you're about to explain how to edit something, check there
+  first; don't let this file and those drift out of sync.
+
 ## Stack decisions
 
 - **Next.js on Vercel** — chosen over Astro because this page is interactive
@@ -221,22 +254,27 @@ sums all entries where `date >= reset_date`. `latest` takes the max-date entry.
 
 ## Open decisions (need Aaron's input before/while building)
 
-1. **Real weekday → city/university mapping.** Mockup uses illustrative
-   placeholders (Chungju/Jeonju/Seoul×3) from the original request — confirm the
-   actual 5-day mapping for `weekly.yml`.
+**Resolved since the original write-up:**
+1. ~~Real weekday → city/university mapping~~ — done, live in `_data/weekly.yml`
+   + `_data/course-sources.yml`.
+4. ~~ETF tracking~~ — real feature: live prices via Yahoo Finance, sidebar row
+   with sparklines, `_data/etfs.yml`.
+6. ~~Working title~~ — "Compass" stuck; 🧭 is the brand mark (swappable for a
+   real logo via `_data/branding.yml`).
+
+**Still open:**
 2. **Recurring checklist items**: should "Grading" / "Prep" items reset weekly
    (pulling fresh from the YAML template each Monday) or persist indefinitely
    until manually removed? Affects whether checklist items are keyed by
-   `{item_id}` alone or `{item_id, week}`.
+   `{item_id}` alone or `{item_id, week}`. Current behavior: persist
+   indefinitely (no reset logic built).
 3. **Google Calendar**: skip entirely, or add the read-only ICS bridge described
    above? Recommend deciding after using `personal-events.yml` manually for a
-   few weeks.
-4. **ETF tracking**: real feature or just a demo of the "file = accordion"
-   pattern? If real, needs a price-fetch source (a free-tier stock API) — small
-   scope addition, not core to the dashboard's purpose.
+   few weeks. (`personal-events.yml` now supports multi-day spans via
+   `end_date`, which covers more of what Calendar might have been for.)
 5. **Habit heatmap window length** — mockup uses 12 weeks; confirm whether a
    semester-length (~16 weeks) or rolling-quarter window is more useful.
-6. **Working title** — "Compass" is a placeholder tied to the North Star name.
+   Current: still 12 weeks, unchanged.
 
 ## Build order (phased, so this doesn't become its own procrastination trap)
 

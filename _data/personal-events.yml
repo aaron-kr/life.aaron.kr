@@ -1,7 +1,17 @@
 # Family hikes, church events, deadlines, conferences — anything manually
-# added to the Month view that doesn't come from class-schedule.yml.
-# type: hike | church | event | deadline | conference | ticket
+# added to the Month view that doesn't come from course-sources.yml.
+# type: family | church | event | deadline | conference | ticket
+#
+# Multi-day events (a vacation, a conference trip): add `end_date` (inclusive)
+# and it renders as a spanning bar across those days instead of a per-day
+# badge — a bar crossing a week boundary automatically splits into one
+# segment per row. Example:
+#   - { date: "2026-10-09", end_date: "2026-10-12", label: "Family trip — Jeju", type: family }
+#
+# Newest first is just a convention for your own editing convenience (so new
+# entries go at the top, not the bottom of an ever-growing file) — nothing in
+# the code depends on this file's order.
 events:
-  - { date: "2026-08-29", label: "Family hike — Bukhansan", type: family }
-  - { date: "2026-09-05", label: "IROS abstract due", type: deadline }
   - { date: "2026-09-12", label: "KSPAI 학회 — Daejeon", type: conference }
+  - { date: "2026-09-05", label: "IROS abstract due", type: deadline }
+  - { date: "2026-08-29", label: "Family hike — Bukhansan", type: family }

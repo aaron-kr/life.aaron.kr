@@ -1,4 +1,4 @@
-export type View = 'week' | 'month' | 'semester' | 'todo'
+export type View = 'week' | 'month' | 'semester' | 'todo' | 'business'
 
 export type Weekday = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'
 
@@ -36,9 +36,10 @@ export interface HolidaysFile {
 }
 
 export interface PersonalEvent {
-  date: string
+  date: string // start date, YYYY-MM-DD
+  end_date?: string // optional inclusive end date — set this for multi-day events (a vacation, a conference trip) and it renders as a spanning pill instead of a single-day badge
   label: string
-  type: 'hike' | 'church' | 'event' | 'deadline' | 'conference' | 'ticket'
+  type: 'family' | 'church' | 'event' | 'deadline' | 'conference' | 'ticket'
 }
 
 export interface PersonalEventsFile {
@@ -52,6 +53,15 @@ export interface Quote {
 
 export interface QuotesFile {
   quotes: Quote[]
+}
+
+export interface BiblePlanEntry {
+  date: string // "MM-DD", no year — reused every year indefinitely
+  reading: string
+}
+
+export interface BiblePlanFile {
+  plan: BiblePlanEntry[]
 }
 
 export type StatType = 'latest' | 'total' | 'fraction'
@@ -99,18 +109,30 @@ export interface GoalChecklistItem {
   text: string
 }
 
-export interface GoalTickerItem {
-  sym: string
-  price: string
-  chg: string
-  up: boolean
-}
-
 export interface GoalListFile {
   id: string
   title: string
-  type: 'checklist' | 'ticker'
-  items: GoalChecklistItem[] | GoalTickerItem[]
+  type: 'checklist'
+  items: GoalChecklistItem[]
+}
+
+/** _data/etfs.yml — symbols to track in the sidebar's ETF row, priced live
+ * from Stooq's free no-key CSV endpoint (see lib/stooq.ts). */
+export interface EtfDeclaration {
+  symbol: string // Stooq ticker, e.g. "VTI.US"
+  label: string
+  color?: string // CSS var name
+}
+
+/** _data/business-deadlines.yml — recurring KR/US filing reminders, shown in
+ * the Business view. Dates are described loosely ("May 31", "Jan / Jul")
+ * rather than parsed, since these are yearly-recurring reminders, not
+ * calendar events. */
+export interface BusinessDeadline {
+  country: 'KR' | 'US'
+  label: string
+  when: string
+  note?: string
 }
 
 export interface TicketRoute {
@@ -149,6 +171,7 @@ export interface University {
 export interface CourseSource {
   label: string
   url?: string // optional — omit while you haven't added the lecture file yet
+  page_url?: string // the course's own webpage on courses.aaron.kr — Semester view links the title to this
   color?: string // CSS var name, e.g. "--blue"
   university?: string // University.abbr
   weekday?: Weekday
@@ -195,11 +218,14 @@ export interface DashboardData {
   holidays: HolidayEntry[]
   events: PersonalEvent[]
   quotes: Quote[]
+  biblePlan: BiblePlanEntry[]
   stats: StatDeclaration[]
   habits: HabitDeclaration[]
   checklists: ChecklistFile[]
   goalLists: GoalListFile[]
   tickets: TicketRoute[]
+  etfs: EtfDeclaration[]
+  businessDeadlines: BusinessDeadline[]
   courseSources: CourseSource[]
   courses: Course[]
   universities: University[]

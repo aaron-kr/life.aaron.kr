@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { DashboardData, FullWeekday, University } from '@/lib/types'
 import { WeatherHero } from './WeatherHero'
 import { HabitHeatmaps } from './HabitHeatmaps'
+import { EtfRow } from './EtfRow'
 import { GoalAccordions } from './GoalAccordions'
 
 export function Sidebar({
@@ -29,6 +30,7 @@ export function Sidebar({
         </div>
 
         <HabitHeatmaps habits={data.habits} />
+        <EtfRow etfs={data.etfs} />
         <GoalAccordions goalLists={data.goalLists} />
       </aside>
       <button className="collapse-btn" onClick={() => setCollapsed((c) => !c)}>

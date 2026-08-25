@@ -1,8 +1,0 @@
-# Manually updated for now — a live price feed is a future enhancement
-# (see README "Future enhancements"). Just edit price/chg by hand.
-title: "ETF Watchlist"
-type: ticker
-items:
-  - { sym: VTI, price: "268.40", chg: "+0.8%", up: true }
-  - { sym: VXUS, price: "61.12", chg: "-0.3%", up: false }
-  - { sym: SCHD, price: "27.95", chg: "+0.2%", up: true }

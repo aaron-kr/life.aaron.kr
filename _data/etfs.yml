@@ -1,0 +1,8 @@
+# Sidebar ETF row, priced live from Yahoo Finance's free chart endpoint (no
+# API key, no signup — see app/api/stock/route.ts). `symbol` is a plain
+# ticker, e.g. "VTI". Add/remove freely, same file-driven idea as everything
+# else in _data/.
+etfs:
+  - { symbol: "VTI", label: "VTI", color: "--blue" }
+  - { symbol: "VXUS", label: "VXUS", color: "--green" }
+  - { symbol: "SCHD", label: "SCHD", color: "--gold" }

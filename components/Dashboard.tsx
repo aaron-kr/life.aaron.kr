@@ -1,8 +1,9 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { DashboardData, View } from '@/lib/types'
 import { buildWeekdayUniversities } from '@/lib/weekdayUniversities'
+import { useLastView } from '@/lib/firestore-hooks'
 import { SiteNav } from './SiteNav'
 import { Header } from './Header'
 import { QuoteBanner } from './QuoteBanner'
@@ -12,13 +13,30 @@ import { WeekView } from './views/WeekView'
 import { MonthView } from './views/MonthView'
 import { SemesterView } from './views/SemesterView'
 import { TodoView } from './views/TodoView'
+import { BusinessView } from './views/BusinessView'
 import { TicketDrawer } from './Checklist/TicketDrawer'
 import { Footer } from './Footer'
 
 export function Dashboard({ data }: { data: DashboardData }) {
-  const [view, setView] = useState<View>('week')
+  const [view, setViewState] = useState<View>('week')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const { lastView, setLastView } = useLastView()
+
+  // Carries the active view across devices/sessions: once Firestore reports
+  // the last one used elsewhere, jump to it (a brief flash of Week first is
+  // the tradeoff for not blocking the initial render on a Firestore read).
+  useEffect(() => {
+    if (lastView) setViewState(lastView)
+  }, [lastView])
+
+  function setView(v: View) {
+    setViewState(v)
+    // Fire-and-forget: never let a transient write failure (offline, a
+    // not-yet-resolved auth token) surface as an unhandled rejection over
+    // something this unimportant.
+    setLastView(v).catch(() => {})
+  }
 
   const weekdayUniversities = useMemo(
     () => buildWeekdayUniversities(data.courseSources, data.universities),
@@ -40,7 +58,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
           hometown={data.hometown}
           logoUrl={data.branding.logoUrl}
         />
-        <QuoteBanner quotes={data.quotes} />
+        <QuoteBanner quotes={data.quotes} biblePlan={data.biblePlan} />
       </div>
       <Sidebar
         data={data}
@@ -65,6 +83,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
           />
         )}
         {view === 'todo' && <TodoView checklists={data.checklists} universities={data.universities} />}
+        {view === 'business' && <BusinessView deadlines={data.businessDeadlines} />}
       </main>
       <Footer />
       <TicketDrawer routes={data.tickets} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
