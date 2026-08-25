@@ -2,9 +2,10 @@
 
 import type { ReactNode } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { BrandMark } from './BrandMark'
 import { SignInScreen } from './SignInScreen'
 
-export function AuthGate({ children }: { children: ReactNode }) {
+export function AuthGate({ children, logoUrl }: { children: ReactNode; logoUrl?: string }) {
   const { status } = useAuth()
 
   if (status === 'loading') {
@@ -15,7 +16,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return (
       <div className="auth-screen">
         <div className="auth-card">
-          <div className="mark">🧭</div>
+          <BrandMark logoUrl={logoUrl} />
           <h1>Set up Firebase first</h1>
           <p>
             Copy <code>.env.local.example</code> to <code>.env.local</code> and fill in your Firebase project&apos;s
@@ -28,7 +29,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }
 
   if (status === 'signed-out' || status === 'unauthorized') {
-    return <SignInScreen />
+    return <SignInScreen logoUrl={logoUrl} />
   }
 
   return <>{children}</>

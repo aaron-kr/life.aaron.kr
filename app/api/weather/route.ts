@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 interface ForecastEntry {
-  dt_txt: string // "2026-08-24 09:00:00"
+  dt: number // UTC unix seconds
   main: { temp: number }
   weather: { icon: string; main: string }[]
   pop?: number // probability of precipitation, 0-1
+}
+
+interface ForecastResponse {
+  list: ForecastEntry[]
+  city: { timezone: number } // seconds offset from UTC for the queried location
 }
 
 function iconEmoji(code: string): string {
@@ -22,12 +27,23 @@ function iconEmoji(code: string): string {
   return map[code.slice(0, 2)] ?? '🌤️'
 }
 
-function closestTo(entries: ForecastEntry[], dateYmd: string, targetHour: number): ForecastEntry | null {
-  const sameDay = entries.filter((e) => e.dt_txt.startsWith(dateYmd))
+/** OpenWeatherMap's `dt` is UTC. Shifting by the location's own tz offset
+ * before reading fields with the UTC getters gives that location's local
+ * hour/date without needing a timezone database. */
+function localHourAndDate(entry: ForecastEntry, tzOffsetSec: number): { hour: number; dateYmd: string } {
+  const local = new Date((entry.dt + tzOffsetSec) * 1000)
+  const y = local.getUTCFullYear()
+  const m = String(local.getUTCMonth() + 1).padStart(2, '0')
+  const d = String(local.getUTCDate()).padStart(2, '0')
+  return { hour: local.getUTCHours(), dateYmd: `${y}-${m}-${d}` }
+}
+
+function closestTo(entries: ForecastEntry[], dateYmd: string, targetHour: number, tzOffsetSec: number): ForecastEntry | null {
+  const sameDay = entries.filter((e) => localHourAndDate(e, tzOffsetSec).dateYmd === dateYmd)
   if (!sameDay.length) return null
   return sameDay.reduce((best, e) => {
-    const hour = parseInt(e.dt_txt.slice(11, 13), 10)
-    const bestHour = parseInt(best.dt_txt.slice(11, 13), 10)
+    const hour = localHourAndDate(e, tzOffsetSec).hour
+    const bestHour = localHourAndDate(best, tzOffsetSec).hour
     return Math.abs(hour - targetHour) < Math.abs(bestHour - targetHour) ? e : best
   }, sameDay[0])
 }
@@ -74,10 +90,11 @@ export async function GET(req: NextRequest) {
     )}&units=metric&appid=${apiKey}`
     const res = await fetch(url, { next: { revalidate: 3600 } })
     if (!res.ok) throw new Error(`OpenWeather ${res.status}`)
-    const data = (await res.json()) as { list: ForecastEntry[] }
+    const data = (await res.json()) as ForecastResponse
+    const tzOffsetSec = data.city?.timezone ?? 0
 
-    const am = closestTo(data.list, dateYmd, 9)
-    const pm = closestTo(data.list, dateYmd, 15)
+    const am = closestTo(data.list, dateYmd, 9, tzOffsetSec)
+    const pm = closestTo(data.list, dateYmd, 15, tzOffsetSec)
     const iconSrc = pm ?? am
     const popAm = am?.pop != null ? Math.round(am.pop * 100) : null
     const popPm = pm?.pop != null ? Math.round(pm.pop * 100) : null

@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import type { HolidayEntry, PersonalEvent, University, Weekday } from '@/lib/types'
+import type { FullWeekday, HolidayEntry, PersonalEvent, University, Weekday } from '@/lib/types'
 import { addDays, rollingMonthGridStart, sameDate, todayLocal, ymd } from '@/lib/dates'
 
 const DOW_HEADS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -29,7 +29,7 @@ export function MonthView({
 }: {
   holidays: HolidayEntry[]
   events: PersonalEvent[]
-  weekdayUniversities: Partial<Record<Weekday, University[]>>
+  weekdayUniversities: Partial<Record<FullWeekday, University[]>>
 }) {
   const today = todayLocal()
   const gridStart = rollingMonthGridStart(today)

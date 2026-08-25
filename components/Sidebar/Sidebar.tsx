@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { DashboardData, University, Weekday } from '@/lib/types'
+import type { DashboardData, FullWeekday, University } from '@/lib/types'
 import { WeatherHero } from './WeatherHero'
 import { HabitHeatmaps } from './HabitHeatmaps'
 import { GoalAccordions } from './GoalAccordions'
@@ -13,7 +13,7 @@ export function Sidebar({
   onMobileClose,
 }: {
   data: DashboardData
-  weekdayUniversities: Partial<Record<Weekday, University[]>>
+  weekdayUniversities: Partial<Record<FullWeekday, University[]>>
   mobileOpen: boolean
   onMobileClose: () => void
 }) {

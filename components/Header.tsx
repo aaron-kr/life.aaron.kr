@@ -8,6 +8,7 @@ import { useTicketBadgeCount } from './Checklist/TicketDrawer'
 import { WaveToggleButton } from './WaveToggleButton'
 import { HometownWidget } from './HometownWidget'
 import { DropdownPortal } from './DropdownPortal'
+import { BrandMark } from './BrandMark'
 
 const VIEWS: { id: View; label: string }[] = [
   { id: 'week', label: 'Week' },
@@ -23,6 +24,7 @@ export function Header({
   onHamburgerClick,
   tickets,
   hometown,
+  logoUrl,
 }: {
   view: View
   onViewChange: (v: View) => void
@@ -30,6 +32,7 @@ export function Header({
   onHamburgerClick: () => void
   tickets: TicketRoute[]
   hometown: HometownConfig
+  logoUrl?: string
 }) {
   const { user, signOutUser } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -43,7 +46,7 @@ export function Header({
         <button className="icon-btn hamburger-btn" onClick={onHamburgerClick} title="Menu" aria-label="Toggle sidebar">
           ☰
         </button>
-        <div className="mark">🧭</div>
+        <BrandMark logoUrl={logoUrl} />
         <div>
           <h1>Compass</h1>
           <div className="sub">Personal Dashboard</div>

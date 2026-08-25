@@ -1,0 +1,6 @@
+# Paste an image URL here to replace the 🧭 emoji everywhere it appears
+# (header, sign-in screen, "set up Firebase" screen). Leave blank to keep the
+# emoji. Any reasonably square image works — it's shown at 28-44px depending
+# on where it renders, with object-fit: contain (so it won't be stretched or
+# cropped) over the existing gradient badge background.
+logo_url: ""

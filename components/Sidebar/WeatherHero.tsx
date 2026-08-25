@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import type { DashboardTemplate, University, Weekday } from '@/lib/types'
-import { getThisWeekDays } from '@/lib/weekDays'
+import type { DashboardTemplate, FullWeekday, University } from '@/lib/types'
+import { getThisWeekDays, getWeekendDays } from '@/lib/weekDays'
 import { useWeather } from '@/lib/useWeather'
 import { weatherBackgroundUrl } from '@/lib/weatherImages'
 
@@ -14,11 +14,16 @@ export function WeatherHero({
   weekdayUniversities,
 }: {
   template: DashboardTemplate
-  weekdayUniversities: Partial<Record<Weekday, University[]>>
+  weekdayUniversities: Partial<Record<FullWeekday, University[]>>
 }) {
-  const days = getThisWeekDays(template)
-  const todayYmd = days.find((d) => d.isToday)?.dateYmd ?? days[0]?.dateYmd
-  const weather = useWeather(days.map((d) => ({ key: d.dateYmd, city: d.city, date: d.dateYmd })))
+  const weekdays = getThisWeekDays(template)
+  const [sat, sun] = getWeekendDays(template)
+  const allDays = [...weekdays, sat, sun]
+
+  const todayYmd = allDays.find((d) => d.isToday)?.dateYmd ?? weekdays[0]?.dateYmd
+  const weather = useWeather(
+    allDays.filter((d) => d.city).map((d) => ({ key: d.dateYmd, city: d.city, date: d.dateYmd }))
+  )
 
   const [viewedYmd, setViewedYmd] = useState(todayYmd)
   const [flipKey, setFlipKey] = useState(0)
@@ -43,7 +48,7 @@ export function WeatherHero({
     }
   }
 
-  const viewedDay = days.find((d) => d.dateYmd === viewedYmd) ?? days[0]
+  const viewedDay = allDays.find((d) => d.dateYmd === viewedYmd) ?? weekdays[0]
   const w = weather[viewedYmd]
   const dateLabel = viewedDay?.date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
   const schools = viewedDay ? (weekdayUniversities[viewedDay.weekday] ?? []) : []
@@ -84,7 +89,7 @@ export function WeatherHero({
         </div>
       </div>
       <div className="day-strip">
-        {days.map((d) => {
+        {weekdays.map((d) => {
           const dw = weather[d.dateYmd]
           return (
             <button
@@ -98,6 +103,21 @@ export function WeatherHero({
             </button>
           )
         })}
+        <div className="day-strip-cell weekend-cell">
+          {[sat, sun].map((d) => {
+            const dw = weather[d.dateYmd]
+            return (
+              <button
+                key={d.dateYmd}
+                className={`weekend-half${d.dateYmd === viewedYmd ? ' active' : ''}${d.isToday ? ' today' : ''}`}
+                onClick={() => selectDay(d.dateYmd)}
+              >
+                <span className="dsc-label">{d.weekday === 'saturday' ? 'Sat' : 'Sun'}</span>
+                <span className="dsc-icon">{dw?.icon ?? '·'}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

@@ -38,6 +38,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
           onHamburgerClick={() => setMobileSidebarOpen((o) => !o)}
           tickets={data.tickets}
           hometown={data.hometown}
+          logoUrl={data.branding.logoUrl}
         />
         <QuoteBanner quotes={data.quotes} />
       </div>

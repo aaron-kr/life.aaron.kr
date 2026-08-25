@@ -186,6 +186,10 @@ export interface HometownConfig {
   label: string
 }
 
+export interface BrandingConfig {
+  logoUrl: string // if set, replaces the 🧭 emoji everywhere it appears
+}
+
 export interface DashboardData {
   template: DashboardTemplate
   holidays: HolidayEntry[]
@@ -201,4 +205,5 @@ export interface DashboardData {
   universities: University[]
   semesterStart: string | null
   hometown: HometownConfig
+  branding: BrandingConfig
 }

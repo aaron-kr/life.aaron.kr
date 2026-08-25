@@ -1,4 +1,4 @@
-import { FULL_WEEK_ORDER, WEEKDAY_ORDER, addDays, mondayOfWeek, sameDate, sundayOfWeek, todayLocal, ymd } from './dates'
+import { FULL_WEEK_ORDER, WEEKDAY_ORDER, addDays, nextWeekdayOccurrence, sameDate, sundayOfWeek, todayLocal, ymd } from './dates'
 import type { DashboardTemplate, FullWeekday, Weekday } from './types'
 
 export interface WeekDayInfo {
@@ -11,11 +11,15 @@ export interface WeekDayInfo {
   label: string // MON, TUE, ...
 }
 
+/** Rolling, not calendar-week-anchored: each weekday is its *next* occurrence
+ * on/after today (today itself if today is that weekday), so no slot ever
+ * points at a day that's already passed — the forecast API only has data
+ * for today forward anyway, so a fixed Mon-anchored week would show blank
+ * "—" cells for any weekday already behind us once the week is underway. */
 export function getThisWeekDays(template: DashboardTemplate): WeekDayInfo[] {
   const today = todayLocal()
-  const monday = mondayOfWeek(today)
-  return WEEKDAY_ORDER.map((weekday, i) => {
-    const date = addDays(monday, i)
+  return WEEKDAY_ORDER.map((weekday) => {
+    const date = nextWeekdayOccurrence(today, weekday)
     const mapping = template.weekdays[weekday] ?? { city: '' }
     return {
       weekday,
@@ -27,6 +31,32 @@ export function getThisWeekDays(template: DashboardTemplate): WeekDayInfo[] {
       label: weekday.slice(0, 3).toUpperCase(),
     }
   })
+}
+
+export interface WeekendDayInfo {
+  weekday: 'saturday' | 'sunday'
+  date: Date
+  dateYmd: string
+  city: string
+  cityDisplay: string
+  isToday: boolean
+}
+
+/** Same rolling logic as getThisWeekDays, for the sidebar's combined Sat/Sun box. */
+export function getWeekendDays(template: DashboardTemplate): [WeekendDayInfo, WeekendDayInfo] {
+  const today = todayLocal()
+  return (['saturday', 'sunday'] as const).map((weekday) => {
+    const date = nextWeekdayOccurrence(today, weekday)
+    const mapping = template.weekdays[weekday] ?? { city: '' }
+    return {
+      weekday,
+      date,
+      dateYmd: ymd(date),
+      city: mapping.city,
+      cityDisplay: mapping.city_kr || mapping.city,
+      isToday: sameDate(date, today),
+    }
+  }) as [WeekendDayInfo, WeekendDayInfo]
 }
 
 export interface FullWeekDayInfo {

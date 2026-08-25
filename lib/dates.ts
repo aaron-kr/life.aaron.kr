@@ -88,11 +88,12 @@ export function currentWeekRange(today: Date): [string, string] {
   return [ymd(monday), ymd(addDays(monday, 6))]
 }
 
-/** Next occurrence of a given weekday on/after `from`. */
-export function nextWeekdayOccurrence(from: Date, weekday: Weekday): Date {
-  const targetDow = WEEKDAY_ORDER.indexOf(weekday) + 1 // Mon=1..Fri=5
+/** Next occurrence of a given weekday on/after `from` (today counts if it
+ * already is that weekday) — accepts any day, not just Mon-Fri. */
+export function nextWeekdayOccurrence(from: Date, weekday: FullWeekday): Date {
+  const targetDow = FULL_WEEK_ORDER.indexOf(weekday) // Sun=0..Sat=6
   let d = new Date(from)
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 7; i++) {
     if (d.getDay() === targetDow) return d
     d = addDays(d, 1)
   }

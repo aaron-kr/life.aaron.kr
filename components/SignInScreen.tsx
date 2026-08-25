@@ -1,14 +1,15 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
+import { BrandMark } from './BrandMark'
 
-export function SignInScreen() {
+export function SignInScreen({ logoUrl }: { logoUrl?: string }) {
   const { status, error, signIn } = useAuth()
 
   return (
     <div className="auth-screen">
       <div className="auth-card">
-        <div className="mark">🧭</div>
+        <BrandMark logoUrl={logoUrl} />
         <h1>Compass</h1>
         <p>
           {status === 'unauthorized'

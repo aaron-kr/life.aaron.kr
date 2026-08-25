@@ -4,6 +4,7 @@ import yaml from 'js-yaml'
 import { fetchAllCourses } from './courses'
 import { fetchUniversities } from './universities'
 import type {
+  BrandingConfig,
   ChecklistFile,
   CourseSourcesFile,
   DashboardData,
@@ -85,6 +86,9 @@ export async function loadDashboardData(): Promise<DashboardData> {
     label: 'Home',
   })
 
+  const brandingRaw = readYaml<{ logo_url?: string }>('branding.yml', {})
+  const branding: BrandingConfig = { logoUrl: brandingRaw.logo_url ?? '' }
+
   const [courses, universities] = await Promise.all([fetchAllCourses(courseSources), fetchUniversities()])
 
   return {
@@ -102,5 +106,6 @@ export async function loadDashboardData(): Promise<DashboardData> {
     universities,
     semesterStart,
     hometown,
+    branding,
   }
 }
