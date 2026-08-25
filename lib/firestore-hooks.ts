@@ -161,17 +161,21 @@ export function useTickets() {
   return { tickets, save, undo }
 }
 
-/** settings/ui — { lastView } — so the active view carries over across
- * devices/sessions instead of always starting on Week. */
-export function useLastView() {
+/** settings/ui — { lastView, statsCollapsed } — small cross-device UI prefs.
+ * One doc, one listener, for anything in this "remember this across devices"
+ * category — add more fields here rather than opening a second listener on
+ * the same document. */
+export function useUiSettings() {
   const { status } = useAuth()
   const [lastView, setLastViewState] = useState<View | null>(null)
+  const [statsCollapsed, setStatsCollapsedState] = useState<boolean | null>(null)
 
   useEffect(() => {
     if (status !== 'signed-in') return
     return onSnapshot(doc(db, 'settings', 'ui'), (snap) => {
-      const v = snap.data()?.lastView as View | undefined
-      if (v) setLastViewState(v)
+      const data = snap.data()
+      if (data?.lastView) setLastViewState(data.lastView as View)
+      if (typeof data?.statsCollapsed === 'boolean') setStatsCollapsedState(data.statsCollapsed)
     })
   }, [status])
 
@@ -179,5 +183,9 @@ export function useLastView() {
     await setDoc(doc(db, 'settings', 'ui'), { lastView: view }, { merge: true })
   }
 
-  return { lastView, setLastView }
+  async function setStatsCollapsed(collapsed: boolean) {
+    await setDoc(doc(db, 'settings', 'ui'), { statsCollapsed: collapsed }, { merge: true })
+  }
+
+  return { lastView, setLastView, statsCollapsed, setStatsCollapsed }
 }

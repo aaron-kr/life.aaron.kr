@@ -3,15 +3,50 @@
 # today's date — nothing here is date-specific, `weekday` + `opens_before_days`
 # is enough to derive it each week.
 routes:
-  - id: chungju-mon
+  # 월요일 MONDAY
+  - id: mon-to-osong
     weekday: monday
-    route: "KTX → Chungju, Mon 7:10am"
-    short: "Chungju Mon"
+    route: "KTX → 오송, Mon 06:25am"
+    short: "Mon am KTX"
     opens_before_days: 30
     urgent_within_days: 7
 
-  - id: jeonju-tue
-    weekday: tuesday
-    route: "Bus → Jeonju, Tue 6:40am"
+  - id: mon-to-chungju
+    weekday: monday
+    route: "무궁화 → 충주, Mon 07:30am"
+    short: "Mon am 무궁화"
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  - id: mon-from-chungju
+    weekday: monday
+    route: "무궁화 → 오송, Mon 17:44pm"
+    short: "Mon pm 무궁화"
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  - id: mon-from-osong
+    weekday: monday
+    route: "KTX → 전주, Mon 19:56pm"
+    short: "Mon pm KTX"
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  # 수요일 WEDNESDAY
+  - id: wed-to-iksan
+    weekday: wednesday
+    route: "전주 → 익산, Wed 12:31, 13:39(ITX) / 13:17, 13:50, 14:03(KTX)"
     short: "Jeonju Tue"
-    opens_before_days: 14
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  - id: wed-from-iksan
+    weekday: wednesday
+    route: "익산 → 전주, Wed 18:40(무궁화) / 18:05, 19:00(KTX)"
+    short: "Jeonju Tue"
+    opens_before_days: 30
+    urgent_within_days: 7
+
+  # 목요일 THURSDAY
+
+  # 금요일 FRIDAY

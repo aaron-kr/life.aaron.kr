@@ -3,15 +3,20 @@ import { ChecklistSection } from '../Checklist/ChecklistSection'
 
 const DEFAULT_GROUP = 'General'
 const GROUP_ORDER = [DEFAULT_GROUP, 'Schools']
+// These groups get their own dedicated view (Business, Jobs) instead of
+// showing up here too.
+const ELSEWHERE_GROUPS = ['Business', 'Jobs']
 
 export function TodoView({ checklists, universities }: { checklists: ChecklistFile[]; universities: University[] }) {
   const groups = new Map<string, ChecklistFile[]>()
-  checklists.forEach((c) => {
-    const g = c.group || DEFAULT_GROUP
-    const list = groups.get(g) ?? []
-    list.push(c)
-    groups.set(g, list)
-  })
+  checklists
+    .filter((c) => !ELSEWHERE_GROUPS.includes(c.group ?? ''))
+    .forEach((c) => {
+      const g = c.group || DEFAULT_GROUP
+      const list = groups.get(g) ?? []
+      list.push(c)
+      groups.set(g, list)
+    })
 
   const orderedGroups = [
     ...GROUP_ORDER.filter((g) => groups.has(g)),

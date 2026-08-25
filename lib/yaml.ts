@@ -16,10 +16,12 @@ import type {
   HabitsFile,
   HolidaysFile,
   HometownConfig,
+  JobsConfig,
   PersonalEventsFile,
   QuotesFile,
   StatDeclaration,
   TicketsFile,
+  WeatherCitiesFile,
 } from './types'
 
 const DATA_DIR = path.join(process.cwd(), '_data')
@@ -50,7 +52,8 @@ function sortByOrder<T extends { order?: number }>(items: T[]): T[] {
 }
 
 export async function loadDashboardData(): Promise<DashboardData> {
-  const template = readYaml<DashboardTemplate>('weekly.yml', {
+  const template = readYaml<DashboardTemplate>('weekly.yml', { recurring_blocks: [] })
+  const weatherCities = readYaml<WeatherCitiesFile>('weather.yml', {
     weekdays: {
       monday: { city: '' },
       tuesday: { city: '' },
@@ -58,8 +61,7 @@ export async function loadDashboardData(): Promise<DashboardData> {
       thursday: { city: '' },
       friday: { city: '' },
     },
-    recurring_blocks: [],
-  })
+  }).weekdays
 
   const holidays = readYaml<HolidaysFile>('holidays.yml', { holidays: [] }).holidays
   const events = readYaml<PersonalEventsFile>('personal-events.yml', { events: [] }).events
@@ -97,10 +99,18 @@ export async function loadDashboardData(): Promise<DashboardData> {
   const brandingRaw = readYaml<{ logo_url?: string }>('branding.yml', {})
   const branding: BrandingConfig = { logoUrl: brandingRaw.logo_url ?? '' }
 
+  const jobsRaw = readYaml<{ alert_rss_url?: string; drive_url?: string; target_positions?: string }>('jobs.yml', {})
+  const jobs: JobsConfig = {
+    alertRssUrl: jobsRaw.alert_rss_url ?? '',
+    driveUrl: jobsRaw.drive_url ?? '',
+    targetPositions: jobsRaw.target_positions ?? '',
+  }
+
   const [courses, universities] = await Promise.all([fetchAllCourses(courseSources), fetchUniversities()])
 
   return {
     template,
+    weatherCities,
     holidays,
     events,
     quotes,
@@ -118,5 +128,6 @@ export async function loadDashboardData(): Promise<DashboardData> {
     semesterStart,
     hometown,
     branding,
+    jobs,
   }
 }

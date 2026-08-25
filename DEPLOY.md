@@ -93,26 +93,34 @@ Most changes don't touch code at all:
 
 | Want to change... | Edit this file |
 |---|---|
-| Weekly schedule blocks, weekday→city map, block colors | `_data/weekly.yml` |
+| Weekly schedule blocks, block colors | `_data/weekly.yml` |
+| Weekday→city weather map (**this is where Sat/Sun weather lives**) | `_data/weather.yml` |
 | Holidays / make-up days | `_data/holidays.yml` |
 | Family events, deadlines, conferences, multi-day trips | `_data/personal-events.yml` |
 | Daily quote rotation | `_data/quotes.yml` |
 | Bible reading plan | `_data/bible-plan.yml` |
-| Top stats strip (what's tracked, units, goals, order) | `_data/stats/*.yml` — one file per stat |
+| Top stats strip: body/semester stats (what's tracked, units, goals, order) | `_data/stats/*.yml` — one file per stat |
+| Top stats strip: ETF watchlist (live-priced, auto-currency) | `_data/etfs.yml` |
 | Habit heatmaps (what's tracked) | `_data/habits.yml` |
 | Recurring ticket routes | `_data/tickets.yml` |
-| ETF watchlist (live-priced) | `_data/etfs.yml` |
 | North Star / PAI Lab goals | `_data/goal-lists/*.yml` |
 | Courses, weekdays, university, colors, course webpage link | `_data/course-sources.yml` |
 | Hometown weather/time widget | `_data/hometown.yml` |
 | Business/tax filing reminders | `_data/business-deadlines.yml` |
+| Business milestone/project checklists (e.g. YouTube channel, blog redesign) | `_data/checklists/*.yml` with `group: Business` |
+| Jobs view: target positions, Drive link, Google Alert feed | `_data/jobs.yml` |
+| Jobs view: job-search reminder checklists | `_data/checklists/*.yml` with `group: Jobs` |
 | Compass logo (replaces the 🧭 emoji) | `_data/branding.yml` |
 | Weather hero background images | `public/images/weather/` (see its README) |
 | Top-band background image | `public/images/hero/` (see its README) |
 
 **Editing convention**: in date-listy files (`holidays.yml`, `personal-events.yml`), newest-first is just a convention for your own sake — nothing in the code reads or depends on file order, add entries wherever's convenient. `bible-plan.yml` is the one exception: it's keyed by calendar day (`MM-DD`), not entry date, so keep it in month-day order instead.
 
-**Weekly schedule blocks** (`_data/weekly.yml`) support a few optional per-block fields: `color` (a CSS var name like `"--pink"`, overriding the `type`'s default palette color), `university` (a courses.aaron.kr `universities.yml` abbr, which puts that school's logo inline in the block and links it to the portal), and `day` accepts `saturday`/`sunday` too, not just weekdays — the grid runs Sun→Sat. Row height and block height are both driven by one constant (`SLOT_H` in `components/views/WeekView.tsx`) — if you ever want taller/shorter rows, that's the only number to change; there's no separate CSS value to keep in sync.
+**Weekly schedule blocks** (`_data/weekly.yml`) support a few optional per-block fields: `color` (a CSS var name like `"--pink"`, overriding the `type`'s default palette color), `university` (a courses.aaron.kr `universities.yml` abbr, which puts that school's logo inline in the block and links it to the portal), and `day` accepts `saturday`/`sunday` too, not just weekdays — the grid runs Sun→Sat. Row height and block height are both driven by one constant (`SLOT_H` in `components/views/WeekView.tsx`) — if you ever want taller/shorter rows, that's the only number to change; there's no separate CSS value to keep in sync. The Week view card has **Print** and **Save Image** buttons — Print opens your browser's normal print dialog (pick landscape/portrait there, print to PDF or paper); Save Image exports a JPG of just the schedule grid, sized for a phone screen.
+
+**Weekday→city weather map** lives in its own file, `_data/weather.yml` — separate from `weekly.yml` on purpose, since this is the setting people lose track of. `city` needs to be English/romanized for OpenWeatherMap's lookup; `city_kr` is an optional Korean display label. Add `saturday`/`sunday` entries there if you want weekend forecasts too — until you do, the weekend box just shows `—`, which is expected.
+
+**Business/Jobs checklists piggyback on the same `_data/checklists/` file-drop pattern as the To-Do view** — a checklist's `group:` field decides which view it renders in: `group: Business` goes to the Business view (good for milestone-style project tracking — put a target date in each item's `meta` field, e.g. `meta: "by Sep 30"`), `group: Jobs` goes to the Jobs view, and anything else (or no group) stays in To-Do.
 
 `_data/course-sources.yml` is the hub for anything school-related: each entry
 declares a course's `label`, `weekday`, `university` (an `abbr` key from
@@ -194,10 +202,13 @@ cache-bust needed beyond that hour.
   사업자등록 type or personal situation. Confirm with your 세무사/accountant
   before relying on it, especially the KR VAT schedule and anything
   PFIC-related.
-- **Business view scope** — currently just a static reminder list. If you
-  want it to do more (track filed/not-filed state, link to actual forms),
-  that's a bigger lift than this pass — say so and it can grow into a real
-  checklist like the To-Do view's.
+- **Business view tax reminders are still a static list** (the milestone
+  checklists next to them are real, checkable checklists now) — if you want
+  filed/not-filed state or links to actual forms for the tax deadlines too,
+  that's a bigger lift than this pass, say so.
+- **Jobs view alert feed is a read-only list** — it shows the 10 most recent
+  entries from your Google Alert each time you open the view; nothing is
+  stored, deduped, or marked read/unread.
 
 ## Third-party data sources this app depends on
 
@@ -209,5 +220,6 @@ working" debugging session starts in the right place:
 |---|---|---|
 | Weather | OpenWeatherMap forecast API | Needs `OPENWEATHER_API_KEY` (free tier) — the one official, documented dependency here |
 | ETF prices | Yahoo Finance's unofficial chart endpoint (`query1.finance.yahoo.com`) | No key. Stooq's CSV export was the original choice but now sits behind a JS bot-verification challenge a server fetch can't pass — see `app/api/stock/route.ts` |
+| Jobs view alert feed | Google Alerts, delivered as an RSS/Atom feed | No key — set up at google.com/alerts (deliver as "RSS feed", not email), paste the link into `_data/jobs.yml`'s `alert_rss_url`. Proxied server-side through `app/api/alerts/route.ts`, which only allows `google.com` feed URLs. |
 | University directory | courses.aaron.kr's `universities.yml` via raw GitHub | Yours, so unlikely to break, but a path/rename there needs a matching update in `lib/universities.ts` |
 | University logos | Cloudinary URLs referenced in `universities.yml` | Rendered `unoptimized` (no Next Image proxy), so any hotlink protection changes there would show as broken logo icons |

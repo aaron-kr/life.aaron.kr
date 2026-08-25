@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { DashboardData, View } from '@/lib/types'
 import { buildWeekdayUniversities } from '@/lib/weekdayUniversities'
-import { useLastView } from '@/lib/firestore-hooks'
+import { useUiSettings } from '@/lib/firestore-hooks'
 import { SiteNav } from './SiteNav'
 import { Header } from './Header'
 import { QuoteBanner } from './QuoteBanner'
@@ -14,6 +14,7 @@ import { MonthView } from './views/MonthView'
 import { SemesterView } from './views/SemesterView'
 import { TodoView } from './views/TodoView'
 import { BusinessView } from './views/BusinessView'
+import { JobsView } from './views/JobsView'
 import { TicketDrawer } from './Checklist/TicketDrawer'
 import { Footer } from './Footer'
 
@@ -21,7 +22,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
   const [view, setViewState] = useState<View>('week')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const { lastView, setLastView } = useLastView()
+  const { lastView, setLastView, statsCollapsed, setStatsCollapsed } = useUiSettings()
 
   // Carries the active view across devices/sessions: once Firestore reports
   // the last one used elsewhere, jump to it (a brief flash of Week first is
@@ -29,6 +30,10 @@ export function Dashboard({ data }: { data: DashboardData }) {
   useEffect(() => {
     if (lastView) setViewState(lastView)
   }, [lastView])
+
+  function toggleStatsCollapsed() {
+    setStatsCollapsed(!(statsCollapsed ?? false)).catch(() => {})
+  }
 
   function setView(v: View) {
     setViewState(v)
@@ -67,9 +72,19 @@ export function Dashboard({ data }: { data: DashboardData }) {
         onMobileClose={() => setMobileSidebarOpen(false)}
       />
       <main className="content">
-        <StatsStrip stats={data.stats} />
+        <StatsStrip
+          stats={data.stats}
+          etfs={data.etfs}
+          collapsed={statsCollapsed ?? false}
+          onToggleCollapsed={toggleStatsCollapsed}
+        />
         {view === 'week' && (
-          <WeekView template={data.template} weekdayUniversities={weekdayUniversities} universities={data.universities} />
+          <WeekView
+            template={data.template}
+            weatherCities={data.weatherCities}
+            weekdayUniversities={weekdayUniversities}
+            universities={data.universities}
+          />
         )}
         {view === 'month' && (
           <MonthView holidays={data.holidays} events={data.events} weekdayUniversities={weekdayUniversities} />
@@ -83,7 +98,20 @@ export function Dashboard({ data }: { data: DashboardData }) {
           />
         )}
         {view === 'todo' && <TodoView checklists={data.checklists} universities={data.universities} />}
-        {view === 'business' && <BusinessView deadlines={data.businessDeadlines} />}
+        {view === 'business' && (
+          <BusinessView
+            deadlines={data.businessDeadlines}
+            checklists={data.checklists.filter((c) => c.group === 'Business')}
+            universities={data.universities}
+          />
+        )}
+        {view === 'jobs' && (
+          <JobsView
+            jobs={data.jobs}
+            checklists={data.checklists.filter((c) => c.group === 'Jobs')}
+            universities={data.universities}
+          />
+        )}
       </main>
       <Footer />
       <TicketDrawer routes={data.tickets} open={drawerOpen} onClose={() => setDrawerOpen(false)} />

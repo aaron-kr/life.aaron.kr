@@ -22,6 +22,7 @@ export function QuoteBanner({ quotes, biblePlan }: { quotes: Quote[]; biblePlan:
   const [baseIndex, setBaseIndex] = useState(0)
   const [offset, setOffset] = useState(0)
   const [reading, setReading] = useState<string | null>(null)
+  const [arrowsRevealed, setArrowsRevealed] = useState(false)
 
   useEffect(() => {
     const now = new Date()
@@ -42,22 +43,41 @@ export function QuoteBanner({ quotes, biblePlan }: { quotes: Quote[]; biblePlan:
 
   return (
     <div className="quote-banner">
-      <button className="q-arrow" onClick={() => setOffset((o) => o - 1)} aria-label="Previous quote">
-        ‹
-      </button>
       <div className="qmain">
         <span className="qtext">&quot;{quote.text}&quot;</span>
         <span className="qref">{quote.ref}</span>
       </div>
-      <button className="q-arrow" onClick={() => setOffset((o) => o + 1)} aria-label="Next quote">
-        ›
-      </button>
       {reading && (
         <div className="bible-plan">
           <span className="qref">Today&apos;s reading</span>
           <span className="qtext bible-text">{reading}</span>
         </div>
       )}
+      <div
+        className={`quote-arrows-zone${arrowsRevealed ? ' revealed' : ''}`}
+        onClick={() => setArrowsRevealed(true)}
+      >
+        <button
+          className="q-arrow"
+          onClick={(e) => {
+            e.stopPropagation()
+            setOffset((o) => o - 1)
+          }}
+          aria-label="Previous quote"
+        >
+          ‹
+        </button>
+        <button
+          className="q-arrow"
+          onClick={(e) => {
+            e.stopPropagation()
+            setOffset((o) => o + 1)
+          }}
+          aria-label="Next quote"
+        >
+          ›
+        </button>
+      </div>
     </div>
   )
 }

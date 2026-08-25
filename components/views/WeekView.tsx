@@ -1,6 +1,8 @@
-import { Fragment } from 'react'
+'use client'
+
+import { Fragment, useRef, useState } from 'react'
 import Image from 'next/image'
-import type { DashboardTemplate, FullWeekday, University } from '@/lib/types'
+import type { DashboardTemplate, FullWeekday, University, WeekdayMapping } from '@/lib/types'
 import { fmtHourLabel, minutesSinceMidnight, todayLocal, weekdayKey } from '@/lib/dates'
 import { getThisFullWeekDays } from '@/lib/weekDays'
 import { useWeather } from '@/lib/useWeather'
@@ -24,16 +26,20 @@ const LEGEND = [
 
 export function WeekView({
   template,
+  weatherCities,
   weekdayUniversities,
   universities,
 }: {
   template: DashboardTemplate
+  weatherCities: Partial<Record<FullWeekday, WeekdayMapping>>
   weekdayUniversities: Partial<Record<FullWeekday, University[]>>
   universities: University[]
 }) {
+  const captureRef = useRef<HTMLDivElement>(null)
+  const [exporting, setExporting] = useState(false)
   const blocks = template.recurring_blocks
   const todayKey = weekdayKey(todayLocal())
-  const days = getThisFullWeekDays(template)
+  const days = getThisFullWeekDays(weatherCities)
   const weather = useWeather(
     days.filter((d) => d.city).map((d) => ({ key: d.dateYmd, city: d.city, date: d.dateYmd }))
   )
@@ -48,11 +54,41 @@ export function WeekView({
     return abbr ? universities.find((u) => u.abbr === abbr) : undefined
   }
 
+  function handlePrint() {
+    window.print()
+  }
+
+  async function handleSaveImage() {
+    if (!captureRef.current) return
+    setExporting(true)
+    try {
+      const { default: html2canvas } = await import('html2canvas')
+      const canvas = await html2canvas(captureRef.current, {
+        backgroundColor: '#0a0b17',
+        scale: 2,
+      })
+      const link = document.createElement('a')
+      link.download = `week-schedule-${todayLocal().toISOString().slice(0, 10)}.jpg`
+      link.href = canvas.toDataURL('image/jpeg', 0.92)
+      link.click()
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <section className="panel active">
-      <div className="card">
+      <div className="card" id="week-print-area" ref={captureRef}>
         <h3>
-          This week <span className="pill">semester template + daily edits</span>
+          This week <span className="pill">_data/weekly.yml + daily edits</span>
+          <span className="week-export-btns">
+            <button className="week-export-btn" onClick={handlePrint} title="Print (your browser's print dialog has a landscape/portrait choice)">
+              🖨️ Print
+            </button>
+            <button className="week-export-btn" onClick={handleSaveImage} disabled={exporting} title="Save as a JPG image">
+              {exporting ? 'Saving…' : '📷 Save Image'}
+            </button>
+          </span>
         </h3>
         <div className="week-grid" style={{ gridTemplateRows: `auto repeat(${slots.length}, ${SLOT_H}px)` }}>
           <div className="gcell ghead" />

@@ -7,9 +7,10 @@ export interface StockResult {
   price: number | null
   changePct: number | null
   series: number[]
+  currency: string | null
 }
 
-const EMPTY: StockResult = { symbol: '', price: null, changePct: null, series: [] }
+const EMPTY: StockResult = { symbol: '', price: null, changePct: null, series: [], currency: null }
 
 export function useStocks(symbols: string[]) {
   const [results, setResults] = useState<Record<string, StockResult>>({})

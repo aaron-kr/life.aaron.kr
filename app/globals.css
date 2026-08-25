@@ -94,7 +94,11 @@ button.hamburger-btn { display: none; }
 .quote-banner .qmain { flex: 1; min-width: 200px; }
 .quote-banner .qtext { font-family: var(--font-display); font-style: italic; font-size: 1.3571rem; line-height: 1.4; color: #f0e6cd; }
 .quote-banner .qref { font-family: var(--font-mono); font-size: 0.8571rem; color: var(--text-faint); margin-left: 8px; }
-.q-arrow { flex-shrink: 0; background: var(--panel-2); border: 1px solid var(--border); color: var(--text-dim); width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 0.9286rem; display: flex; align-items: center; justify-content: center; }
+.quote-arrows-zone { flex-shrink: 0; display: flex; align-items: center; gap: 6px; align-self: stretch; padding: 0 22px 0 20px; margin-right: -22px; cursor: pointer; }
+.q-arrow { flex-shrink: 0; background: var(--panel-2); border: 1px solid var(--border); color: var(--text-dim); width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 0.9286rem; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .15s ease; }
+.quote-arrows-zone:hover .q-arrow,
+.quote-arrows-zone.revealed .q-arrow,
+.quote-arrows-zone:focus-within .q-arrow { opacity: 1; pointer-events: auto; }
 .q-arrow:hover { color: var(--text); border-color: var(--gold); }
 .bible-plan { flex-shrink: 0; display: flex; flex-direction: column; padding-left: 16px; border-left: 1px solid var(--border-soft); max-width: 260px; }
 .bible-plan .qref { margin-left: 0; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
@@ -222,10 +226,30 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 18px; }
 .card h3 { font-family: var(--font-mono); font-size: 0.7857rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
 .card h3 span.pill { font-size: 0.7143rem; background: var(--violet-dim); color: var(--violet); padding: 2px 8px; border-radius: 999px; text-transform: none; letter-spacing: 0; }
+.week-export-btns { display: flex; gap: 6px; margin-left: auto; }
+.week-export-btn { font-family: var(--font-mono); font-size: 0.6786rem; letter-spacing: 0; text-transform: none; background: var(--panel-2); border: 1px solid var(--border); color: var(--text-dim); padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+.week-export-btn:hover { color: var(--text); border-color: var(--violet); }
+.week-export-btn:disabled { opacity: .6; cursor: default; }
+
+@media print {
+  @page { size: landscape; margin: 10mm; }
+  body * { visibility: hidden; }
+  #week-print-area, #week-print-area * { visibility: visible; }
+  #week-print-area { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; color: #111 !important; border: none; box-shadow: none; }
+  .week-export-btns { display: none !important; }
+  .week-grid .gcell, .week-grid .ghead { border-color: #ccc !important; background: #fff !important; }
+  .week-grid .ghead.today { background: #eee !important; }
+  .time-label, .city-tag { color: #444 !important; }
+  .block, .block .bt, .block .bs { color: #1a1a1a !important; background: #f2f2f6 !important; opacity: 1 !important; }
+}
 
 /* ===== checklist card ===== */
 .biz-disclaimer { font-family: var(--font-mono); font-size: 0.7143rem; color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 6px; padding: 8px 12px; line-height: 1.5; }
 .biz-note { color: var(--text-faint); font-style: italic; }
+.drive-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; text-decoration: none; }
+.drive-link:hover { color: var(--text); border-color: var(--violet); }
+.cl-item a.ti-route { color: var(--text-dim); text-decoration: none; }
+.cl-item a.ti-route:hover { color: var(--violet); text-decoration: underline; }
 .todo-group { margin-bottom: 22px; }
 .todo-group-title { font-family: var(--font-mono); font-size: 0.7857rem; text-transform: uppercase; letter-spacing: .07em; color: var(--text-faint); margin-bottom: 12px; }
 .checklist-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }

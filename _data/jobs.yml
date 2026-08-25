@@ -1,0 +1,23 @@
+# Jobs view config — job-search tracking for national university
+# lecturing applications. Nothing here is fetched automatically except the
+# Google Alert feed below (and only once you set it).
+#
+# To get a Google Alert as an RSS feed: go to google.com/alerts, create an
+# alert for a search like "강사 채용", click the settings (gear) icon and
+# change "Deliver to" from Email to "RSS feed", then copy the feed link it
+# gives you into alert_rss_url below. Leave it blank and the Jobs view will
+# just show setup instructions instead of a feed.
+alert_rss_url: ""
+
+# Google Drive folder/link where you keep your résumé, 경력증명서 packet,
+# and Corus (외국인등록/취업) filing documents — shown as a quick-access
+# link in the Jobs view.
+drive_url: ""
+
+# Free-text blurb shown at the top of the Jobs view — what you're actually
+# looking for, so future-you (or anyone helping you search) has it in one
+# place.
+target_positions: |
+  National university lecturing positions — 컴공(Computer Science)/IT/AI
+  departments, and any post open to English-capable instructors (영어 가능한
+  분 우대). Korean-language lecturing is also fine — I can teach in both.

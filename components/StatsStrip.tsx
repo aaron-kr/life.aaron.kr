@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import type { StatDeclaration } from '@/lib/types'
+import type { EtfDeclaration, StatDeclaration } from '@/lib/types'
 import { useStatLog } from '@/lib/firestore-hooks'
+import { useStocks } from '@/lib/useStock'
 import { currentWeekRange, todayLocal } from '@/lib/dates'
 import { sparkPoints } from '@/lib/sparkline'
+import { formatPrice } from '@/lib/formatCurrency'
 
 function BodyStripItem({ stat }: { stat: StatDeclaration }) {
   const { entries } = useStatLog(stat.log)
@@ -88,15 +89,60 @@ function SemesterStripItem({ stat }: { stat: StatDeclaration }) {
   )
 }
 
-export function StatsStrip({ stats }: { stats: StatDeclaration[] }) {
-  const [collapsed, setCollapsed] = useState(false)
+function EtfStripItem({ etf }: { etf: EtfDeclaration }) {
+  const results = useStocks([etf.symbol])
+  const r = results[etf.symbol]
+  const color = etf.color ? `var(${etf.color})` : 'var(--text-dim)'
+  const up = r?.changePct != null && r.changePct >= 0
+
+  return (
+    <div className="stat-strip-item">
+      <div className="ss-label">
+        <span className="h-dot" style={{ background: color }} />
+        {etf.label}
+      </div>
+      <div className="ss-values">
+        {r?.price != null ? (
+          <div className="ss-col">
+            <span className="ss-val">{formatPrice(r.price, r.currency)}</span>
+            {r.changePct != null && (
+              <span className="h-delta" style={{ color: up ? 'var(--green)' : 'var(--red)' }}>
+                {up ? '+' : ''}
+                {r.changePct.toFixed(2)}%
+              </span>
+            )}
+          </div>
+        ) : (
+          <span className="ss-val dash">loading…</span>
+        )}
+      </div>
+      {r?.series && r.series.length > 1 && (
+        <svg className="spark" viewBox="0 0 160 20" preserveAspectRatio="none">
+          <polyline points={sparkPoints(r.series)} fill="none" stroke={color} strokeWidth="2" />
+        </svg>
+      )}
+    </div>
+  )
+}
+
+export function StatsStrip({
+  stats,
+  etfs,
+  collapsed,
+  onToggleCollapsed,
+}: {
+  stats: StatDeclaration[]
+  etfs: EtfDeclaration[]
+  collapsed: boolean
+  onToggleCollapsed: () => void
+}) {
   const body = stats.filter((s) => s.placement === 'body')
   const semester = stats.filter((s) => s.placement === 'semester')
-  if (body.length === 0 && semester.length === 0) return null
+  if (body.length === 0 && semester.length === 0 && etfs.length === 0) return null
 
   return (
     <div className="sticky-strip">
-      <button className="strip-collapse-btn" onClick={() => setCollapsed((c) => !c)}>
+      <button className="strip-collapse-btn" onClick={onToggleCollapsed}>
         {collapsed ? '▾ stats' : '▴ hide'}
       </button>
       {!collapsed && (
@@ -112,6 +158,13 @@ export function StatsStrip({ stats }: { stats: StatDeclaration[] }) {
             <div className="stat-strip-inner" style={{ marginTop: body.length ? 8 : 0 }}>
               {semester.map((s) => (
                 <SemesterStripItem stat={s} key={s.id} />
+              ))}
+            </div>
+          )}
+          {etfs.length > 0 && (
+            <div className="stat-strip-inner" style={{ marginTop: body.length || semester.length ? 8 : 0 }}>
+              {etfs.map((etf) => (
+                <EtfStripItem etf={etf} key={etf.symbol} />
               ))}
             </div>
           )}

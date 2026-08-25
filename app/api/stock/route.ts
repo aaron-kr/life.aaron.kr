@@ -9,7 +9,7 @@ const YAHOO_URL = (symbol: string) =>
 interface YahooChartResponse {
   chart: {
     result: {
-      meta: { regularMarketPrice?: number; chartPreviousClose?: number }
+      meta: { regularMarketPrice?: number; chartPreviousClose?: number; currency?: string }
       indicators: { quote: { close: (number | null)[] }[] }
     }[]
     error: unknown
@@ -29,16 +29,17 @@ export async function GET(req: NextRequest) {
     const data = (await res.json()) as YahooChartResponse
     const result = data.chart.result?.[0]
     if (!result) {
-      return NextResponse.json({ symbol, price: null, changePct: null, series: [], configured: true })
+      return NextResponse.json({ symbol, price: null, changePct: null, series: [], currency: null, configured: true })
     }
 
     const price = result.meta.regularMarketPrice ?? null
     const prevClose = result.meta.chartPreviousClose ?? null
     const changePct = price != null && prevClose ? ((price - prevClose) / prevClose) * 100 : null
     const series = (result.indicators.quote[0]?.close ?? []).filter((c): c is number => c != null)
+    const currency = result.meta.currency ?? null
 
-    return NextResponse.json({ symbol, price, changePct, series, configured: true })
+    return NextResponse.json({ symbol, price, changePct, series, currency, configured: true })
   } catch {
-    return NextResponse.json({ symbol, price: null, changePct: null, series: [], configured: true, error: true })
+    return NextResponse.json({ symbol, price: null, changePct: null, series: [], currency: null, configured: true, error: true })
   }
 }

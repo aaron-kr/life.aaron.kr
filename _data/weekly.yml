@@ -1,18 +1,6 @@
-# Recurring weekly schedule template + weekday→city map.
-# Edit freely — this drives the Week view grid and the weather hero.
-# `city` must be English/romanized (OpenWeatherMap's lookup needs it — see
-# DEPLOY.md). Add an optional `city_kr` for the on-screen label if you want
-# it shown in Korean instead, e.g. `{ city: Chungju, city_kr: 충주 }`.
-# University/weekday mapping now lives in course-sources.yml, not here — it's
-# the shared source of truth for the Semester/Month views and weather-hero
-# school logos too.
-
-weekdays:
-  monday: { city: Chungju, city_kr: 충주 }
-  tuesday: { city: Jeonju, city_kr: 전주 }
-  wednesday: { city: Iksan, city_kr: 임산 }
-  thursday: { city: Cheongju, city_kr: 청주 }
-  friday: { city: Kongju, city_kr: 공주 }
+# Recurring weekly schedule blocks — drives the Week view grid.
+# Weekday→city mapping (for weather) lives in _data/weather.yml, not here.
+# University/weekday mapping for schools lives in course-sources.yml.
 
 # type maps to a CSS class (b-<type>) — see app/globals.css for the palette:
 # class, family, church, deepwork, gym, commute, nophone
@@ -21,26 +9,40 @@ weekdays:
 # the type's default palette color — set your own per block if you want each
 # school's block to match its logo's color.
 recurring_blocks:
-  - { day: monday, start: "06:30", end: "07:30", type: commute, title: "KTX ➔ 오송", sub: "Buy tix" }
-  - { day: monday, start: "07:30", end: "08:30", type: commute, title: "무궁화 ➔ 충주", sub: "Buy tix" }
+  - { day: monday, start: "06:30", end: "07:30", type: commute, title: "KTX ➔ 오송", sub: "06:25 - 07:21" }
+  - { day: monday, start: "07:30", end: "08:30", type: commute, title: "무궁화 ➔ 충주", sub: "07:30 - 07:34" }
   - { day: monday, start: "09:00", end: "12:00", type: class, title: "KNUT - 데이터과학", sub: "Room", university: ut, color: "--pink" }
   - { day: monday, start: "13:00", end: "16:00", type: class, title: "KNUT - 데이터과학", sub: "Room", university: ut, color: "--pink" }
+  - { day: monday, start: "17:30", end: "19:00", type: commute, title: "무궁화 ➔ 오송", sub: "17:44 - 18:48" }
+  - { day: monday, start: "20:00", end: "21:00", type: commute, title: "KTX ➔ 전주", sub: "19:56 - 20:51" }
+  - { day: monday, start: "21:30", end: "22:30", type: commute, title: "Isaac"}
 
+  - { day: tuesday, start: "06:00", end: "07:00", type: commute, title: "Isaac"}
   - { day: tuesday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "push" }
   - { day: tuesday, start: "09:00", end: "12:00", type: deepwork, title: "Deep work", sub: "paper draft" }
-  - { day: tuesday, start: "12:00", end: "13:00", type: commute, title: "Lunch & Walk"}
+  - { day: tuesday, start: "12:30", end: "13:00", type: commute, title: "Walk"}
   - { day: tuesday, start: "13:00", end: "16:00", type: class, title: "JBNU - DC", sub: "Room", university: jbnu, color: "--violet" }
   - { day: tuesday, start: "16:00", end: "18:40", type: class, title: "JBNU - AC", sub: "Room", university: jbnu, color: "--violet" }
   - { day: tuesday, start: "18:40", end: "19:20", type: commute, title: "Walk", }
+  - { day: tuesday, start: "21:30", end: "22:30", type: commute, title: "Isaac"}
 
+  - { day: wednesday, start: "06:00", end: "07:00", type: commute, title: "Isaac"}
   - { day: wednesday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "legs" }
+  - { day: wednesday, start: "08:30", end: "09:00", type: commute, title: "Bike"}
   - { day: wednesday, start: "09:00", end: "12:00", type: class, title: "JBNU - Info", sub: "Room", university: jbnu, color: "--violet" }
+  - { day: wednesday, start: "12:00", end: "12:30", type: commute, title: "Bike ➔ 전주역"}
+  - { day: wednesday, start: "12:30", end: "13:00", type: commute, title: "전주역 ➔ 익산역"}
   - { day: wednesday, start: "15:00", end: "18:00", type: class, title: "WKU - DB", sub: "Room", university: wku, color: "--blue" }
+  - { day: wednesday, start: "18:00", end: "18:30", type: commute, title: "익산역 ➔ Home"}
+  - { day: wednesday, start: "21:30", end: "22:30", type: commute, title: "Isaac"}
 
+  - { day: thursday, start: "06:00", end: "07:00", type: commute, title: "Isaac"}
   - { day: thursday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "pull" }
   - { day: thursday, start: "12:00", end: "15:00", type: class, title: "CBNU - Grad ML", sub: "Room", university: cbnu, color: "--red" }
   - { day: thursday, start: "15:00", end: "18:00", type: class, title: "CBNU - Grad MongoDB", sub: "Room", university: cbnu, color: "--red" }
+  - { day: thursday, start: "21:30", end: "22:30", type: commute, title: "Isaac"}
 
+  - { day: friday, start: "06:00", end: "07:00", type: commute, title: "Isaac"}
   - { day: friday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "other" }
   - { day: friday, start: "14:00", end: "17:00", type: class, title: "KJNU - Bio Net", sub: "Room", university: kjnu, color: "--teal" }
 

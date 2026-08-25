@@ -1,4 +1,4 @@
-export type View = 'week' | 'month' | 'semester' | 'todo' | 'business'
+export type View = 'week' | 'month' | 'semester' | 'todo' | 'business' | 'jobs'
 
 export type Weekday = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'
 
@@ -21,8 +21,15 @@ export interface RecurringBlock {
 }
 
 export interface DashboardTemplate {
-  weekdays: Partial<Record<FullWeekday, WeekdayMapping>>
   recurring_blocks: RecurringBlock[]
+}
+
+/** _data/weather.yml — separate from weekly.yml so it's easy to find; this
+ * is the ONLY place weekday→city mapping lives (used by the weather hero,
+ * the sticky day-strip, and the Week view's day headers). Include
+ * `saturday`/`sunday` here too if you want weekend forecasts. */
+export interface WeatherCitiesFile {
+  weekdays: Partial<Record<FullWeekday, WeekdayMapping>>
 }
 
 export interface HolidayEntry {
@@ -213,8 +220,25 @@ export interface BrandingConfig {
   logoUrl: string // if set, replaces the 🧭 emoji everywhere it appears
 }
 
+/** _data/jobs.yml — Jobs view config. `alert_rss_url` comes from Google
+ * Alerts (google.com/alerts -> create alert -> deliver as "RSS feed"
+ * instead of email); leave blank to just show setup instructions instead
+ * of a feed. */
+export interface JobsConfig {
+  alertRssUrl: string
+  driveUrl: string
+  targetPositions: string
+}
+
+export interface AlertFeedItem {
+  title: string
+  link: string
+  pubDate: string | null
+}
+
 export interface DashboardData {
   template: DashboardTemplate
+  weatherCities: Partial<Record<FullWeekday, WeekdayMapping>>
   holidays: HolidayEntry[]
   events: PersonalEvent[]
   quotes: Quote[]
@@ -232,4 +256,5 @@ export interface DashboardData {
   semesterStart: string | null
   hometown: HometownConfig
   branding: BrandingConfig
+  jobs: JobsConfig
 }

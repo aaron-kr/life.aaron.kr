@@ -1,7 +1,9 @@
-# Sidebar ETF row, priced live from Yahoo Finance's free chart endpoint (no
-# API key, no signup — see app/api/stock/route.ts). `symbol` is a plain
-# ticker, e.g. "VTI". Add/remove freely, same file-driven idea as everything
-# else in _data/.
+# ETF row in the top stats strip, priced live from Yahoo Finance's free chart
+# endpoint (no API key, no signup — see app/api/stock/route.ts). `symbol` is
+# a plain ticker, e.g. "VTI"; for Korean tickers use the .KS suffix, e.g.
+# "091160.KS" for a KODEX fund — Yahoo reports each symbol's native currency
+# automatically (KRW shows with a ₩ sign, no manual currency field needed).
+# Add/remove freely; a new entry here shows up as a new card automatically.
 etfs:
   - { symbol: "VTI", label: "VTI", color: "--blue" }
   - { symbol: "VXUS", label: "VXUS", color: "--green" }

@@ -12,3 +12,6 @@ items:
     meta: "check requirement + deadline"
   - text: "Grade turn-in"
     meta: "confirm deadline once posted"
+  - text: "Download 경력증명서 while portal access is active"
+    meta: "get it during final exam week — 1차 hiring often opens right after the semester ends"
+    urgent: true

@@ -1,5 +1,7 @@
 import { FULL_WEEK_ORDER, WEEKDAY_ORDER, addDays, nextWeekdayOccurrence, sameDate, sundayOfWeek, todayLocal, ymd } from './dates'
-import type { DashboardTemplate, FullWeekday, Weekday } from './types'
+import type { FullWeekday, Weekday, WeekdayMapping } from './types'
+
+type WeatherCities = Partial<Record<FullWeekday, WeekdayMapping>>
 
 export interface WeekDayInfo {
   weekday: Weekday
@@ -16,11 +18,11 @@ export interface WeekDayInfo {
  * points at a day that's already passed — the forecast API only has data
  * for today forward anyway, so a fixed Mon-anchored week would show blank
  * "—" cells for any weekday already behind us once the week is underway. */
-export function getThisWeekDays(template: DashboardTemplate): WeekDayInfo[] {
+export function getThisWeekDays(weatherCities: WeatherCities): WeekDayInfo[] {
   const today = todayLocal()
   return WEEKDAY_ORDER.map((weekday) => {
     const date = nextWeekdayOccurrence(today, weekday)
-    const mapping = template.weekdays[weekday] ?? { city: '' }
+    const mapping = weatherCities[weekday] ?? { city: '' }
     return {
       weekday,
       date,
@@ -43,11 +45,11 @@ export interface WeekendDayInfo {
 }
 
 /** Same rolling logic as getThisWeekDays, for the sidebar's combined Sat/Sun box. */
-export function getWeekendDays(template: DashboardTemplate): [WeekendDayInfo, WeekendDayInfo] {
+export function getWeekendDays(weatherCities: WeatherCities): [WeekendDayInfo, WeekendDayInfo] {
   const today = todayLocal()
   return (['saturday', 'sunday'] as const).map((weekday) => {
     const date = nextWeekdayOccurrence(today, weekday)
-    const mapping = template.weekdays[weekday] ?? { city: '' }
+    const mapping = weatherCities[weekday] ?? { city: '' }
     return {
       weekday,
       date,
@@ -70,12 +72,12 @@ export interface FullWeekDayInfo {
 }
 
 /** Sunday -> Saturday, for the Week view grid. */
-export function getThisFullWeekDays(template: DashboardTemplate): FullWeekDayInfo[] {
+export function getThisFullWeekDays(weatherCities: WeatherCities): FullWeekDayInfo[] {
   const today = todayLocal()
   const sunday = sundayOfWeek(today)
   return FULL_WEEK_ORDER.map((weekday, i) => {
     const date = addDays(sunday, i)
-    const mapping = template.weekdays[weekday] ?? { city: '' }
+    const mapping = weatherCities[weekday] ?? { city: '' }
     return {
       weekday,
       date,

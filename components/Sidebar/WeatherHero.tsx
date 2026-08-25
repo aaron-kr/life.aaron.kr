@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import type { DashboardTemplate, FullWeekday, University } from '@/lib/types'
+import type { FullWeekday, University, WeekdayMapping } from '@/lib/types'
 import { getThisWeekDays, getWeekendDays } from '@/lib/weekDays'
 import { useWeather } from '@/lib/useWeather'
 import { weatherBackgroundUrl } from '@/lib/weatherImages'
@@ -10,14 +10,14 @@ import { weatherBackgroundUrl } from '@/lib/weatherImages'
 const REVERT_MS = 5000
 
 export function WeatherHero({
-  template,
+  weatherCities,
   weekdayUniversities,
 }: {
-  template: DashboardTemplate
+  weatherCities: Partial<Record<FullWeekday, WeekdayMapping>>
   weekdayUniversities: Partial<Record<FullWeekday, University[]>>
 }) {
-  const weekdays = getThisWeekDays(template)
-  const [sat, sun] = getWeekendDays(template)
+  const weekdays = getThisWeekDays(weatherCities)
+  const [sat, sun] = getWeekendDays(weatherCities)
   const allDays = [...weekdays, sat, sun]
 
   const todayYmd = allDays.find((d) => d.isToday)?.dateYmd ?? weekdays[0]?.dateYmd

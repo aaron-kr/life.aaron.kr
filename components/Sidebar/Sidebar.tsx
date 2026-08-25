@@ -4,7 +4,6 @@ import { useState } from 'react'
 import type { DashboardData, FullWeekday, University } from '@/lib/types'
 import { WeatherHero } from './WeatherHero'
 import { HabitHeatmaps } from './HabitHeatmaps'
-import { EtfRow } from './EtfRow'
 import { GoalAccordions } from './GoalAccordions'
 
 export function Sidebar({
@@ -26,11 +25,10 @@ export function Sidebar({
       <aside className={`sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' mobile-open' : ''}`}>
         <div className="sb-section hide-on-collapse">
           <h2>This Week</h2>
-          <WeatherHero template={data.template} weekdayUniversities={weekdayUniversities} />
+          <WeatherHero weatherCities={data.weatherCities} weekdayUniversities={weekdayUniversities} />
         </div>
 
         <HabitHeatmaps habits={data.habits} />
-        <EtfRow etfs={data.etfs} />
         <GoalAccordions goalLists={data.goalLists} />
       </aside>
       <button className="collapse-btn" onClick={() => setCollapsed((c) => !c)}>

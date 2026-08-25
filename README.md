@@ -2,12 +2,14 @@
 
 *(working title — rename freely; ties to the "North Star" long-range-goals section)*
 
-A single-page personal dashboard: semester schedule (Sun–Sat, 30-min granularity),
-per-city daily weather, rolling transportation ticket checklist, lecture prep /
-grading / school-admin checklists, habit streaks + a live ETF row, body stats,
-Business/tax filing reminders, and a small set of "systems" reminders (US-return
-prep, long-range goals) — replacing a mix of Google Calendar, HabitKit, and
-데일리 스케쥴.
+A single-page personal dashboard: semester schedule (Sun–Sat, 30-min granularity,
+printable / exportable as a JPG), per-city daily weather, rolling transportation
+ticket checklist, lecture prep / grading / school-admin checklists, habit streaks
++ live ETF prices (auto-converted to each ticker's native currency), body stats,
+Business/tax filing reminders + milestone-style project checklists, a Jobs view
+(job-search reminders, a Google Alert feed, a Drive link), and a small set of
+"systems" reminders (US-return prep, long-range goals) — replacing a mix of
+Google Calendar, HabitKit, and 데일리 스케쥴.
 
 Companion sites, same design language (Playfair Display / IBM Plex Mono+Sans, dark
 indigo-black theme):
@@ -87,16 +89,20 @@ Fonts: `Playfair Display` (headings/quotes), `IBM Plex Mono` (labels, data, time
 ## Status
 
 Real Next.js app, builds and lints clean, live in daily use — Firebase, real
-schedule/course data, and OpenWeatherMap are all configured. Five views (Week/
-Month/Semester/To-Do/Business), the sidebar (weather hero, habits, live ETF
-row, goal accordions), the ticket drawer, and the wave background toggle are
-wired up end-to-end against real Firestore, weather, and Yahoo Finance data —
-not mock data. The active view persists across devices via Firestore.
+schedule/course data, and OpenWeatherMap are all configured. Six views (Week/
+Month/Semester/To-Do/Business/Jobs), the sidebar (weather hero, habits, goal
+accordions), and the top stats strip (body stats, semester stats, live ETF
+prices) are wired up end-to-end against real Firestore, weather, and Yahoo
+Finance data — not mock data. The active view **and** the stats strip's
+shown/hidden state persist across devices via Firestore (`settings/ui`).
 
 Known soft spots, not bugs exactly:
 - `_data/bible-plan.yml` only has 3 placeholder days — add your own plan.
 - `_data/business-deadlines.yml` needs a once-over from an actual accountant
   before you trust the specific dates.
+- `_data/jobs.yml`'s `alert_rss_url` and `drive_url` are blank until you fill
+  them in — see the comments in that file for how to get a Google Alerts RSS
+  link.
 - `public/images/weather/` and `public/images/hero/` are asset folders you
   populate yourself (see each folder's README) — the app degrades gracefully
   to a plain gradient without them.

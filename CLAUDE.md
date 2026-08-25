@@ -36,15 +36,45 @@ real ways worth knowing before assuming this file is current:
   logos/portal links update themselves; only *which courses you're teaching*
   needs manual editing each semester.
 - **ETF prices are live** (Yahoo Finance's unofficial chart endpoint, no
-  key), not manually typed — moved out of the sidebar goal-list accordions
-  into their own file-driven row (`_data/etfs.yml`), styled like the body
-  stats (sparkline + current value).
-- **Two views were added** beyond the original four: a **Business** view
-  (KR/US tax filing reminders — `_data/business-deadlines.yml`) and the quote
-  banner grew a companion **Bible reading plan** (`_data/bible-plan.yml`,
-  keyed by `MM-DD` so it's year-agnostic).
-- **The active view now persists across devices** via a small
-  `settings/ui` Firestore doc.
+  key), not manually typed — declared in `_data/etfs.yml`, rendered as a
+  third row of the top **stats strip** (`components/StatsStrip.tsx`), not
+  the sidebar — same sparkline-+-current-value styling as the body stats.
+  Each ticker renders in its own native currency (Yahoo reports `meta.currency`
+  per symbol — KRW for KODEX/TIGER funds, USD for US ETFs, etc.; see
+  `lib/formatCurrency.ts`). Adding a new entry to `etfs.yml` auto-adds a card.
+- **Weekday→city weather mapping split into its own file**, `_data/weather.yml`
+  (was folded into `weekly.yml`) — the one thing Aaron kept losing track of,
+  so it gets its own obviously-named file. `weekly.yml` now only holds
+  `recurring_blocks`.
+- **Three views were added** beyond the original four: a **Business** view
+  (KR/US tax filing reminders — `_data/business-deadlines.yml`, collapsed by
+  default via a show/hide button since it's reference material, not daily —
+  plus milestone-style project checklists via `_data/checklists/*.yml` with
+  `group: Business`, using each item's `meta` field as the target date), a
+  **Jobs** view (`_data/jobs.yml` — target-position blurb, a Google Drive
+  link, an optional Google Alert RSS feed proxied through `/api/alerts`, and
+  job-search reminder checklists via `group: Jobs`), and the quote banner
+  grew a companion **Bible reading plan** (`_data/bible-plan.yml`, keyed by
+  `MM-DD` so it's year-agnostic).
+- **Checklist `group` is now a routing key, not just a display heading** —
+  `TodoView` renders every group except `Business` and `Jobs`, which get
+  pulled into their own views instead (see `ELSEWHERE_GROUPS` in
+  `components/views/TodoView.tsx`). Adding a checklist file with
+  `group: Business` or `group: Jobs` sends it to that view automatically;
+  any other (or no) group value stays in To-Do.
+- **The active view *and* the stats strip's shown/hidden state persist
+  across devices** via one `settings/ui` Firestore doc (`lib/firestore-hooks.ts`
+  → `useUiSettings()`, replacing the old single-field `useLastView()`) — add
+  more small cross-device UI prefs to that same doc/hook rather than opening
+  a second listener.
+- **Week view has print / save-image buttons** — `window.print()` with a
+  dedicated `@media print` block (native browser dialog handles landscape vs.
+  portrait), and a client-side JPG export via `html2canvas` targeting the
+  `#week-print-area` node.
+- **Quote banner arrows** are paired together in one hit-zone at the banner's
+  right edge (`.quote-arrows-zone`), hidden by default and revealed on hover
+  (desktop) or tap (mobile, via an `arrowsRevealed` state toggle) — they no
+  longer sit split on either side of the quote text.
 - **Everyday operation is documented in `DEPLOY.md` and `README.md`**, not
   here — this file is for architecture/history, those two are for "how do I
   change X." If you're about to explain how to edit something, check there

@@ -12,6 +12,7 @@
   "dependencies": {
     "country-flag-emoji-polyfill": "^0.1.10",
     "firebase": "^11.6.0",
+    "html2canvas": "^1.4.1",
     "js-yaml": "^4.1.0",
     "next": "^15.3.0",
     "react": "^19.0.0",

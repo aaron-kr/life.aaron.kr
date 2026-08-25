@@ -1,0 +1,17 @@
+# Weekday → city map for the weather hero, the Week view's day headers, and
+# the sticky day-strip. This is the ONLY place this lives — separate from
+# weekly.yml so it's easy to find on its own.
+#
+# `city` must be English/romanized (OpenWeatherMap's lookup needs it). Add an
+# optional `city_kr` for the on-screen label if you want it shown in Korean
+# instead. Add `saturday`/`sunday` entries if you want weekend forecasts too
+# (they're blank by default — the weekend box just shows "—" until you set
+# them, which is expected, not a bug).
+weekdays:
+  monday: { city: Chungju, city_kr: 충주 }
+  tuesday: { city: Jeonju, city_kr: 전주 }
+  wednesday: { city: Iksan, city_kr: 임산 }
+  thursday: { city: Cheongju, city_kr: 청주 }
+  friday: { city: Kongju, city_kr: 공주 }
+  saturday: { city: "Jeonju", city_kr: "전주" }
+  sunday: { city: "Jeonju", city_kr: "전주" }
