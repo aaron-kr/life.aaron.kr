@@ -113,6 +113,48 @@ real ways worth knowing before assuming this file is current:
   that element. Fixed by wrapping just the flag glyph in its own inner span.
   If a future flag emoji doesn't render, check for exactly this before
   assuming the polyfill itself failed.
+- **Month view multi-day pills must not participate in grid auto-placement,
+  or they corrupt every date after them.** `.mcell`/`.mhead` used to have no
+  explicit `grid-row`/`grid-column` (relying on the browser's auto-placement
+  to walk them in), while `.month-pill` segments DO have an explicit one —
+  and CSS Grid's auto-placement algorithm treats any cell already claimed by
+  an explicitly-positioned item as occupied, so every un-placed day cell
+  that would've overlapped a pill instead got silently bumped to the next
+  open slot, cascading a date-shift through the rest of the grid. `position:
+  absolute` was the first fix attempted (removes an item from grid
+  flow/occupancy per spec) but reliably mis-resolved its static top/left to
+  the grid container's origin instead of the named grid line on this
+  Chromium build whenever any inset was left `auto` — not worth depending
+  on. The actual fix: give `.mcell`/`.mhead` an explicit `gridRow`/
+  `gridColumn` too (computed inline in `MonthView.tsx`), so nothing is
+  auto-placed and there's nothing left to dodge. Cells and pills
+  intentionally share a grid area now — `.month-pill` stays `position:
+  relative` + `z-index` to paint over the cell's own content, not to avoid
+  occupying it.
+- **Print backgrounds need `print-color-adjust: exact` or Chrome silently
+  drops them** — the "no color, no box outlines, only text" report was this:
+  Chrome strips `background-color`/`background-image` from print output by
+  default (the print dialog's "Background graphics" checkbox, off by
+  default) regardless of what CSS the page sets, unless the page opts in
+  with `-webkit-print-color-adjust: exact; print-color-adjust: exact;`.
+  Event blocks also went from a left-accent-stripe-only look (fine on the
+  dark screen theme, too subtle on white paper) to a full box outline in
+  print, colored per block via a `--block-accent` CSS custom property set
+  inline per block in `WeekView.tsx` — necessary because a block's inline
+  `color-mix()` override (the `b.color` field) is inline style, which beats
+  any class-based print color rule trying to recolor it; reading the accent
+  back out through a custom property sidesteps that fight entirely.
+  Commute/no-phone blocks get a lighter dotted outline instead, on purpose —
+  a reminder in print, not the focus of it.
+- **`useTickets()` follows the same optimistic-local-first pattern as
+  `useUiSettings()`'s `statsCollapsed`** (see above) — save/dismiss/undo
+  update a local `pending` overlay immediately, merged over the
+  Firestore-synced `tickets` map for rendering, with the actual write firing
+  in the background. `pending[id] = null` means "treat as deleted" (for
+  undo) — a plain JS `delete` would just fall through to the still-stale
+  Firestore-synced value for that key, which is exactly what undo is trying
+  to clear. The whole overlay resets to `{}` on every fresh snapshot, since
+  by then it's already reflected there.
 - **Everyday operation is documented in `DEPLOY.md` and `README.md`**, not
   here — this file is for architecture/history, those two are for "how do I
   change X." If you're about to explain how to edit something, check there

@@ -50,7 +50,7 @@ export function BusinessView({
     <section className="panel active">
       <div className="card">
         <h3>
-          Business & Projects <span className="pill">_data/business-deadlines.yml</span>
+          Business & Projects <span className="pill">business-deadlines.yml</span>
         </h3>
       </div>
 

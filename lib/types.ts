@@ -101,6 +101,7 @@ export interface ChecklistItemDecl {
   text: string
   meta?: string
   urgent?: boolean
+  later?: boolean // dims the item to 50% opacity (still there, just out of the way) until you flip it off when it's actually relevant
 }
 
 export interface ChecklistFile {
@@ -150,6 +151,7 @@ export interface TicketRoute {
   opens_before_days: number // ticket sales open this many days before the trip
   note?: string
   urgent_within_days?: number
+  start_date?: string // YYYY-MM-DD — no occurrences generated before this date (e.g. a route that doesn't start until a new semester)
 }
 
 export interface TicketsFile {
@@ -178,7 +180,7 @@ export interface University {
 export interface CourseSource {
   label: string
   url?: string // optional — omit while you haven't added the lecture file yet
-  page_url?: string // the course's own webpage on courses.aaron.kr — Semester view links the title to this
+  site?: string // the course's own webpage on courses.aaron.kr — Semester view links the column header and every lecture title to this
   color?: string // CSS var name, e.g. "--blue"
   university?: string // University.abbr
   weekday?: Weekday

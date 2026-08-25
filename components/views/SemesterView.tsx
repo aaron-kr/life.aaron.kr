@@ -34,7 +34,7 @@ export function SemesterView({
       <section className="panel active">
         <div className="card">
           <h3>
-            Semester <span className="pill">_data/course-sources.yml</span>
+            Semester <span className="pill">course-sources.yml</span>
           </h3>
           <div className="sem-empty">
             No courses with a <code>weekday</code> set yet — add entries to <code>_data/course-sources.yml</code>.
@@ -79,7 +79,7 @@ export function SemesterView({
     <section className="panel active">
       <div className="card">
         <h3>
-          Semester <span className="pill">_data/course-sources.yml</span>
+          Semester <span className="pill">course-sources.yml</span>
         </h3>
         <div className="sem-wrap">
           <div className="sem-grid3">
@@ -98,8 +98,8 @@ export function SemesterView({
                             <Image src={uni.logo} alt={uni.name} width={16} height={16} unoptimized />
                           </a>
                         )}
-                        {s.page_url ? (
-                          <a href={s.page_url} target="_blank" rel="noopener noreferrer" className="sdh-course-link">
+                        {s.site ? (
+                          <a href={s.site} target="_blank" rel="noopener noreferrer" className="sdh-course-link">
                             {s.label}
                           </a>
                         ) : (
@@ -137,8 +137,8 @@ export function SemesterView({
                               className={`sem-cell-course${isPast ? ' past' : ''}${isThisWeek ? ' current' : ''}${lecture.isBreak ? ' break-row' : ''}${lecture.isExam ? ' exam-row' : ''}`}
                               style={{ borderLeftColor: s.color ? `var(${s.color})` : 'var(--border)' }}
                             >
-                              {s.page_url ? (
-                                <a href={s.page_url} target="_blank" rel="noopener noreferrer">
+                              {s.site ? (
+                                <a href={s.site} target="_blank" rel="noopener noreferrer">
                                   {lecture.title || '—'}
                                 </a>
                               ) : (

@@ -16,16 +16,18 @@ interface TicketCardProps {
   title: string
   rows: TicketRow[]
   onSave: (id: string, time: string, seat: string) => void
-  onUndo: (id: string) => void
+  onDismiss: (id: string) => void
 }
 
-export function TicketCard({ title, rows, onSave, onUndo }: TicketCardProps) {
+// Purchased/dismissed rows never reach this card — TicketDrawer routes those
+// into the "Complete" section instead, so every row here is still active.
+export function TicketCard({ title, rows, onSave, onDismiss }: TicketCardProps) {
   return (
     <div className="checklist-card">
       <h4>{title}</h4>
       <div>
         {rows.map((row) => (
-          <TicketItemRow key={row.id} row={row} onSave={onSave} onUndo={onUndo} />
+          <TicketItemRow key={row.id} row={row} onSave={onSave} onDismiss={onDismiss} />
         ))}
       </div>
     </div>
@@ -35,52 +37,23 @@ export function TicketCard({ title, rows, onSave, onUndo }: TicketCardProps) {
 function TicketItemRow({
   row,
   onSave,
-  onUndo,
+  onDismiss,
 }: {
   row: TicketRow
   onSave: (id: string, time: string, seat: string) => void
-  onUndo: (id: string) => void
+  onDismiss: (id: string) => void
 }) {
-  const [checked, setChecked] = useState(Boolean(row.state?.purchased))
+  const [checked, setChecked] = useState(false)
   const [time, setTime] = useState('')
   const [seat, setSeat] = useState('')
-  const purchased = Boolean(row.state?.purchased)
-
-  function handleCheck() {
-    setChecked(true)
-  }
 
   function handleSave() {
     onSave(row.id, time || '—', seat || '—')
   }
 
-  function handleUndo() {
-    onUndo(row.id)
-    setChecked(false)
-    setTime('')
-    setSeat('')
-  }
-
-  if (purchased) {
-    return (
-      <div className="cl-item collapsed">
-        <div className="ti-text">
-          <span className="ti-route">{row.label}</span>
-          <span className="ti-meta">{row.meta}</span>
-        </div>
-        <span className="ticket-chip">
-          ✓ {row.short} · {row.state?.time}
-          <button className="undo-link" onClick={handleUndo}>
-            undo
-          </button>
-        </span>
-      </div>
-    )
-  }
-
   return (
-    <div className={`cl-item${row.urgent ? ' urgent' : ''}`}>
-      <input type="checkbox" checked={checked} onChange={handleCheck} />
+    <div className={`cl-item ticket-row${row.urgent ? ' urgent' : ''}`}>
+      <input type="checkbox" checked={checked} onChange={() => setChecked(true)} />
       <div style={{ flex: 1 }}>
         <div className="ti-text">
           <span className="ti-route">{row.label}</span>
@@ -94,6 +67,13 @@ function TicketItemRow({
           </div>
         )}
       </div>
+      <button
+        className="ticket-dismiss"
+        onClick={() => onDismiss(row.id)}
+        title="Not traveling this one — dismiss without entering purchase details"
+      >
+        ×
+      </button>
     </div>
   )
 }

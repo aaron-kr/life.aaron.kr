@@ -130,14 +130,30 @@ export function useGoalItemState(listId: string) {
 
 export interface TicketState {
   purchased: boolean
+  dismissed?: boolean
   time?: string
   seat?: string
 }
 
-/** tickets/{ticketId} — { purchased, time?, seat? }, ticketId = `${routeId}_${weekOfYmd}` */
+/** tickets/{ticketId} — { purchased, dismissed?, time?, seat? }, ticketId =
+ * `${routeId}_${weekOfYmd}`. `dismissed` is for occurrences you're skipping
+ * without ever entering purchase details (e.g. a route you just show up
+ * for) — same "move it out of the active list" effect as purchasing, minus
+ * the time/seat form.
+ *
+ * `pending` is the same optimistic-overlay pattern as `useUiSettings`'s
+ * `statsCollapsed` (see there for why): save/dismiss/undo update it
+ * immediately so the row visibly moves before the Firestore round-trip
+ * finishes, rather than waiting on `onSnapshot` to reflect a change that
+ * already happened locally. A `null` entry means "treat as deleted" (for
+ * undo) — plain `delete`ing the key would just fall back to showing
+ * whatever `tickets` still has for it, which is exactly the stale state
+ * undo is trying to clear. Each fresh snapshot clears the whole overlay,
+ * since by then it's already reflected there. */
 export function useTickets() {
   const { status } = useAuth()
   const [tickets, setTickets] = useState<Record<string, TicketState>>({})
+  const [pending, setPending] = useState<Record<string, TicketState | null>>({})
 
   useEffect(() => {
     if (status !== 'signed-in') return
@@ -147,18 +163,32 @@ export function useTickets() {
         map[d.id] = d.data() as TicketState
       })
       setTickets(map)
+      setPending({})
     })
   }, [status])
 
-  async function save(ticketId: string, time: string, seat: string) {
-    await setDoc(doc(db, 'tickets', ticketId), { purchased: true, time, seat })
+  function save(ticketId: string, time: string, seat: string) {
+    setPending((p) => ({ ...p, [ticketId]: { purchased: true, time, seat } }))
+    setDoc(doc(db, 'tickets', ticketId), { purchased: true, time, seat }).catch(() => {})
   }
 
-  async function undo(ticketId: string) {
-    await deleteDoc(doc(db, 'tickets', ticketId))
+  function dismiss(ticketId: string) {
+    setPending((p) => ({ ...p, [ticketId]: { purchased: false, dismissed: true } }))
+    setDoc(doc(db, 'tickets', ticketId), { dismissed: true }).catch(() => {})
   }
 
-  return { tickets, save, undo }
+  function undo(ticketId: string) {
+    setPending((p) => ({ ...p, [ticketId]: null }))
+    deleteDoc(doc(db, 'tickets', ticketId)).catch(() => {})
+  }
+
+  const merged = { ...tickets }
+  Object.entries(pending).forEach(([id, v]) => {
+    if (v === null) delete merged[id]
+    else merged[id] = v
+  })
+
+  return { tickets: merged, save, dismiss, undo }
 }
 
 /** settings/ui — { lastView, statsCollapsed } — small cross-device UI prefs.

@@ -1,7 +1,13 @@
 # Recurring transportation-ticket needs. The drawer groups these into a
-# rolling 4-week window (This week / Next week / 3-4 weeks out) computed from
-# today's date — nothing here is date-specific, `weekday` + `opens_before_days`
-# is enough to derive it each week.
+# rolling 4-week window (This week / Next week / 3-4 weeks out), sorted by
+# date, computed from today's date — nothing here is date-specific,
+# `weekday` + `opens_before_days` is enough to derive it each week. Add an
+# optional `start_date: "YYYY-MM-DD"` to a route if it shouldn't show up
+# until later (e.g. a semester that hasn't started yet) — no occurrences
+# before that date will appear. Each occurrence can be dismissed with the ×
+# that appears on hover (for routes you're skipping without ever entering
+# purchase details) or saved with time/seat once purchased — either way it
+# moves down into the collapsed "Complete" section at the bottom.
 routes:
   # 월요일 MONDAY
   - id: mon-to-osong

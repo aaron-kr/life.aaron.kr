@@ -241,7 +241,13 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 
 @media print {
   @page { size: A4 landscape; margin: 10mm; }
-  body * { visibility: hidden; }
+  /* Chrome/Edge strip background colors from print output by default
+     (the "Background graphics" checkbox in the print dialog, off by
+     default) — without this, everything below renders as text-only no
+     matter what color/border rules exist, which is exactly what "no color
+     and no box outlines" looks like. */
+  html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body * { visibility: hidden; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   #week-print-area, #week-print-area * { visibility: visible; }
   /* `position: fixed` anchors to the page box itself, ignoring the
      sidebar/header/hero-band flex layout it sits inside — those are only
@@ -264,10 +270,28 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
     box-shadow: none;
   }
   .week-export-btns { display: none !important; }
-  .week-grid .gcell, .week-grid .ghead { border-color: #ccc !important; background: #fff !important; }
+
+  /* Hourly/half-hourly rulings — `.gcell.half` already carries a dashed
+     bottom border on screen (the half-hour marks); that rule is unchanged,
+     only the color needs to be paper-legible here. */
+  .week-grid { border-color: #999 !important; }
+  .week-grid .gcell, .week-grid .ghead { border-color: #aaa !important; background: #fff !important; }
   .week-grid .ghead.today { background: #eee !important; }
   .time-label, .city-tag { color: #444 !important; }
-  .block, .block .bt, .block .bs { color: #1a1a1a !important; background: #f2f2f6 !important; opacity: 1 !important; }
+
+  /* Full box outline per block, in that block's own accent color (screen
+     view only shows a left accent stripe — too subtle on white paper to
+     read as "a box"). `--block-accent` is set inline per block in
+     WeekView.tsx specifically so a custom per-school `color:` override
+     (also inline) still gets its own outline here, not just the type
+     default — inline style otherwise wins over any class-based color rule
+     trying to override it, custom or not. */
+  .block { border: 1px solid var(--block-accent, #999) !important; background: color-mix(in srgb, var(--block-accent, #999) 14%, white) !important; color: #1a1a1a !important; opacity: 1 !important; }
+  .block .bt, .block .bs { color: #1a1a1a !important; }
+  /* Commute/no-phone blocks stay a subtle reminder, not the point of the
+     printout — lighter dotted outline, muted text, regardless of accent. */
+  .b-nophone, .b-commute { border: 1px dotted #bbb !important; background: #fafafa !important; }
+  .b-nophone .bt, .b-nophone .bs, .b-commute .bt, .b-commute .bs { color: #888 !important; }
 }
 
 /* ===== checklist card ===== */
@@ -290,6 +314,8 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .cl-item .ti-text { display: flex; flex-direction: column; }
 .cl-item .ti-meta { font-family: var(--font-mono); font-size: 0.7143rem; color: var(--text-faint); margin-top: 1px; }
 .cl-item.urgent .ti-meta { color: var(--pink); }
+.cl-item.later { opacity: .5; transition: opacity .15s ease; }
+.cl-item.later:hover { opacity: 1; }
 .done-toggle { font-family: var(--font-mono); font-size: 0.7143rem; color: var(--text-faint); cursor: pointer; margin-top: 8px; display: flex; align-items: center; gap: 5px; }
 .done-toggle:hover { color: var(--text-dim); }
 .done-list { display: none; margin-top: 6px; }
@@ -306,14 +332,15 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .ti-form.show { display: flex; }
 .ti-form input[type=text] { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-family: var(--font-mono); font-size: 0.75rem; padding: 4px 7px; width: 72px; }
 .ti-form button { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold); border-radius: 5px; font-family: var(--font-mono); font-size: 0.7143rem; padding: 4px 9px; cursor: pointer; }
-.ticket-chip { display: none; align-items: center; gap: 8px; margin-left: auto; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-faint); background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 999px; padding: 3px 10px; cursor: default; }
-.cl-item.collapsed .ti-text, .cl-item.collapsed input[type=checkbox] { display: none; }
-.cl-item.collapsed { justify-content: flex-end; border-bottom: none; padding: 3px 0; }
-.cl-item.collapsed .ticket-chip { display: flex; }
-.cl-item.collapsed:hover .ticket-chip { display: none; }
-.cl-item.collapsed:hover .ti-text, .cl-item.collapsed:hover input[type=checkbox] { display: flex; }
-.cl-item.collapsed:hover { justify-content: flex-start; }
-.undo-link { font-size: 0.6786rem; color: var(--pink); text-decoration: underline; cursor: pointer; margin-left: 6px; background: none; border: none; }
+/* Purchased/dismissed tickets move into the "Complete" done-list (below)
+   instead of collapsing in place — a former `justify-content: flex-end`
+   version of this row right-aligned a variable-width chip, which left a
+   jagged, misaligned left edge whenever the kept title text differed in
+   length between rows. The done-list pattern is already flush-left with a
+   fixed layout, so it doesn't have that failure mode. */
+.ticket-dismiss { flex-shrink: 0; align-self: flex-start; opacity: 0; background: none; border: none; color: var(--text-faint); font-size: 1.0714rem; line-height: 1; cursor: pointer; padding: 2px 5px; transition: opacity .12s ease; }
+.cl-item.ticket-row:hover .ticket-dismiss { opacity: 1; }
+.ticket-dismiss:hover { color: var(--pink); }
 
 /* ticket drawer */
 .ticket-drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 360px; background: var(--panel); border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,.4); transform: translateX(100%); transition: transform .22s ease; z-index: 40; padding: 18px 18px 30px; overflow-y: auto; }
@@ -365,6 +392,22 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .month-grid .mnum.makeup { color: var(--yellow); }
 .month-grid .mflags { display: flex; gap: 3px; margin-top: 6px; flex-wrap: wrap; }
 .month-grid .mflag { font-size: 0.6429rem; padding: 1px 5px; border-radius: 4px; display: inline-block; cursor: default; }
+/* `.mcell`/`.mhead` now carry an explicit grid-row+grid-column each (set
+   inline in MonthView.tsx) instead of relying on the browser's
+   auto-placement to walk them in — that used to be the bug: pills DO have
+   an explicit grid-row+grid-column (`seg.row`/`seg.colStart`), and CSS
+   Grid's auto-placement algorithm treats any cell already claimed by an
+   explicitly-positioned item as occupied, so every un-placed day cell that
+   would-have overlapped a pill instead got silently bumped to the next
+   open cell, corrupting every date after it for the rest of the grid.
+   Giving every cell its own explicit coordinate sidesteps that avoidance
+   behavior entirely — cells and pills can share a grid area on purpose
+   (they're meant to visually overlap), painted in DOM order, so the pill
+   still needs `position: relative` + `z-index` to sit above the cell's own
+   content, but no longer to dodge occupancy. (`position: absolute` was
+   tried first and reliably mis-resolves its static top/left to the grid
+   container's origin instead of the named grid line in this Chromium
+   build once *any* inset is left `auto` — not worth depending on.) */
 .month-pill { position: relative; align-self: start; height: 15px; margin: 0 1px; border-radius: 3px; border: 1px solid; font-family: var(--font-mono); font-size: 0.5714rem; color: var(--text); padding: 0 5px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; z-index: 1; }
 .month-pill-swatch { display: inline-block; width: 16px; height: 9px; border-radius: 2px; background: color-mix(in srgb, var(--green) 35%, var(--panel-2)); border: 1px solid var(--green); }
 .flag-deadline { background: var(--pink-dim); color: var(--pink); }

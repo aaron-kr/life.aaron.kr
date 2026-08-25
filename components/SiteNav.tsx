@@ -1,10 +1,10 @@
 const LINKS = [
   { label: 'PAI Lab', href: 'https://pailab.io' },
   { label: 'Courses', href: 'https://courses.aaron.kr' },
-  { label: 'CV / Contact', href: 'https://aaron.kr' },
-  { label: 'Blog', href: 'https://aaronsnowberger.com' },
+  { label: 'CV / Contact', href: 'https://aaronsnowberger.com' },
+  { label: 'Blog', href: 'https://notes.aaron.kr' },
+  { label: 'Scientia', href: 'https://sci.aaron.kr/' },
   { label: 'KSPAI', href: 'https://kspai.org' },
-  { label: 'SERVO', href: 'https://servo.aaron.kr' },
 ]
 
 export function SiteNav() {

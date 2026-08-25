@@ -125,7 +125,11 @@ export function MonthView({
             const wdKey = DOW_WEEKDAY_KEY[i]
             const schools = wdKey ? (weekdayUniversities[wdKey] ?? []) : []
             return (
-              <div key={d} className={`mhead${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}`}>
+              <div
+                key={d}
+                className={`mhead${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}`}
+                style={{ gridRow: 1, gridColumn: i + 1 }}
+              >
                 {d}
                 {schools.length > 0 && (
                   <div className="mhead-logos">
@@ -139,7 +143,7 @@ export function MonthView({
               </div>
             )
           })}
-          {cells.map((date) => {
+          {cells.map((date, i) => {
             const key = ymd(date)
             const dow = date.getDay()
             const inFocalMonth = date.getMonth() === currentMonth
@@ -155,6 +159,7 @@ export function MonthView({
               <div
                 key={key}
                 className={`mcell${inFocalMonth ? '' : ' dim'}${sameDate(date, today) ? ' today' : ''}`}
+                style={{ gridRow: Math.floor(i / 7) + 2, gridColumn: (i % 7) + 1 }}
               >
                 <div className={numClass} title={holiday?.label ?? ''}>
                   {date.getDate()}
@@ -201,7 +206,7 @@ export function MonthView({
           </div>
           <div className="lg-item">
             <span className="month-pill-swatch" />
-            Multi-day (set end_date)
+            Multi-day (set end_date — pill color follows the event&apos;s type, same as the flags above)
           </div>
           <div className="lg-item">
             <span style={{ color: 'var(--red)' }}>●</span>Sunday / holiday

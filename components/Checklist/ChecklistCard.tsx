@@ -8,6 +8,7 @@ export interface ChecklistCardItem {
   text: string
   meta?: string
   urgent?: boolean
+  later?: boolean
   done: boolean
 }
 
@@ -40,7 +41,7 @@ export function ChecklistCard({ title, items, onToggle, onRemove, logo }: Checkl
       <h4>{title}</h4>
       <div>
         {active.map((item) => (
-          <div className={`cl-item${item.urgent ? ' urgent' : ''}`} key={item.id}>
+          <div className={`cl-item${item.urgent ? ' urgent' : ''}${item.later ? ' later' : ''}`} key={item.id}>
             <input type="checkbox" checked={false} onChange={() => onToggle(item.id, true)} />
             <div className="ti-text">
               <span className="ti-route">{item.text}</span>

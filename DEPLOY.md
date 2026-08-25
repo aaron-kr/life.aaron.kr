@@ -104,7 +104,7 @@ Most changes don't touch code at all:
 | Habit heatmaps (what's tracked) | `_data/habits.yml` |
 | Recurring ticket routes | `_data/tickets.yml` |
 | North Star / PAI Lab goals | `_data/goal-lists/*.yml` |
-| Courses, weekdays, university, colors, course webpage link | `_data/course-sources.yml` |
+| Courses, weekdays, university, colors, course website link (`site:`) | `_data/course-sources.yml` |
 | Hometown weather/time widget | `_data/hometown.yml` |
 | Business/tax filing reminders | `_data/business-deadlines.yml` |
 | Business milestone/project checklists (e.g. YouTube channel, blog redesign) | `_data/checklists/*.yml` with `group: Business` |
@@ -122,13 +122,19 @@ Most changes don't touch code at all:
 
 **Business/Jobs checklists piggyback on the same `_data/checklists/` file-drop pattern as the To-Do view** — a checklist's `group:` field decides which view it renders in: `group: Business` goes to the Business view (good for milestone-style project tracking — put a target date in each item's `meta` field, e.g. `meta: "by Sep 30"`), `group: Jobs` goes to the Jobs view, and anything else (or no group) stays in To-Do.
 
+**Checklist items support a `later: true` flag** — dims that item to 50% opacity (hover brings it back to full brightness) without hiding it, for things that are on the list but not worth your attention yet, like a grade-turn-in reminder sitting there since week 1. It's still there, still checkable, just visually out of the way until it's actually relevant. See the school checklists' `later: true` on "Grade turn-in" for an example.
+
+**Multi-day events** (`_data/personal-events.yml`, set `end_date`) render as one spanning bar in the Month view, colored by the event's `type` (same palette as the single-day flags). A trip that crosses a week boundary (Saturday into the next Sunday, say) automatically becomes two bars, one per row — that's the Month view's normal weekly-row layout, not a bug to work around.
+
+**Recurring ticket routes** (`_data/tickets.yml`) are sorted soonest-first within each window bucket. Add `start_date: "YYYY-MM-DD"` to a route that shouldn't show up yet (a route that only starts once a new semester begins, say). Each occurrence gets a small × on hover to dismiss it without entering purchase details — for routes you just show up for rather than book (e.g. a route where reservations aren't possible and buses run every 20 minutes) — or fill in time/seat and Save once purchased. Either way it moves into a collapsed "Complete" section at the bottom of the drawer, out of the way until you want to check it.
+
 **The top strip's content switches by view, not by a separate toggle**: Week/Month/Semester/To-Do show body/semester stats; Business/Jobs show the ETF row instead (same "hide" button, same persisted collapsed state either way — see `_data/etfs.yml`'s comments for a few suggested market-pulse tickers, like SPY/QQQ/VIX or a KRW=X exchange-rate card). The ETF row has **1D/1W/1M/1Y/5Y/10Y** buttons above it — Yahoo needs both a `range` and an `interval` per request, so each button maps to a sensible pair (e.g. 1M → daily closes over the past month, 1Y → weekly closes over the past year); the small text next to the buttons always says exactly which one is currently showing.
 
 `_data/course-sources.yml` is the hub for anything school-related: each entry
 declares a course's `label`, `weekday`, `university` (an `abbr` key from
 courses.aaron.kr's shared `universities.yml`, fetched live — logos and portal
 links come from there automatically), `color`, optionally a `url` to that
-course's lecture YAML, and optionally a `page_url` — the course's own webpage
+course's lecture YAML, and optionally a `site` — the course's own webpage
 on courses.aaron.kr, which the Semester view links every title/header to when
 set. A course shows up in the Month view header and the weather hero's school
 badge as soon as `weekday`+`university` are set — the `url` only affects

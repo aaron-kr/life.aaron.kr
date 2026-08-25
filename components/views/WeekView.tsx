@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef, useState, type CSSProperties } from 'react'
 import Image from 'next/image'
 import type { DashboardTemplate, FullWeekday, University, WeekdayMapping } from '@/lib/types'
 import { fmtHourLabel, minutesSinceMidnight, todayLocal, weekdayKey } from '@/lib/dates'
@@ -23,6 +23,20 @@ const LEGEND = [
   { color: 'var(--pink)', label: 'Gym' },
   { color: 'var(--text-faint)', label: 'Commute / No-phone' },
 ]
+
+// Each block type's default accent color — same values the `.b-*` CSS
+// classes already use. Exposed here too (as an inline `--block-accent` custom
+// property, below) so the print stylesheet can outline each block in its own
+// color even when a block sets a custom per-school `color:` override, which
+// arrives as an inline style and would otherwise beat any class-based print
+// rule trying to recolor it.
+const TYPE_ACCENT: Record<string, string> = {
+  class: '--blue',
+  deepwork: '--silver',
+  gym: '--pink',
+  family: '--green',
+  church: '--gold',
+}
 
 export function WeekView({
   template,
@@ -132,7 +146,7 @@ export function WeekView({
     <section className="panel active">
       <div className="card" id="week-print-area" ref={captureRef}>
         <h3>
-          This week <span className="pill">_data/weekly.yml + daily edits</span>
+          This week <span className="pill">weekly.yml + daily edits</span>
           <span className="week-export-btns">
             <button className="week-export-btn" onClick={handlePrint} title="Print (your browser's print dialog has a landscape/portrait choice)">
               🖨️ Print
@@ -181,19 +195,23 @@ export function WeekView({
                         const durationMin = minutesSinceMidnight(b.end) - minutesSinceMidnight(b.start)
                         const spanSlots = durationMin / SLOT_MIN
                         const uni = logoFor(b.university)
+                        const accentVar = b.color ?? TYPE_ACCENT[b.type]
                         return (
                           <div
                             key={i}
                             className={`block b-${b.type}`}
-                            style={{
-                              height: `${SLOT_H * spanSlots - 4}px`,
-                              ...(b.color
-                                ? {
-                                    background: `color-mix(in srgb, var(${b.color}) 22%, var(--panel-2))`,
-                                    borderLeftColor: `var(${b.color})`,
-                                  }
-                                : {}),
-                            }}
+                            style={
+                              {
+                                height: `${SLOT_H * spanSlots - 4}px`,
+                                ...(accentVar ? { '--block-accent': `var(${accentVar})` } : {}),
+                                ...(b.color
+                                  ? {
+                                      background: `color-mix(in srgb, var(${b.color}) 22%, var(--panel-2))`,
+                                      borderLeftColor: `var(${b.color})`,
+                                    }
+                                  : {}),
+                              } as CSSProperties
+                            }
                           >
                             <div className="bt">
                               {uni && (

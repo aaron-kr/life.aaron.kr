@@ -12,7 +12,7 @@ export function ChecklistSection({ checklist, universities }: { checklist: Check
     .map((it) => {
       const slug = slugify(it.text)
       const s = state[slug]
-      return { id: slug, text: it.text, meta: it.meta, urgent: it.urgent, done: Boolean(s?.done) }
+      return { id: slug, text: it.text, meta: it.meta, urgent: it.urgent, later: it.later, done: Boolean(s?.done) }
     })
     .filter((it) => !state[it.id]?.removed)
 

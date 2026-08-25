@@ -19,7 +19,7 @@ export function JobsView({
     <section className="panel active">
       <div className="card">
         <h3>
-          Jobs <span className="pill">_data/jobs.yml</span>
+          Jobs <span className="pill">jobs.yml</span>
         </h3>
         {jobs.targetPositions && (
           <div className="biz-disclaimer" style={{ whiteSpace: 'pre-line' }}>
