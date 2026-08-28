@@ -39,8 +39,8 @@ recurring_blocks:
   - { day: thursday, start: "06:00", end: "07:00", type: commute, title: "Isaac"}
   - { day: thursday, start: "07:00", end: "08:00", type: gym, title: "Gym", sub: "pull" }
   - { day: thursday, start: "09:30", end: "11:30", type: commute, title: "Bus ➔ 청주", sub: "09:20 - 11:20~" }
-  - { day: thursday, start: "12:00", end: "15:00", type: class, title: "CBNU - Grad ML", sub: "Room", university: cbnu, color: "--red" }
-  - { day: thursday, start: "15:00", end: "18:00", type: class, title: "CBNU - Grad MongoDB", sub: "Room", university: cbnu, color: "--red" }
+  - { day: thursday, start: "12:00", end: "15:00", type: class, title: "CBNU - Grad Research", sub: "Room", university: cbnu, color: "--red" }
+  - { day: thursday, start: "15:00", end: "18:00", type: class, title: "CBNU - Grad Software Engineering", sub: "Room", university: cbnu, color: "--red" }
   - { day: thursday, start: "18:00", end: "18:30", type: commute, title: "Walk"}
   - { day: thursday, start: "18:30", end: "20:30", type: commute, title: "Bus ➔ 전주", sub: "18:40 - 20:40" }
   - { day: thursday, start: "21:30", end: "22:30", type: commute, title: "Isaac"}

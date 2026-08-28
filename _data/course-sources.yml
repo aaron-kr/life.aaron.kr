@@ -53,19 +53,19 @@ sources:
     url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/wku_db_lectures.yml"
     site: "https://courses.aaron.kr/courses/2026/wku-db/"
 
-  - label: "CBNU — Grad Mongo (Thur)"
+  - label: "CBNU — Grad Research (Thur)"
     university: cbnu
     weekday: thursday
     color: "--gold"
-    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_mongo_lectures.yml"
-    site: "https://courses.aaron.kr/courses/2026/cbnu-grad-mongo/"
+    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_research_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/cbnu-grad-research/"
 
-  - label: "CBNU — Grad ML (Thur)"
+  - label: "CBNU — Grad Software Engineering (Thur)"
     university: cbnu
     weekday: thursday
     color: "--gold"
-    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_ml_lectures.yml"
-    site: "https://courses.aaron.kr/courses/2026/cbnu-grad-ml/"
+    url: "https://raw.githubusercontent.com/aaronkr-courses/courses.aaron.kr/refs/heads/main/_data/2026/cbnu_grad_soft_eng_lectures.yml"
+    site: "https://courses.aaron.kr/courses/2026/cbnu-grad-soft-eng/"
 
   - label: "KJNU — Bio Net (Fri)"
     university: kjnu

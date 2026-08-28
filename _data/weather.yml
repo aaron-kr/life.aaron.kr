@@ -10,7 +10,7 @@
 weekdays:
   monday: { city: Chungju, city_kr: 충주 }
   tuesday: { city: Jeonju, city_kr: 전주 }
-  wednesday: { city: Iksan, city_kr: 임산 }
+  wednesday: { city: Iksan, city_kr: 익산 }
   thursday: { city: Cheongju, city_kr: 청주 }
   friday: { city: Kongju, city_kr: 공주 }
   saturday: { city: "Jeonju", city_kr: "전주" }
