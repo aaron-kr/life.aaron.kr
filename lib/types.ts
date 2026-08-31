@@ -1,4 +1,4 @@
-export type View = 'week' | 'month' | 'semester' | 'todo' | 'business' | 'jobs'
+export type View = 'week' | 'month' | 'semester' | 'todo' | 'jobs'
 
 export type Weekday = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'
 
@@ -53,6 +53,33 @@ export interface PersonalEventsFile {
   events: PersonalEvent[]
 }
 
+/** _data/calendars.yml — external .ics feeds (Google Calendar's own secret
+ * address, a published public holiday calendar, a sports team's schedule,
+ * ...) merged in as colored dots alongside holidays.yml/personal-events.yml.
+ * Each feed is fetched + parsed server-side (see lib/ics.ts) — the client
+ * never sees the raw .ics or the feed URL. */
+export interface CalendarSource {
+  id: string
+  label: string
+  url: string
+  color: string // CSS var name, e.g. "--blue"
+}
+
+export interface CalendarSourcesFile {
+  calendars: CalendarSource[]
+}
+
+/** One expanded occurrence from an imported .ics feed — RRULE (if present
+ * and one of the simple cases lib/ics.ts supports) is already expanded
+ * server-side into individual dates by the time this reaches the client. */
+export interface ImportedEvent {
+  date: string // YYYY-MM-DD
+  label: string
+  calendarId: string
+  calendarLabel: string
+  color: string
+}
+
 export interface Quote {
   text: string
   ref: string
@@ -82,7 +109,8 @@ export interface StatDeclaration {
   reset_date?: string // for type: total
   goal?: number // for type: fraction
   color?: string
-  placement: 'body' | 'semester' // which row of the top stats strip this renders in
+  placement: 'body' | 'semester' // which row-GROUP of the top stats strip this renders in
+  row?: number // sub-row within its placement group — unset defaults to 0; higher numbers wrap onto a new line below the rest of that group, in ascending order
   order?: number // ascending sort within its row; unset sorts to the end
 }
 
@@ -243,6 +271,8 @@ export interface DashboardData {
   weatherCities: Partial<Record<FullWeekday, WeekdayMapping>>
   holidays: HolidayEntry[]
   events: PersonalEvent[]
+  calendars: CalendarSource[]
+  importedEvents: ImportedEvent[]
   quotes: Quote[]
   biblePlan: BiblePlanEntry[]
   stats: StatDeclaration[]

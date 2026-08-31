@@ -4,7 +4,7 @@ import type { HabitDeclaration } from '@/lib/types'
 import { useHabitCheckins } from '@/lib/firestore-hooks'
 import { addDays, mondayOfWeek, sameDate, todayLocal, ymd } from '@/lib/dates'
 
-const WEEKS = 12
+const WEEKS = 14
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
 function currentStreak(checkins: Record<string, boolean>, today: Date): number {

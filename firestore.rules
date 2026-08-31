@@ -39,6 +39,11 @@ service cloud.firestore {
       allow read, write: if isOwner();
     }
 
+    // Lecture prep checkboxes: lecture_prep/{slugifiedCourse_lectureDate} — { done }
+    match /lecture_prep/{prepId} {
+      allow read, write: if isOwner();
+    }
+
     // UI settings: settings/ui — { lastView, statsCollapsed } — persists
     // small UI prefs across devices/sessions.
     match /settings/{docId} {

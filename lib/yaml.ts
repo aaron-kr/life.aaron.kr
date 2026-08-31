@@ -3,10 +3,12 @@ import path from 'path'
 import yaml from 'js-yaml'
 import { fetchAllCourses } from './courses'
 import { fetchUniversities } from './universities'
+import { fetchAllCalendars } from './ics'
 import type {
   BiblePlanFile,
   BrandingConfig,
   BusinessDeadline,
+  CalendarSourcesFile,
   ChecklistFile,
   CourseSourcesFile,
   DashboardData,
@@ -16,6 +18,7 @@ import type {
   HabitsFile,
   HolidaysFile,
   HometownConfig,
+  ImportedEvent,
   JobsConfig,
   PersonalEventsFile,
   QuotesFile,
@@ -65,6 +68,7 @@ export async function loadDashboardData(): Promise<DashboardData> {
 
   const holidays = readYaml<HolidaysFile>('holidays.yml', { holidays: [] }).holidays
   const events = readYaml<PersonalEventsFile>('personal-events.yml', { events: [] }).events
+  const calendars = readYaml<CalendarSourcesFile>('calendars.yml', { calendars: [] }).calendars.filter((c) => c.url)
   const quotes = readYaml<QuotesFile>('quotes.yml', { quotes: [] }).quotes
   const biblePlan = readYaml<BiblePlanFile>('bible-plan.yml', { plan: [] }).plan
   const habits = readYaml<HabitsFile>('habits.yml', { habits: [] }).habits
@@ -106,13 +110,33 @@ export async function loadDashboardData(): Promise<DashboardData> {
     targetPositions: jobsRaw.target_positions ?? '',
   }
 
-  const [courses, universities] = await Promise.all([fetchAllCourses(courseSources), fetchUniversities()])
+  const [courses, universities, rawImportedEvents] = await Promise.all([
+    fetchAllCourses(courseSources),
+    fetchUniversities(),
+    fetchAllCalendars(calendars),
+  ])
+
+  // Bound the window sent to the client — a weekly-recurring RRULE can
+  // expand to hundreds of dates, and the Month view (6-week grid + a
+  // 3-month ahead strip) never needs more than about 7 months of runway.
+  const today = new Date()
+  const windowStart = new Date(today)
+  windowStart.setDate(windowStart.getDate() - 31)
+  const windowEnd = new Date(today)
+  windowEnd.setDate(windowEnd.getDate() + 210)
+  const windowStartYmd = windowStart.toISOString().slice(0, 10)
+  const windowEndYmd = windowEnd.toISOString().slice(0, 10)
+  const importedEvents: ImportedEvent[] = rawImportedEvents.filter(
+    (e) => e.date >= windowStartYmd && e.date <= windowEndYmd
+  )
 
   return {
     template,
     weatherCities,
     holidays,
     events,
+    calendars,
+    importedEvents,
     quotes,
     biblePlan,
     stats,

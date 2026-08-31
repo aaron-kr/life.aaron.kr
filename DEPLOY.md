@@ -97,9 +97,10 @@ Most changes don't touch code at all:
 | Weekday→city weather map (**this is where Sat/Sun weather lives**) | `_data/weather.yml` |
 | Holidays / make-up days | `_data/holidays.yml` |
 | Family events, deadlines, conferences, multi-day trips | `_data/personal-events.yml` |
+| Imported .ics calendars (Google Calendar, published holiday calendars, a sports schedule) | `_data/calendars.yml` |
 | Daily quote rotation | `_data/quotes.yml` |
 | Bible reading plan | `_data/bible-plan.yml` |
-| Top strip on Week/Month/Semester/To-Do: body/semester stats (what's tracked, units, goals, order) | `_data/stats/*.yml` — one file per stat |
+| Top strip on Week/Month/Semester/To-Do: body/semester stats (what's tracked, units, goals, order, which row) | `_data/stats/*.yml` — one file per stat |
 | Top strip on Business/Jobs: ETF watchlist (live-priced, auto-currency, 1D–10Y period buttons) | `_data/etfs.yml` |
 | Habit heatmaps (what's tracked) | `_data/habits.yml` |
 | Recurring ticket routes | `_data/tickets.yml` |
@@ -120,13 +121,23 @@ Most changes don't touch code at all:
 
 **Weekday→city weather map** lives in its own file, `_data/weather.yml` — separate from `weekly.yml` on purpose, since this is the setting people lose track of. `city` needs to be English/romanized for OpenWeatherMap's lookup; `city_kr` is an optional Korean display label. Add `saturday`/`sunday` entries there if you want weekend forecasts too — until you do, the weekend box just shows `—`, which is expected.
 
-**Business/Jobs checklists piggyback on the same `_data/checklists/` file-drop pattern as the To-Do view** — a checklist's `group:` field decides which view it renders in: `group: Business` goes to the Business view (good for milestone-style project tracking — put a target date in each item's `meta` field, e.g. `meta: "by Sep 30"`), `group: Jobs` goes to the Jobs view, and anything else (or no group) stays in To-Do.
+**Business/Jobs checklists piggyback on the same `_data/checklists/` file-drop pattern as the To-Do view** — a checklist's `group:` field decides which section it renders in: `group: Business` goes to the Business column of the (merged) Jobs view (good for milestone-style project tracking — put a target date in each item's `meta` field, e.g. `meta: "by Sep 30"`), `group: Jobs` goes to the Jobs column, and anything else (or no group) stays in To-Do. Business and Jobs used to be two separate nav tabs — they're now one "Jobs" view with two side-by-side columns (stacked on narrow/mobile screens), gold-accented for Jobs and teal-accented for Business, since neither had enough day-to-day content on its own to justify a full separate tab.
+
+**Semester view lecture checkboxes**: each lecture title has a checkbox beside it — checking it dims and strikes through the title, independently per course *and* per week (checking week 3's box doesn't touch week 4's). Needs the `lecture_prep` collection in `firestore.rules` — paste the current file into the Firebase console if you haven't since this was added, or the checkboxes will silently fail to save.
+
+**Top stats strip rows**: each stat in `_data/stats/*.yml` can set `row: <number>` (default `0`) *within* its `placement` (`body` or `semester`) — items sharing a row number render on the same line together, higher numbers wrap onto a new line below. So splitting the semester-stats row into two just means giving half those files `row: 1` (or leaving the other half at the default `0`) — no literal line-break markup needed.
+
+**Imported .ics calendars** (`_data/calendars.yml`) merge into the Month view as small colored dots (hover for the title) — both on the main 6-week grid's day cells (alongside the existing flags) and on a new "Looking ahead" strip of 3 mini months below it, which also pulls in `holidays.yml` and `personal-events.yml` as dots so it's a genuine glance-ahead view, not just the imported feeds. RRULE recurrence is expanded for the simple, common cases (weekly/daily, same weekday as the start date) — see the comments in `calendars.yml` and `lib/ics.ts` for exactly what's and isn't supported, and for how to get a Google Calendar's secret .ics address. There's no automatic override between an imported event and a `personal-events.yml` entry on the same date yet — both just render; say so if you actually hit a case where you need one to suppress the other.
+
+**Week view day headers now show a dimmed weather-condition image as their background** (the same `public/images/weather/*.jpg` set the sidebar's weather hero already uses) — populate that folder (see its own README) and it applies automatically; missing images just leave the plain header background, no broken-image icon.
 
 **Checklist items support a `later: true` flag** — dims that item to 50% opacity (hover brings it back to full brightness) without hiding it, for things that are on the list but not worth your attention yet, like a grade-turn-in reminder sitting there since week 1. It's still there, still checkable, just visually out of the way until it's actually relevant. See the school checklists' `later: true` on "Grade turn-in" for an example.
 
 **Multi-day events** (`_data/personal-events.yml`, set `end_date`) render as one spanning bar in the Month view, colored by the event's `type` (same palette as the single-day flags). A trip that crosses a week boundary (Saturday into the next Sunday, say) automatically becomes two bars, one per row — that's the Month view's normal weekly-row layout, not a bug to work around.
 
 **Recurring ticket routes** (`_data/tickets.yml`) are sorted soonest-first within each window bucket. Add `start_date: "YYYY-MM-DD"` to a route that shouldn't show up yet (a route that only starts once a new semester begins, say). Each occurrence gets a small × on hover to dismiss it without entering purchase details — for routes you just show up for rather than book (e.g. a route where reservations aren't possible and buses run every 20 minutes) — or fill in time/seat and Save once purchased. Either way it moves into a collapsed "Complete" section at the bottom of the drawer, out of the way until you want to check it.
+
+**Semester view lecture checkboxes** — each lecture title has a checkbox beside it for marking that week's prep/review done; checking it dims and strikes through the title (unchecking restores it). State is per course + per lecture date, so it's independent across weeks and courses, and persists across devices like everything else Firestore-backed. **This needs a rules redeploy**: it added a new `lecture_prep` collection to `firestore.rules` — paste the updated file into the Firebase console (Firestore Database → Rules) or the checkboxes will fail to save.
 
 **The top strip's content switches by view, not by a separate toggle**: Week/Month/Semester/To-Do show body/semester stats; Business/Jobs show the ETF row instead (same "hide" button, same persisted collapsed state either way — see `_data/etfs.yml`'s comments for a few suggested market-pulse tickers, like SPY/QQQ/VIX or a KRW=X exchange-rate card). The ETF row has **1D/1W/1M/1Y/5Y/10Y** buttons above it — Yahoo needs both a `range` and an `interval` per request, so each button maps to a sensible pair (e.g. 1M → daily closes over the past month, 1Y → weekly closes over the past year); the small text next to the buttons always says exactly which one is currently showing.
 
@@ -203,14 +214,15 @@ cache-bust needed beyond that hour.
 - **Weather hero images** — `public/images/weather/` ships empty; the hero
   falls back to a plain gradient until you upload images (see that folder's
   README for the exact filenames it looks for).
-- **Google Calendar ICS bridge** — intentionally skipped per `CLAUDE.md`;
-  `personal-events.yml` covers this for now.
-- **Business view dates** — `_data/business-deadlines.yml` was seeded from
-  general/commonly-known deadlines, not verified against your specific
+- **Google Calendar ICS bridge** — done, see `_data/calendars.yml` and the
+  "Imported .ics calendars" section above; `personal-events.yml` still
+  works exactly as before alongside it.
+- **Business deadline dates** — `_data/business-deadlines.yml` was seeded
+  from general/commonly-known deadlines, not verified against your specific
   사업자등록 type or personal situation. Confirm with your 세무사/accountant
   before relying on it, especially the KR VAT schedule and anything
   PFIC-related.
-- **Business view tax reminders are still a static list** (the milestone
+- **Business tax reminders are still a static list** (the milestone
   checklists next to them are real, checkable checklists now) — if you want
   filed/not-filed state or links to actual forms for the tax deadlines too,
   that's a bigger lift than this pass, say so.

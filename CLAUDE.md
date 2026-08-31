@@ -155,6 +155,42 @@ real ways worth knowing before assuming this file is current:
   Firestore-synced value for that key, which is exactly what undo is trying
   to clear. The whole overlay resets to `{}` on every fresh snapshot, since
   by then it's already reflected there.
+- **`lib/courses.ts`'s fetch revalidate is deliberately short (300s), not
+  the more typical 3600.** Next's fetch Data Cache persists *across
+  deployments* by URL — a `git push` to the lecture-file repo (or to this
+  one) does not by itself bust a cached fetch result for an unchanged URL.
+  A 1-hour window on actively-edited class content reads as "my edit didn't
+  save"; this is what that report actually was. If another fetch in this
+  codebase is for similarly live-edited content, the same reasoning
+  applies — long revalidate windows are for content that's genuinely
+  static (`universities.ts` at 86400s, holiday-calendar .ics feeds), not a
+  default to copy without thinking about it.
+- **`.sitenav`'s sticky positioning needed two separate cascade fights
+  resolved, not just `position: sticky`.** First, its containing block
+  matters as much as `position: sticky` itself: it used to be nested in
+  `.hero-band` (~195px tall), and a sticky element can't stay stuck past
+  its own containing block's bottom edge, so it detached and scrolled away
+  almost immediately — moving it to be a sibling of `.app` (both children
+  of `.waves-root`, which spans the full page) fixed that. Second, *two*
+  existing selectors — `.hero-band > *:not(...)` and `.waves-root >
+  *:not(canvas)` — set `position`/`z-index` on every one of their direct
+  children at higher specificity than a bare `.sitenav` rule, so either
+  would silently force it back to `position: relative` if not explicitly
+  excluded (`:not(.sitenav)`) or moved out of that parent entirely. Its
+  transparent-then-opaque scroll behavior (transparent over the hero photo,
+  solid blurred bar once scrolled past it) is plain CSS plus one
+  IntersectionObserver in `SiteNav.tsx` watching `#hero-sentinel` (the hero
+  band's bottom edge, with a `rootMargin` offset by the nav's own height) —
+  no scroll-position math, no throttling to get right by hand.
+- **`lib/ics.ts` is a deliberately small RFC5545 subset**, not a general
+  calendar library — plain VEVENTs parse fully; RRULE expansion only
+  covers FREQ=DAILY/WEEKLY with INTERVAL/COUNT/UNTIL, recurring on
+  DTSTART's own weekday. Anything with BYDAY or a monthly/yearly pattern
+  falls back to a single occurrence at DTSTART rather than guessing at
+  more complex recurrence math and risking a silently wrong expansion.
+  Imported events are windowed server-side in `lib/yaml.ts` (-31d to
+  +210d from today) before ever reaching the client, since an unbounded
+  weekly RRULE could otherwise expand to hundreds of dates per feed.
 - **Everyday operation is documented in `DEPLOY.md` and `README.md`**, not
   here — this file is for architecture/history, those two are for "how do I
   change X." If you're about to explain how to edit something, check there

@@ -26,8 +26,8 @@ routes:
 
   - id: mon-from-chungju
     weekday: monday
-    route: "무궁화 → 오송, Mon 17:44pm"
-    short: "Mon pm 오송 무궁화"
+    route: "ITX → 오송, Mon 17:44pm"
+    short: "Mon pm 오송 ITX"
     opens_before_days: 30
     urgent_within_days: 7
 
@@ -55,14 +55,14 @@ routes:
 
   # 목요일 THURSDAY
   - id: thur-to-cbnu
-    weekday: Thursday
+    weekday: thursday
     route: "덕진 → 청주, Thu 9:20am"
     short: "Thur am 청주 bus"
     opens_before_days: 30
     urgent_within_days: 7
 
   - id: thur-from-cbnu
-    weekday: Thursday
+    weekday: thursday
     route: "청주 → 전주, Thu 18:40"
     short: "Thur pm 전주 bus"
     opens_before_days: 30

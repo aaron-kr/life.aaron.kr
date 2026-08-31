@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import type { FullWeekday, HolidayEntry, PersonalEvent, University, Weekday } from '@/lib/types'
+import type { FullWeekday, HolidayEntry, ImportedEvent, PersonalEvent, University, Weekday } from '@/lib/types'
 import { addDays, rollingMonthGridStart, sameDate, todayLocal, ymd } from '@/lib/dates'
 
 const DOW_HEADS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -82,13 +82,92 @@ function computeSegments(events: PersonalEvent[], gridStart: Date): PillSegment[
   return segments
 }
 
+function groupByDate<T>(items: T[], dateOf: (item: T) => string): Map<string, T[]> {
+  const map = new Map<string, T[]>()
+  items.forEach((item) => {
+    const key = dateOf(item)
+    const list = map.get(key) ?? []
+    list.push(item)
+    map.set(key, list)
+  })
+  return map
+}
+
+interface DotInfo {
+  label: string
+  color: string
+}
+
+/** Every dot the ahead-strip can show, combined: holidays + personal-events
+ * (multi-day ones represented by their start date only — a tiny mini-month
+ * cell has no room for a spanning bar) + imported .ics events. The main
+ * 6-week grid doesn't use this — it already has its own flag/day-number
+ * treatment for holidays and personal events, and only needs the imported
+ * events layered in (see `importedByDate` below). */
+function buildAheadDots(holidays: HolidayEntry[], events: PersonalEvent[], importedEvents: ImportedEvent[]): Map<string, DotInfo[]> {
+  const map = new Map<string, DotInfo[]>()
+  const push = (date: string, info: DotInfo) => {
+    const list = map.get(date) ?? []
+    list.push(info)
+    map.set(date, list)
+  }
+  holidays.forEach((h) => push(h.date, { label: h.label, color: h.makeup ? 'var(--yellow)' : 'var(--red)' }))
+  events.forEach((e) => push(e.date, { label: e.label, color: PILL_COLOR[e.type] }))
+  importedEvents.forEach((e) => push(e.date, { label: `${e.calendarLabel}: ${e.label}`, color: `var(${e.color})` }))
+  return map
+}
+
+function MiniMonth({ monthDate, dotsByDate, today }: { monthDate: Date; dotsByDate: Map<string, DotInfo[]>; today: Date }) {
+  const year = monthDate.getFullYear()
+  const month = monthDate.getMonth()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const leadingBlanks = new Date(year, month, 1).getDay()
+  const cells: (Date | null)[] = [
+    ...Array.from({ length: leadingBlanks }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, i) => new Date(year, month, i + 1)),
+  ]
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  return (
+    <div className="mini-month">
+      <div className="mini-month-title">{monthDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}</div>
+      <div className="mini-month-grid">
+        {DOW_HEADS.map((d) => (
+          <div className="mini-dow" key={d}>
+            {d[0]}
+          </div>
+        ))}
+        {cells.map((date, i) => {
+          if (!date) return <div className="mini-cell empty" key={i} />
+          const key = ymd(date)
+          const dots = dotsByDate.get(key) ?? []
+          return (
+            <div className={`mini-cell${sameDate(date, today) ? ' today' : ''}`} key={i}>
+              <span className="mini-num">{date.getDate()}</span>
+              {dots.length > 0 && (
+                <span className="mini-dots" title={dots.map((d) => d.label).join(' · ')}>
+                  {dots.slice(0, 4).map((d, j) => (
+                    <span className="mini-dot" key={j} style={{ background: d.color }} />
+                  ))}
+                </span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function MonthView({
   holidays,
   events,
+  importedEvents,
   weekdayUniversities,
 }: {
   holidays: HolidayEntry[]
   events: PersonalEvent[]
+  importedEvents: ImportedEvent[]
   weekdayUniversities: Partial<Record<FullWeekday, University[]>>
 }) {
   const today = todayLocal()
@@ -105,6 +184,8 @@ export function MonthView({
       eventsByDate.set(e.date, list)
     })
   const segments = computeSegments(events, gridStart)
+  const importedByDate = groupByDate(importedEvents, (e) => e.date)
+  const aheadDots = buildAheadDots(holidays, events, importedEvents)
 
   const monthNames = new Set<string>()
   const cells = Array.from({ length: 42 }, (_, i) => {
@@ -149,6 +230,7 @@ export function MonthView({
             const inFocalMonth = date.getMonth() === currentMonth
             const holiday = holidayMap.get(key)
             const dayEvents = eventsByDate.get(key) ?? []
+            const dayImported = importedByDate.get(key) ?? []
             let numClass = 'mnum'
             if (dow === 0) numClass += ' sun'
             if (dow === 6) numClass += ' sat'
@@ -171,6 +253,13 @@ export function MonthView({
                     </span>
                   ))}
                 </div>
+                {dayImported.length > 0 && (
+                  <span className="mini-dots" title={dayImported.map((e) => `${e.calendarLabel}: ${e.label}`).join(' · ')}>
+                    {dayImported.slice(0, 6).map((e, j) => (
+                      <span className="mini-dot" key={j} style={{ background: `var(${e.color})` }} />
+                    ))}
+                  </span>
+                )}
               </div>
             )
           })}
@@ -209,11 +298,31 @@ export function MonthView({
             Multi-day (set end_date — pill color follows the event&apos;s type, same as the flags above)
           </div>
           <div className="lg-item">
+            <span className="mini-dot" style={{ background: 'var(--blue)' }} />
+            Imported calendar event (hover for title — see calendars.yml)
+          </div>
+          <div className="lg-item">
             <span style={{ color: 'var(--red)' }}>●</span>Sunday / holiday
           </div>
           <div className="lg-item">
             <span style={{ color: 'var(--yellow)' }}>●</span>Make-up day
           </div>
+        </div>
+      </div>
+
+      <div className="card ahead-strip">
+        <h3>
+          Looking ahead <span className="pill">calendars.yml + holidays.yml + personal-events.yml</span>
+        </h3>
+        <div className="ahead-strip-row">
+          {[2, 3, 4].map((offset) => (
+            <MiniMonth
+              key={offset}
+              monthDate={new Date(today.getFullYear(), today.getMonth() + offset, 1)}
+              dotsByDate={aheadDots}
+              today={today}
+            />
+          ))}
         </div>
       </div>
     </section>

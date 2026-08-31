@@ -45,14 +45,47 @@ button { font-family: inherit; }
 
 .app { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr auto; min-height: 100vh; max-width: 2200px; margin: 0 auto; }
 
-/* ===== HERO BAND (Sites nav -> header -> quote banner, optional bg image) ===== */
-.hero-band { grid-column: 1/-1; grid-row: 1; position: relative; }
+/* ===== HERO BAND (header -> quote banner, optional bg image) ===== */
+/* `padding-top` reserves room for the now-`fixed` `.sitenav` floating over
+   this box (see the SITE NAV block below) so its actual content (Header,
+   QuoteBanner) starts right below the nav instead of underneath it — the
+   background image layers still cover this padding too (their `inset: 0`
+   fills the padding box, padding included), so the photo stays visible in
+   that reserved strip rather than the padding creating a second gap.
+   `--sitenav-height` is set by SiteNav.tsx via ResizeObserver, since the
+   nav can grow taller when its links wrap to a second line on narrow
+   screens; the 40px fallback covers the instant before that JS runs. */
+.hero-band { grid-column: 1/-1; grid-row: 1; position: relative; padding-top: var(--sitenav-height, 40px); }
 .hero-band-bg { position: absolute; inset: 0; background-image: url('/images/hero/banner.jpg'); background-size: cover; background-position: center; opacity: .92; z-index: 0; }
 .hero-band-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,11,23,.5), rgba(10,11,23,.88) 75%, var(--bg) 100%); z-index: 0; }
 .hero-band > *:not(.hero-band-bg):not(.hero-band-overlay) { position: relative; z-index: 1; }
 
 /* ===== SITE NAV ===== */
-.sitenav { grid-column: 1/-1; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 7px 22px; background: #08091250; border-bottom: 1px solid var(--border-soft); font-family: var(--font-mono); font-size: 0.75rem; }
+/* `position: fixed`, not `sticky` — this needs to float OVER the hero image
+   from the very first pixel, not push it down. `sticky` still participates
+   in normal flow until it actually starts sticking, which reserved the
+   nav's own height as empty space *above* `.hero-band` (a sibling of
+   `.app` in Dashboard.tsx, not nested inside `.hero-band` itself — see the
+   comment there) — the hero image only fills `.hero-band`'s own box, so
+   that reserved strip above it had nothing behind it but the plain page
+   background, i.e. looked solid black instead of transparent-over-photo.
+   `position: fixed` removes it from flow entirely, so `.hero-band` now
+   starts at true y:0 and its image runs the full height including the
+   strip the nav floats over. `left`/`right: 0` replace the full width
+   `position: sticky` got for free from being a block-level flow element.
+   z-index 20 clears the header/quote banner (3) and the stats/ETF strip's
+   own sticky bar (12) so it stays on top of both as they scroll under it,
+   but stays below the mobile sidebar drawer + backdrop (24/26) and the
+   ticket drawer (40) so those overlays still take full priority when open.
+
+   Starts fully transparent — while it's still overlapping the hero photo,
+   the point is to see the image, not cover it. `SiteNav.tsx` watches
+   `#hero-sentinel` (the hero band's bottom edge) via IntersectionObserver
+   and adds `.scrolled` once that edge passes under the nav, at which point
+   there's arbitrary page content behind it instead of the photo and it
+   switches to a solid blurred bar so that content doesn't show through. */
+.sitenav { position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 7px 22px; background: transparent; border-bottom: 1px solid transparent; font-family: var(--font-mono); font-size: 0.75rem; transition: background-color .25s ease, border-color .25s ease, backdrop-filter .25s ease; }
+.sitenav.scrolled { background: rgba(8, 9, 18, .85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom-color: var(--border-soft); }
 .sitenav .snlabel { color: var(--text-faint); margin-right: 6px; text-transform: uppercase; letter-spacing: .06em; }
 .sitenav a { color: var(--text-dim); padding: 4px 10px; border-radius: 999px; border: 1px solid transparent; transition: .15s; }
 .sitenav a:hover { color: var(--text); border-color: var(--border); background: var(--panel-2); }
@@ -169,7 +202,17 @@ aside.sidebar.collapsed .hide-on-collapse { display: none; }
 .heat-wrap { display: flex; gap: 4px; align-items: flex-start; }
 .heat-daylabels { display: flex; flex-direction: column; gap: 2.5px; font-family: var(--font-mono); font-size: 0.5357rem; color: var(--text-faint); padding-top: 1px; }
 .heat-daylabels span { height: 11px; display: flex; align-items: center; }
-.habit-grid7 { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 11px); gap: 2.5px; flex: 1; }
+/* `flex: 1` lets this grow to fill the sidebar's width, but with no
+   explicit `grid-template-columns` its implicit (`auto`-sized) columns
+   default to `justify-content: normal`, which resolves to `stretch` when
+   there's leftover space — every extra pixel from a wider sidebar was
+   inflating each square's column instead of adding more weeks of history.
+   `justify-content: start` packs the columns at their natural size (11px +
+   gap) so growing the sidebar no longer distorts them; `WEEKS` in
+   HabitHeatmaps.tsx is the number to bump if you want more of the
+   reclaimed width spent on visible history instead of trailing blank
+   space. */
+.habit-grid7 { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 11px); justify-content: start; gap: 2.5px; flex: 1; }
 .habit-grid7 .sq { width: 11px; height: 11px; border-radius: 2px; background: var(--panel-2); cursor: pointer; }
 .habit-grid7 .sq.on { background: var(--sq-color, var(--green)); }
 .habit-grid7 .sq.today { outline: 1.5px solid var(--violet); outline-offset: .5px; }
@@ -303,6 +346,22 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .cl-item a.ti-route:hover { color: var(--violet); text-decoration: underline; }
 .todo-group { margin-bottom: 22px; }
 .todo-group-title { font-family: var(--font-mono); font-size: 0.7857rem; text-transform: uppercase; letter-spacing: .07em; color: var(--text-faint); margin-bottom: 12px; }
+.todo-group-title.accent-jobs { color: var(--gold); }
+.todo-group-title.accent-biz { color: var(--teal); }
+
+/* Jobs view: Jobs + Business side by side on wide screens (a colored left
+   border per column stands in for a header/divider, and keeps working
+   whichever direction the columns stack), one under the other once the
+   viewport's too narrow for two comfortably — same breakpoint the mobile
+   sidebar switches at. */
+.jobs-biz-split { display: flex; gap: 28px; align-items: flex-start; }
+.jobs-biz-col { flex: 1 1 0; min-width: 0; border-left: 3px solid var(--border); padding-left: 18px; }
+.jobs-biz-col.col-jobs { border-left-color: var(--gold-dim); }
+.jobs-biz-col.col-biz { border-left-color: var(--teal-dim); }
+@media (max-width: 860px) {
+  .jobs-biz-split { flex-direction: column; }
+  .jobs-biz-col { width: 100%; }
+}
 .checklist-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
 .checklist-card { position: relative; flex: 1 1 260px; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px 16px; min-width: 240px; }
 .cl-logo { position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; border-radius: 5px; background: var(--panel-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -415,6 +474,28 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .flag-ticket { background: var(--violet-dim); color: var(--violet); }
 .flag-event { background: var(--green-dim); color: var(--green); }
 
+/* Imported-calendar dots — used both as a supplemental layer on the main
+   month-grid's day cells (next to the existing flags) and as the *only*
+   per-day marker in the mini "ahead" months below, where there's no room
+   for text. Color comes from calendars.yml per feed; the label lives in
+   the native `title` tooltip rather than on-screen, on purpose — this is
+   meant to stay a quick glance, not compete with the flags for space. */
+.mini-dots { display: flex; gap: 2px; flex-wrap: wrap; margin-top: 4px; cursor: default; }
+.mini-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+
+/* ===== MONTH view: ahead strip (3 mini months, dots only) ===== */
+.ahead-strip { margin-top: 18px; }
+.ahead-strip-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.mini-month { flex: 1 1 260px; min-width: 220px; }
+.mini-month-title { font-family: var(--font-mono); font-size: 0.7143rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-faint); margin-bottom: 6px; }
+.mini-month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.mini-dow { background: var(--panel-2); text-align: center; font-family: var(--font-mono); font-size: 0.6071rem; color: var(--text-faint); padding: 3px 0; }
+.mini-cell { background: var(--panel); min-height: 34px; padding: 3px 4px; display: flex; flex-direction: column; align-items: flex-start; }
+.mini-cell.empty { background: #0e0f22; }
+.mini-cell.today { background: var(--violet-dim); }
+.mini-num { font-family: var(--font-mono); font-size: 0.6429rem; color: var(--text-dim); }
+.mini-cell.today .mini-num { color: var(--violet); font-weight: 600; }
+
 /* ===== SEMESTER view — weekday columns x week rows, no fixed height (page scrolls) ===== */
 .sem-wrap { overflow-x: auto; }
 .sem-grid3 { display: grid; grid-template-columns: 60px repeat(5, minmax(160px, 1fr)); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; min-width: 860px; }
@@ -425,14 +506,25 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 .sdh-course-link:hover, .sem-cell-course a:hover { text-decoration: underline; }
 .sdh-course img { border-radius: 3px; flex-shrink: 0; }
 .sdh-empty { font-size: 0.6786rem; color: var(--text-faint); }
-.sem-wk-cell { background: var(--panel-2); font-family: var(--font-mono); font-size: 0.6786rem; color: var(--text-faint); display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border-soft); padding: 4px 2px; }
+.sem-wk-cell { background: var(--panel-2); font-family: var(--font-mono); font-size: 0.6786rem; color: var(--text-faint); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border-soft); padding: 4px 2px; }
+.sem-wk-cell.collapsible { cursor: pointer; }
+.sem-wk-cell.collapsible:hover { background: var(--panel); }
+.swc-toggle { font-size: 0.6071rem; color: var(--text-faint); line-height: 1; }
 .swc-date { color: var(--text-faint); }
 .sem-day-cell { border-right: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); padding: 4px; display: flex; flex-direction: column; gap: 3px; }
-.sem-cell-course { border-left: 3px solid var(--border); background: var(--panel-2); border-radius: 4px; padding: 4px 6px; font-size: 0.6786rem; line-height: 1.3; color: var(--text); }
+.sem-cell-course { border-left: 3px solid var(--border); background: var(--panel-2); border-radius: 4px; padding: 4px 6px; font-size: 0.6786rem; line-height: 1.3; color: var(--text); display: flex; align-items: flex-start; gap: 5px; }
 .sem-cell-course.current { background: var(--violet-dim); }
 .sem-cell-course.past { opacity: .4; }
 .sem-cell-course.break-row { font-style: italic; color: var(--text-faint); }
 .sem-cell-course.exam-row { color: var(--gold); font-weight: 600; }
+.sem-cell-check { flex-shrink: 0; margin-top: 2px; accent-color: var(--panel-2); cursor: pointer; }
+.sem-cell-title { flex: 1; min-width: 0; }
+.sem-cell-course.prepped .sem-cell-title { opacity: .5; text-decoration: line-through; }
+/* A past week auto-collapses to one line per course (not hidden entirely)
+   — still enough to scan what happened that week at a glance, just without
+   the full multi-line detail. Click the week's own "wk N" cell to expand
+   it back; `.sem-wk-cell.collapsible` above is what makes that clickable. */
+.sem-cell-course.row-collapsed .sem-cell-title { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .sem-empty { font-family: var(--font-mono); font-size: 0.8214rem; color: var(--text-faint); padding: 40px 20px; text-align: center; line-height: 1.7; }
 
 /* ===== footer ===== */
@@ -442,7 +534,11 @@ main.content { grid-row: 2; padding: 0 24px 32px; overflow-x: auto; position: re
 
 /* ===== waves background (ported from courses.aaron.kr) ===== */
 .waves-root { position: relative; min-height: 100vh; }
-.waves-root > *:not(canvas) { position: relative; z-index: 1; }
+/* `.sitenav` excluded — same reason as the `.hero-band` rule used to need it
+   (see Dashboard.tsx): it manages its own `position`/`z-index` (sticky,
+   above everything else's stacking context) and this selector would
+   otherwise win the cascade on specificity and force it back to relative. */
+.waves-root > *:not(canvas):not(.sitenav) { position: relative; z-index: 1; }
 html.waves-off canvas.hero-waves { display: none; }
 canvas.hero-waves { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 100%; pointer-events: none; z-index: 0; display: block; opacity: .5; }
 

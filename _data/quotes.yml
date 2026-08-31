@@ -1,6 +1,8 @@
 # Daily quote/verse rotation for the banner under the header.
 # One is chosen deterministically by day-of-year so it's stable within a day.
 quotes:
+  - text: "The curse of discipline is that every day looks the same. The curse of indiscipline is that every year does."
+    ref: "Hemant Mohapatra"
   - text: "It is not the critic who counts... but who, while daring greatly, spends himself in a worthy cause."
     ref: "— T. Roosevelt"
   - text: "Whatever you do, work at it with all your heart, as working for the Lord."

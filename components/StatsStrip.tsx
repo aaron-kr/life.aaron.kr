@@ -90,6 +90,23 @@ function SemesterStripItem({ stat }: { stat: StatDeclaration }) {
   )
 }
 
+/** Buckets by `row` (default 0) and returns the buckets in ascending row
+ * order — each becomes its own line in the strip. Items keep whatever
+ * relative order they arrived in (already `order`-sorted by the time this
+ * runs), so `row` only ever controls *which line*, not position within it. */
+function groupByRow(items: StatDeclaration[]): StatDeclaration[][] {
+  const buckets = new Map<number, StatDeclaration[]>()
+  items.forEach((s) => {
+    const row = s.row ?? 0
+    const list = buckets.get(row) ?? []
+    list.push(s)
+    buckets.set(row, list)
+  })
+  return Array.from(buckets.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([, list]) => list)
+}
+
 type PeriodId = '1D' | '1W' | '1M' | '1Y' | '5Y' | '10Y'
 
 // Yahoo's chart endpoint wants a (range, interval) pair, not a single
@@ -191,9 +208,11 @@ export function StatsStrip({
     )
   }
 
-  const body = stats.filter((s) => s.placement === 'body')
-  const semester = stats.filter((s) => s.placement === 'semester')
-  if (body.length === 0 && semester.length === 0) return null
+  const bodyRows = groupByRow(stats.filter((s) => s.placement === 'body'))
+  const semesterRows = groupByRow(stats.filter((s) => s.placement === 'semester'))
+  if (bodyRows.length === 0 && semesterRows.length === 0) return null
+
+  let rowsRenderedSoFar = 0
 
   return (
     <div className="sticky-strip">
@@ -202,20 +221,26 @@ export function StatsStrip({
       </button>
       {!collapsed && (
         <>
-          {body.length > 0 && (
-            <div className="stat-strip-inner">
-              {body.map((s) => (
-                <BodyStripItem stat={s} key={s.id} />
-              ))}
-            </div>
-          )}
-          {semester.length > 0 && (
-            <div className="stat-strip-inner" style={{ marginTop: body.length ? 8 : 0 }}>
-              {semester.map((s) => (
-                <SemesterStripItem stat={s} key={s.id} />
-              ))}
-            </div>
-          )}
+          {bodyRows.map((row) => {
+            const marginTop = rowsRenderedSoFar++ > 0 ? 8 : 0
+            return (
+              <div className="stat-strip-inner" style={{ marginTop }} key={`body-${row[0].id}`}>
+                {row.map((s) => (
+                  <BodyStripItem stat={s} key={s.id} />
+                ))}
+              </div>
+            )
+          })}
+          {semesterRows.map((row) => {
+            const marginTop = rowsRenderedSoFar++ > 0 ? 8 : 0
+            return (
+              <div className="stat-strip-inner" style={{ marginTop }} key={`semester-${row[0].id}`}>
+                {row.map((s) => (
+                  <SemesterStripItem stat={s} key={s.id} />
+                ))}
+              </div>
+            )
+          })}
         </>
       )}
     </div>

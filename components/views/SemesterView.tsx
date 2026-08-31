@@ -1,7 +1,11 @@
-import { Fragment } from 'react'
+'use client'
+
+import { Fragment, useState } from 'react'
 import Image from 'next/image'
 import type { Course, CourseSource, University, Weekday } from '@/lib/types'
 import { addDays, todayLocal, ymd } from '@/lib/dates'
+import { useLecturePrep } from '@/lib/firestore-hooks'
+import { slugify } from '@/lib/slug'
 
 const WEEKDAY_COLS: Weekday[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
 
@@ -28,6 +32,11 @@ export function SemesterView({
   const sourcesWithWeekday = courseSources.filter((s) => s.weekday)
   const today = todayLocal()
   const todayYmd = ymd(today)
+  const { checkins: prepped, toggle: togglePrep } = useLecturePrep()
+  // Weeks that are over auto-collapse to a one-line-per-course glance —
+  // this set holds the ones manually re-expanded back to full detail.
+  // Current/future weeks never collapse, so they're never in here.
+  const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set())
 
   if (sourcesWithWeekday.length === 0) {
     return (
@@ -115,9 +124,26 @@ export function SemesterView({
 
             {rows.map((weekIdx) => {
               const rowMonday = addDays(startDate, weekIdx * 7)
+              const isPastWeek = weekIdx < todayWeekIdx
+              const isCollapsed = isPastWeek && !expandedWeeks.has(weekIdx)
+
+              function toggleWeek() {
+                setExpandedWeeks((prev) => {
+                  const next = new Set(prev)
+                  if (next.has(weekIdx)) next.delete(weekIdx)
+                  else next.add(weekIdx)
+                  return next
+                })
+              }
+
               return (
                 <Fragment key={weekIdx}>
-                  <div className="sem-wk-cell">
+                  <div
+                    className={`sem-wk-cell${isPastWeek ? ' collapsible' : ''}`}
+                    onClick={isPastWeek ? toggleWeek : undefined}
+                    title={isPastWeek ? (isCollapsed ? 'Click to expand this week' : 'Click to collapse this week') : undefined}
+                  >
+                    {isPastWeek && <span className="swc-toggle">{isCollapsed ? '▸' : '▾'}</span>}
                     <span>wk {weekIdx + 1}</span>
                     <span className="swc-date">{rowMonday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                   </div>
@@ -131,19 +157,39 @@ export function SemesterView({
                           if (!lecture) return null
                           const isPast = lecture.date < todayYmd
                           const isThisWeek = weekIdx === todayWeekIdx
+                          // `s.label`, not `s.url` — course URLs share one long
+                          // GitHub path prefix (same org/repo/branch/_data
+                          // folder for every course), and slugify() truncates
+                          // to 80 chars, so two different courses' URLs were
+                          // collapsing to the identical slug before the part
+                          // that actually differs (the filename) ever got
+                          // reached — any two courses meeting the same day
+                          // shared one prepId and toggled together. Labels are
+                          // short and already the human-distinguishing field.
+                          const prepId = `${slugify(s.label)}_${lecture.date}`
+                          const isPrepped = Boolean(prepped[prepId])
                           return (
                             <div
                               key={s.url ?? s.label}
-                              className={`sem-cell-course${isPast ? ' past' : ''}${isThisWeek ? ' current' : ''}${lecture.isBreak ? ' break-row' : ''}${lecture.isExam ? ' exam-row' : ''}`}
+                              className={`sem-cell-course${isPast ? ' past' : ''}${isThisWeek ? ' current' : ''}${lecture.isBreak ? ' break-row' : ''}${lecture.isExam ? ' exam-row' : ''}${isPrepped ? ' prepped' : ''}${isCollapsed ? ' row-collapsed' : ''}`}
                               style={{ borderLeftColor: s.color ? `var(${s.color})` : 'var(--border)' }}
                             >
-                              {s.site ? (
-                                <a href={s.site} target="_blank" rel="noopener noreferrer">
-                                  {lecture.title || '—'}
-                                </a>
-                              ) : (
-                                lecture.title || '—'
-                              )}
+                              <input
+                                type="checkbox"
+                                className="sem-cell-check"
+                                checked={isPrepped}
+                                onChange={(e) => togglePrep(prepId, e.target.checked)}
+                                title="Prepped / reviewed"
+                              />
+                              <span className="sem-cell-title">
+                                {s.site ? (
+                                  <a href={s.site} target="_blank" rel="noopener noreferrer">
+                                    {lecture.title || '—'}
+                                  </a>
+                                ) : (
+                                  lecture.title || '—'
+                                )}
+                              </span>
                             </div>
                           )
                         })}

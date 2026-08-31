@@ -89,11 +89,12 @@ Fonts: `Playfair Display` (headings/quotes), `IBM Plex Mono` (labels, data, time
 ## Status
 
 Real Next.js app, builds and lints clean, live in daily use — Firebase, real
-schedule/course data, and OpenWeatherMap are all configured. Six views (Week/
-Month/Semester/To-Do/Business/Jobs), the sidebar (weather hero, habits, goal
-accordions), and the top stats strip (body stats, semester stats, live ETF
-prices) are wired up end-to-end against real Firestore, weather, and Yahoo
-Finance data — not mock data. The active view **and** the stats strip's
+schedule/course data, and OpenWeatherMap are all configured. Five views (Week/
+Month/Semester/To-Do/Jobs — Jobs and Business used to be separate tabs, now
+one view with two side-by-side columns), the sidebar (weather hero, habits,
+goal accordions), and the top stats strip (body stats, semester stats, live
+ETF prices) are wired up end-to-end against real Firestore, weather, and
+Yahoo Finance data — not mock data. The active view **and** the stats strip's
 shown/hidden state persist across devices via Firestore (`settings/ui`).
 
 Known soft spots, not bugs exactly:

@@ -6,6 +6,7 @@ import type { DashboardTemplate, FullWeekday, University, WeekdayMapping } from 
 import { fmtHourLabel, minutesSinceMidnight, todayLocal, weekdayKey } from '@/lib/dates'
 import { getThisFullWeekDays } from '@/lib/weekDays'
 import { useWeather } from '@/lib/useWeather'
+import { weatherBackgroundUrl } from '@/lib/weatherImages'
 
 const SLOT_MIN = 30
 // px per 30-min slot. This is the ONLY place row height is defined — it drives
@@ -161,12 +162,32 @@ export function WeekView({
           {days.map((d) => {
             const schools = weekdayUniversities[d.weekday] ?? []
             const w = weather[d.dateYmd]
+            const isToday = d.weekday === todayKey
             return (
-              <div key={d.weekday} className={`gcell ghead${d.weekday === todayKey ? ' today' : ''}`}>
+              <div
+                key={d.weekday}
+                className={`gcell ghead${isToday ? ' today' : ''}`}
+                style={
+                  w?.iconCode
+                    ? {
+                        // `background-blend-mode: multiply` dims the photo
+                        // toward the cell's normal background color instead
+                        // of needing a separate overlay layer — a quick
+                        // glance at rain/cloud/sun art beats parsing a tiny
+                        // emoji against this color scheme, per the ask.
+                        backgroundImage: `url(${weatherBackgroundUrl(w.iconCode)})`,
+                        backgroundColor: `var(${isToday ? '--violet-dim' : '--panel-2'})`,
+                        backgroundBlendMode: 'multiply',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                      }
+                    : undefined
+                }
+              >
                 {d.label}
                 <span className="city-tag">
-                  {d.cityDisplay || '—'}
                   {w?.icon && <span title={w.condition ?? ''}>{w.icon}</span>}
+                  {d.cityDisplay || '—'}
                   {schools.map((uni) => (
                     <a key={uni.abbr} href={uni.url} target="_blank" rel="noopener noreferrer" title={`${uni.name} portal`}>
                       <Image src={uni.logo} alt={uni.name} width={13} height={13} unoptimized />

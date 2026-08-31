@@ -13,7 +13,6 @@ import { WeekView } from './views/WeekView'
 import { MonthView } from './views/MonthView'
 import { SemesterView } from './views/SemesterView'
 import { TodoView } from './views/TodoView'
-import { BusinessView } from './views/BusinessView'
 import { JobsView } from './views/JobsView'
 import { TicketDrawer } from './Checklist/TicketDrawer'
 import { Footer } from './Footer'
@@ -49,73 +48,85 @@ export function Dashboard({ data }: { data: DashboardData }) {
   )
 
   return (
-    <div className="app">
-      <div className="hero-band">
-        <div className="hero-band-bg" />
-        <div className="hero-band-overlay" />
-        <SiteNav />
-        <Header
-          view={view}
-          onViewChange={setView}
-          onDrawerOpen={() => setDrawerOpen(true)}
-          onHamburgerClick={() => setMobileSidebarOpen((o) => !o)}
-          tickets={data.tickets}
-          hometown={data.hometown}
-          logoUrl={data.branding.logoUrl}
+    <>
+      {/* Sibling of `.app`, not a child of `.hero-band` — `.hero-band` is
+          only ~195px tall (nav + header + quote banner), and a `position:
+          sticky` element can't stay stuck past its own containing block's
+          bottom edge. Living directly under `.waves-root` (which spans the
+          full page height) instead gives it room to stay pinned through the
+          whole scroll, not just the first ~195px of it. */}
+      <SiteNav />
+      <div className="app">
+        <div className="hero-band">
+          <div className="hero-band-bg" />
+          <div className="hero-band-overlay" />
+          <Header
+            view={view}
+            onViewChange={setView}
+            onDrawerOpen={() => setDrawerOpen(true)}
+            onHamburgerClick={() => setMobileSidebarOpen((o) => !o)}
+            tickets={data.tickets}
+            hometown={data.hometown}
+            logoUrl={data.branding.logoUrl}
+          />
+          <QuoteBanner quotes={data.quotes} biblePlan={data.biblePlan} />
+          {/* Marks the bottom edge of the hero image area — SiteNav watches
+              this to know when to switch from transparent (over the photo)
+              to its solid blurred background (over regular content). */}
+          <div id="hero-sentinel" />
+        </div>
+        <Sidebar
+          data={data}
+          weekdayUniversities={weekdayUniversities}
+          mobileOpen={mobileSidebarOpen}
+          onMobileClose={() => setMobileSidebarOpen(false)}
         />
-        <QuoteBanner quotes={data.quotes} biblePlan={data.biblePlan} />
+        <main className="content">
+          <StatsStrip
+            stats={data.stats}
+            etfs={data.etfs}
+            showEtfs={view === 'jobs'}
+            collapsed={statsCollapsed}
+            onToggleCollapsed={toggleStatsCollapsed}
+          />
+          {view === 'week' && (
+            <WeekView
+              template={data.template}
+              weatherCities={data.weatherCities}
+              weekdayUniversities={weekdayUniversities}
+              universities={data.universities}
+            />
+          )}
+          {view === 'month' && (
+            <MonthView
+              holidays={data.holidays}
+              events={data.events}
+              importedEvents={data.importedEvents}
+              weekdayUniversities={weekdayUniversities}
+            />
+          )}
+          {view === 'semester' && (
+            <SemesterView
+              courseSources={data.courseSources}
+              courses={data.courses}
+              semesterStart={data.semesterStart}
+              universities={data.universities}
+            />
+          )}
+          {view === 'todo' && <TodoView checklists={data.checklists} universities={data.universities} />}
+          {view === 'jobs' && (
+            <JobsView
+              jobs={data.jobs}
+              jobsChecklists={data.checklists.filter((c) => c.group === 'Jobs')}
+              businessDeadlines={data.businessDeadlines}
+              businessChecklists={data.checklists.filter((c) => c.group === 'Business')}
+              universities={data.universities}
+            />
+          )}
+        </main>
+        <Footer />
+        <TicketDrawer routes={data.tickets} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
       </div>
-      <Sidebar
-        data={data}
-        weekdayUniversities={weekdayUniversities}
-        mobileOpen={mobileSidebarOpen}
-        onMobileClose={() => setMobileSidebarOpen(false)}
-      />
-      <main className="content">
-        <StatsStrip
-          stats={data.stats}
-          etfs={data.etfs}
-          showEtfs={view === 'business' || view === 'jobs'}
-          collapsed={statsCollapsed}
-          onToggleCollapsed={toggleStatsCollapsed}
-        />
-        {view === 'week' && (
-          <WeekView
-            template={data.template}
-            weatherCities={data.weatherCities}
-            weekdayUniversities={weekdayUniversities}
-            universities={data.universities}
-          />
-        )}
-        {view === 'month' && (
-          <MonthView holidays={data.holidays} events={data.events} weekdayUniversities={weekdayUniversities} />
-        )}
-        {view === 'semester' && (
-          <SemesterView
-            courseSources={data.courseSources}
-            courses={data.courses}
-            semesterStart={data.semesterStart}
-            universities={data.universities}
-          />
-        )}
-        {view === 'todo' && <TodoView checklists={data.checklists} universities={data.universities} />}
-        {view === 'business' && (
-          <BusinessView
-            deadlines={data.businessDeadlines}
-            checklists={data.checklists.filter((c) => c.group === 'Business')}
-            universities={data.universities}
-          />
-        )}
-        {view === 'jobs' && (
-          <JobsView
-            jobs={data.jobs}
-            checklists={data.checklists.filter((c) => c.group === 'Jobs')}
-            universities={data.universities}
-          />
-        )}
-      </main>
-      <Footer />
-      <TicketDrawer routes={data.tickets} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
-    </div>
+    </>
   )
 }

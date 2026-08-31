@@ -1,0 +1,55 @@
+# External .ics calendar feeds, merged into the Month view (and the 3-month
+# "ahead" strip below it) alongside holidays.yml and personal-events.yml.
+# Each feed is fetched and parsed server-side — the raw .ics URL never
+# reaches the browser. Add/remove entries freely; an empty or missing
+# `url` just gets skipped.
+#
+# Support is intentionally a small subset of the .ics spec, not a full
+# calendar library (see lib/ics.ts): plain events work fully; RRULE
+# recurrence is expanded for the simple, common cases — FREQ=DAILY or
+# FREQ=WEEKLY, with INTERVAL/COUNT/UNTIL, recurring on DTSTART's own
+# weekday. More exotic rules (BYDAY lists, monthly/yearly patterns) fall
+# back to showing just the first occurrence rather than guessing wrong.
+#
+# For a Google Calendar of your own (e.g. teaching events you add on the
+# go from your phone): open the calendar's Settings, scroll to "Integrate
+# calendar", and copy "Secret address in iCal format" — NOT the public
+# one, the secret one, so it includes events on a calendar you haven't
+# made public. Treat that URL like a password (anyone with it can read
+# your calendar) — it's fine to keep here since this file isn't served to
+# the browser, just don't paste it somewhere public.
+#
+# personal-events.yml still works exactly as before and isn't replaced by
+# this — the two simply both render. There's no automatic override/dedupe
+# between an imported .ics event and a hand-written personal-events.yml
+# entry on the same date yet; if you need one to suppress the other, say
+# so and it can be added.
+calendars: 
+#  - id: teaching
+#    label: "Teaching (Google Cal)"
+#    color: "--gold"
+#    url: ""   # your Google Calendar "Secret address in iCal format"
+
+  - id: korea-soccer
+    label: "국가대표 축구"
+    color: "--red"
+    url: "https://pub.fotmob.com/prod/pub/api/v2/calendar/team/7804.ics"
+
+  - id: jeonbuk-fc
+    label: "전북 현대"
+    color: "--green"
+    url: "https://pub.fotmob.com/prod/pub/api/v2/calendar/team/46038.ics"   # find a published .ics feed for the club's schedule, or build one yourself
+#
+#  US and South Korea both publish their public holiday calendars on
+#  Google's own calendar servers — real, standing URLs, not something to
+#  verify per-project — uncomment if you'd rather see holidays flow
+#  through here too instead of (or in addition to) holidays.yml:
+  - id: us-holidays
+    label: "US Holidays"
+    color: "--blue"
+    url: "https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics"
+
+  - id: kr-holidays
+    label: "KR Holidays"
+    color: "--red"
+    url: "https://calendar.google.com/calendar/ical/en.south_korea%23holiday%40group.v.calendar.google.com/public/basic.ics"

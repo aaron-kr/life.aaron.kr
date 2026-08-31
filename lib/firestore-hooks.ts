@@ -72,6 +72,40 @@ export function useHabitCheckins(habitId: string) {
   return { checkins, toggle }
 }
 
+/** lecture_prep/{prepId} — { done }, prepId = `${slugify(courseKey)}_${lectureDate}`.
+ * One flat collection covering every course's every week (not a
+ * subcollection per course) so the Semester view can listen once instead of
+ * opening a listener per course — the number of courses changes across
+ * semesters, and hooks can't be called a variable number of times per
+ * render. Same optimistic-overlay pattern as `useTickets`: toggling updates
+ * `pending` immediately so the checkbox/strikethrough responds without
+ * waiting on the round-trip, and each fresh snapshot clears the overlay
+ * since it's already reflected there by then. */
+export function useLecturePrep() {
+  const { status } = useAuth()
+  const [state, setState] = useState<Record<string, boolean>>({})
+  const [pending, setPending] = useState<Record<string, boolean>>({})
+
+  useEffect(() => {
+    if (status !== 'signed-in') return
+    return onSnapshot(collection(db, 'lecture_prep'), (snap) => {
+      const map: Record<string, boolean> = {}
+      snap.docs.forEach((d) => {
+        map[d.id] = Boolean(d.data().done)
+      })
+      setState(map)
+      setPending({})
+    })
+  }, [status])
+
+  function toggle(prepId: string, done: boolean) {
+    setPending((p) => ({ ...p, [prepId]: done }))
+    setDoc(doc(db, 'lecture_prep', prepId), { done }).catch(() => {})
+  }
+
+  return { checkins: { ...state, ...pending }, toggle }
+}
+
 export interface ChecklistItemState {
   done: boolean
   removed: boolean

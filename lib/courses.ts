@@ -38,7 +38,11 @@ function resolveDate(dateStr: string | undefined, sourceUrl: string): string | n
 export async function fetchCourse(source: CourseSource): Promise<Course | null> {
   if (!source.url) return null
   try {
-    const res = await fetch(source.url, { next: { revalidate: 3600 } })
+    // Short revalidate window on purpose — this is actively-edited class
+    // content (syllabus tweaks, added lectures), and Next's fetch cache
+    // persists across deployments by URL, so a `git push` alone doesn't
+    // bust it. A full hour of staleness reads as "my edit didn't save."
+    const res = await fetch(source.url, { next: { revalidate: 300 } })
     if (!res.ok) return null
     const text = await res.text()
     const raw = yaml.load(text) as RawLectureEntry[]
