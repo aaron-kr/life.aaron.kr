@@ -1,4 +1,4 @@
 title: Grading
 items:
   - text: "Add grading"
-  - text: "repeatable"
+    meta: "repeatable"
