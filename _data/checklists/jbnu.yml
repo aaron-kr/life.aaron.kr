@@ -3,6 +3,7 @@ group: Schools
 order: 20
 university: jbnu
 items:
+  - text: "JBNU - Verify Info attendance Wk 1"
   - text: "개강 — Sep 1 (Tue)"
     meta: "first day of class"
     urgent: true

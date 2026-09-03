@@ -3,6 +3,8 @@ group: Schools
 order: 30
 university: wku
 items:
+  - text: "WKU - Verify MySQL install"
+    meta: "Doesn't work with 한글 computer names - update slides"
   - text: "개강 — Sep 2 (Wed)"
     meta: "first day of class"
     urgent: true

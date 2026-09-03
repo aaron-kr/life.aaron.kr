@@ -3,6 +3,10 @@ group: Schools
 order: 40
 university: cbnu
 items:
+  - text: "CBNU - Verify Research attendance Wk 1"
+  - text: "CBNU - Verify Software attendance Wk 1"
+  - text: "CBNU - Research Scientia video"
+    meta: "Create video to show students how to use the Scientia site & GitHub discussions for research"
   - text: "개강 — Sep 3 (Thu)"
     meta: "first day of class"
     urgent: true
